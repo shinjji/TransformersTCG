@@ -3717,9 +3717,9 @@ function renderGrid(filtered) {
         ${!((c.type || '').toLowerCase().includes('battle')) && c.back && c.qty > 0 ? `<img class="card-tile-img-back" src="${c.back}" alt="${displayName} back" loading="lazy">` : ''}
       </div>
       <div class="card-tile-info">
-        <div class="card-tile-name" data-tooltip="${displayName}">${displayName}</div>
+        <div class="card-tile-name" data-tooltip="${displayName}" title="${displayName}">${displayName}</div>
         <div class="card-tile-meta">
-          <span class="card-tile-set" data-tooltip="${c.set}">${c.set}</span>
+          <span class="card-tile-set" data-tooltip="${c.set}" title="${c.set}">${c.set}</span>
           <span class="card-tile-qty ${qClass}">${c.qty}×</span>
         </div>
       </div>
@@ -4176,9 +4176,9 @@ function renderCombinerPage() {
           : `<div class="card-tile-img-placeholder">${displayName}</div>`}
       </div>
       <div class="card-tile-info">
-        <div class="card-tile-name" data-tooltip="${displayName}">${displayName}</div>
+        <div class="card-tile-name" data-tooltip="${displayName}" title="${displayName}">${displayName}</div>
         <div class="card-tile-meta">
-          <span class="card-tile-set" data-tooltip="${c.set}">${c.set}</span>
+          <span class="card-tile-set" data-tooltip="${c.set}" title="${c.set}">${c.set}</span>
           <span class="card-tile-qty ${qClass}">${c.qty}×</span>
         </div>
       </div>
@@ -4228,36 +4228,46 @@ document.addEventListener('keydown', e => {
 const tooltip = document.getElementById('tile-tooltip');
 let tooltipTimeout;
 
-document.addEventListener('mouseover', e => {
-  const el = e.target.closest('[data-tooltip]');
-  if (!el) return;
-  clearTimeout(tooltipTimeout);
-  tooltipTimeout = setTimeout(() => {
-    tooltip.textContent = el.dataset.tooltip;
-    tooltip.classList.add('visible');
-  }, 300);
-});
+function showTooltipFor(el, x, y) {
+  tooltip.textContent = el.dataset.tooltip;
+  tooltip.style.left = (x + 12) + 'px';
+  tooltip.style.top = (y - 36) + 'px';
+  tooltip.classList.add('visible');
+}
 
-document.addEventListener('mousemove', e => {
-  if (tooltip.classList.contains('visible')) {
-    tooltip.style.left = (e.clientX + 12) + 'px';
-    tooltip.style.top = (e.clientY - 28) + 'px';
-    // Keep within viewport
-    const rect = tooltip.getBoundingClientRect();
-    if (rect.right > window.innerWidth - 8) {
-      tooltip.style.left = (e.clientX - rect.width - 12) + 'px';
-    }
-    if (rect.top < 8) {
-      tooltip.style.top = (e.clientY + 16) + 'px';
-    }
-  }
-});
-
-document.addEventListener('mouseout', e => {
-  const el = e.target.closest('[data-tooltip]');
-  if (!el) return;
+function hideTooltip() {
   clearTimeout(tooltipTimeout);
   tooltip.classList.remove('visible');
+}
+
+// Use mousemove on the document — fires continuously while cursor is held over element
+// Track which element we're currently over
+let lastTooltipEl = null;
+
+document.addEventListener('mousemove', e => {
+  const el = e.target.closest('[data-tooltip]');
+
+  // Update position if visible
+  if (tooltip.classList.contains('visible')) {
+    tooltip.style.left = (e.clientX + 12) + 'px';
+    tooltip.style.top = (e.clientY - 36) + 'px';
+    const rect = tooltip.getBoundingClientRect();
+    if (rect.right > window.innerWidth - 8) tooltip.style.left = (e.clientX - rect.width - 12) + 'px';
+    if (rect.top < 8) tooltip.style.top = (e.clientY + 16) + 'px';
+  }
+
+  if (el === lastTooltipEl) return; // same element, do nothing
+  
+  // Moved to a different element
+  hideTooltip();
+  lastTooltipEl = el;
+
+  if (!el) return;
+
+  // Start timer for new element
+  tooltipTimeout = setTimeout(() => {
+    showTooltipFor(el, e.clientX, e.clientY);
+  }, 600);
 });
 </script>
 </body>
