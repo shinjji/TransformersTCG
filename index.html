@@ -2217,6 +2217,20 @@
       </div>
     </div>
 
+    <!-- Recently updated -->
+    <div class="panel" style="margin-top:1.5rem;">
+      <div class="panel-corner tl"></div><div class="panel-corner tr"></div>
+      <div class="panel-corner bl"></div><div class="panel-corner br"></div>
+      <div class="panel-body">
+        <div class="section-header" style="margin-bottom:1rem;">
+          <span class="section-title">⟳ Recently Updated</span>
+          <div class="section-line"></div>
+          <button class="sync-btn" style="flex-shrink:0;" onclick="syncFromSheet()">↻ SYNC SHEET</button>
+        </div>
+        <div id="stats-recent"></div>
+      </div>
+    </div>
+
   </div>
 
   <!-- ===== SETTINGS PAGE ===== -->
@@ -2301,6 +2315,10 @@
               <div class="form-group">
                 <label class="form-label">Combiner</label>
                 <input type="number" class="form-input" id="col-combiner" value="8" min="1">
+              </div>
+              <div class="form-group">
+                <label class="form-label">Updated At</label>
+                <input type="number" class="form-input" id="col-updated-at" value="9" min="1">
               </div>
             </div>
           </div>
@@ -2499,7 +2517,7 @@ function loadConfig() {
       // Column mapping
       if (config.cols) {
         Object.keys(config.cols).forEach(k => {
-          const el = document.getElementById('col-' + k);
+          const el = document.getElementById('col-' + k.replace(/([A-Z])/g, '-$1').toLowerCase());
           if (el) el.value = config.cols[k];
         });
       }
@@ -2535,6 +2553,7 @@ function saveConfig() {
       name: parseInt(document.getElementById('col-name').value) || 6,
       qty: parseInt(document.getElementById('col-qty').value) || 7,
       combiner: parseInt(document.getElementById('col-combiner').value) || 8,
+      updatedAt: parseInt(document.getElementById('col-updated-at').value) || 9,
     }
   };
   localStorage.setItem('tcg_config', JSON.stringify(config));
@@ -2631,6 +2650,65 @@ function renderStats() {
     : '';
 
   container.innerHTML = renderSetRows(waveSets) + divider + renderSetRows(otherSets);
+
+  // ===== RECENTLY UPDATED =====
+  const recentContainer = document.getElementById('stats-recent');
+  const withDates = cards
+    .filter(c => c.updatedAt)
+    .sort((a, b) => {
+      // Parse DD/MM/YYYY, HH:MM:SS format
+      const parse = s => {
+        const [datePart, timePart] = s.split(', ');
+        if (!datePart) return 0;
+        const [d, m, y] = datePart.split('/');
+        return new Date(`${y}-${m}-${d}T${timePart || '00:00:00'}`).getTime();
+      };
+      return parse(b.updatedAt) - parse(a.updatedAt);
+    })
+    .slice(0, 10);
+
+  if (!withDates.length) {
+    recentContainer.innerHTML = `<div style="text-align:center;padding:1.5rem;color:var(--chrome);opacity:0.5;font-size:0.8rem;letter-spacing:0.1em;">No updates recorded yet — save a card quantity to start tracking</div>`;
+  } else {
+    recentContainer.innerHTML = `
+      <div class="collection-list-wrap">
+        <table class="collection-list">
+          <thead>
+            <tr>
+              <th class="list-thumb-cell"></th>
+              <th>NAME</th>
+              <th>SET</th>
+              <th>TYPE</th>
+              <th>NO.</th>
+              <th>COMBINER</th>
+              <th style="text-align:center;">QTY</th>
+              <th style="text-align:right;">UPDATED</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${withDates.map(c => {
+              const idx = cards.indexOf(c);
+              const missing = !c.qty || c.qty < 1;
+              return `<tr onclick="openCardModal(${idx})">
+                <td class="list-thumb-cell">
+                  ${c.front
+                    ? `<img class="list-thumb ${missing ? 'card-img-unowned' : ''}" src="${c.front}" alt="${c.name}" loading="lazy" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                       <div class="list-thumb-ph" style="display:none;">?</div>`
+                    : `<div class="list-thumb-ph">?</div>`}
+                </td>
+                <td class="list-name">${c.name}</td>
+                <td>${c.set || '—'}</td>
+                <td>${c.type || '—'}</td>
+                <td style="color:var(--chrome);font-size:0.8rem;">${c.number || '—'}</td>
+                <td>${c.combiner ? `<span class="list-combiner-yes">${c.combiner}</span>` : '<span style="color:var(--chrome);opacity:0.4;">—</span>'}</td>
+                <td class="list-qty ${missing ? 'list-qty-zero' : qtyClass(c)}">${c.qty}</td>
+                <td style="text-align:right;white-space:nowrap;font-size:0.7rem;color:var(--chrome);padding-right:1rem;">${c.updatedAt}</td>
+              </tr>`;
+            }).join('')}
+          </tbody>
+        </table>
+      </div>`;
+  }
 }
 
 // ===== BURGER MENU =====
@@ -2673,7 +2751,7 @@ function showPage(name) {
 // ===== GOOGLE SHEETS API =====
 function getColIndex(key) {
   return (config.cols && config.cols[key]) ? config.cols[key] - 1 : {
-    front:0, back:1, set:2, type:3, number:4, name:5, qty:6, combiner:7
+    front:0, back:1, set:2, type:3, number:4, name:5, qty:6, combiner:7, updatedAt:8
   }[key];
 }
 
@@ -2701,7 +2779,8 @@ function rowToCard(row, rowIndex) {
     number: row[getColIndex('number')] || '',
     name: row[getColIndex('name')] || '',
     qty: parseInt(row[getColIndex('qty')]) || 0,
-    combiner: row[getColIndex('combiner')] || ''
+    combiner: row[getColIndex('combiner')] || '',
+    updatedAt: row[getColIndex('updatedAt')] || ''
   };
 }
 
@@ -2862,8 +2941,10 @@ async function writeRowToSheet(card) {
   const token = await getAccessToken();
   const id = config.sheetId;
   const sheet = encodeURIComponent(config.sheetName || 'Sheet1');
-  const cols = config.cols || { front:1, back:2, set:3, type:4, number:5, name:6, qty:7, combiner:8 };
+  const cols = config.cols || { front:1, back:2, set:3, type:4, number:5, name:6, qty:7, combiner:8, updatedAt:9 };
   const maxCol = Math.max(...Object.values(cols));
+
+  const now = new Date().toLocaleString('en-GB', { day:'2-digit', month:'2-digit', year:'numeric', hour:'2-digit', minute:'2-digit', second:'2-digit' });
 
   // Build row array — strip proxy so raw Drive URLs go back to the sheet
   const row = new Array(maxCol).fill('');
@@ -2875,6 +2956,7 @@ async function writeRowToSheet(card) {
   row[cols.name - 1] = card.name || '';
   row[cols.qty - 1] = card.qty !== undefined ? card.qty : 1;
   row[cols.combiner - 1] = card.combiner || '';
+  if (cols.updatedAt) row[cols.updatedAt - 1] = now;
 
   const url = `https://sheets.googleapis.com/v4/spreadsheets/${id}/values/${sheet}:append?valueInputOption=USER_ENTERED&insertDataOption=INSERT_ROWS`;
   const resp = await fetch(url, {
@@ -2889,13 +2971,15 @@ async function writeRowToSheet(card) {
   return await resp.json();
 }
 
-async function updateRowInSheet(card) {
+async function updateRowInSheet(card, stampTime = false) {
   if (!card.rowIndex) throw new Error('No row index for this card');
   const token = await getAccessToken();
   const id = config.sheetId;
   const sheet = config.sheetName || 'Sheet1';
-  const cols = config.cols || { front:1, back:2, set:3, type:4, number:5, name:6, qty:7, combiner:8 };
+  const cols = config.cols || { front:1, back:2, set:3, type:4, number:5, name:6, qty:7, combiner:8, updatedAt:9 };
   const maxCol = Math.max(...Object.values(cols));
+
+  const now = new Date().toLocaleString('en-GB', { day:'2-digit', month:'2-digit', year:'numeric', hour:'2-digit', minute:'2-digit', second:'2-digit' });
 
   const row = new Array(maxCol).fill('');
   row[cols.front - 1] = unproxyImg(card.front) || '';
@@ -2906,6 +2990,7 @@ async function updateRowInSheet(card) {
   row[cols.name - 1] = card.name || '';
   row[cols.qty - 1] = card.qty !== undefined ? card.qty : 0;
   row[cols.combiner - 1] = card.combiner || '';
+  if (cols.updatedAt) row[cols.updatedAt - 1] = stampTime ? now : (card.updatedAt || '');
 
   const colLetter = String.fromCharCode(64 + maxCol);
   const range = encodeURIComponent(`${sheet}!A${card.rowIndex}:${colLetter}${card.rowIndex}`);
@@ -3326,23 +3411,29 @@ function adjustQty(delta) {
 
 async function saveCardQty() {
   if (currentCardIndex === null) return;
+  const originalQty = cards[currentCardIndex].qty;
   const card = { ...cards[currentCardIndex], qty: modalQty };
   const btn = document.getElementById('modal-save-btn');
   btn.disabled = true;
   btn.textContent = '⚡ SAVING...';
 
   try {
-    await updateRowInSheet(card);
+    await updateRowInSheet(card, originalQty !== modalQty);
+    if (originalQty !== modalQty) {
+      card.updatedAt = new Date().toLocaleString('en-GB', { day:'2-digit', month:'2-digit', year:'numeric', hour:'2-digit', minute:'2-digit', second:'2-digit' });
+    }
     cards[currentCardIndex] = card;
     saveLocalCards();
     updateStats();
     renderCollection();
+    if (document.getElementById('page-stats').classList.contains('active')) renderStats();
     closeModal();
   } catch(e) {
     cards[currentCardIndex] = card;
     saveLocalCards();
     updateStats();
     renderCollection();
+    if (document.getElementById('page-stats').classList.contains('active')) renderStats();
     closeModal();
   }
 
