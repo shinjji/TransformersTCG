@@ -1225,6 +1225,123 @@
     gap: 0.75rem;
   }
 
+  /* ===== NEWEST ACQUISITION ===== */
+  .newest-card-wrap {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.75rem;
+  }
+
+  .newest-card-img-wrap {
+    position: relative;
+    flex-shrink: 0;
+  }
+
+  .newest-card-img {
+    width: auto;
+    height: 500px;
+    object-fit: cover;
+    display: block;
+    cursor: pointer;
+    position: relative;
+    z-index: 1;
+  }
+
+  /* Animated energon border */
+  .newest-card-border {
+    position: absolute;
+    inset: -8px;
+    z-index: 0;
+    background: linear-gradient(135deg, var(--autobot-red), var(--warning-yellow), var(--energon-blue), var(--autobot-red));
+    background-size: 300% 300%;
+    animation: borderFlow 3s ease infinite;
+  }
+
+  @keyframes borderFlow {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+  }
+
+  .newest-card-border-inner {
+    position: absolute;
+    inset: 6px;
+    background: var(--card-bg);
+    z-index: 0;
+  }
+
+  .newest-card-info { flex: 1; }
+
+  .newest-card-name {
+    font-family: 'Orbitron', monospace;
+    font-size: 1.4rem;
+    font-weight: 900;
+    color: var(--warning-yellow);
+    text-shadow: 0 0 20px rgba(245,197,24,0.5);
+    margin-bottom: 0.75rem;
+    line-height: 1.2;
+  }
+
+  .newest-acquired-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: linear-gradient(135deg, rgba(227,30,36,0.15), rgba(0,207,255,0.15));
+    border: 1px solid var(--energon-blue);
+    padding: 0.45rem 1.1rem;
+    font-family: 'Orbitron', monospace;
+    font-size: 0.85rem;
+    font-weight: 700;
+    letter-spacing: 0.2em;
+    color: var(--energon-blue);
+    text-transform: uppercase;
+    margin-bottom: 1rem;
+    box-shadow: 0 0 10px var(--glow-blue);
+  }
+
+  .newest-acquired-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #00e676;
+    box-shadow: 0 0 6px #00e676;
+    animation: blink 1.5s ease-in-out infinite;
+    flex-shrink: 0;
+  }
+
+  /* Blueprint side panels */
+  .newest-blueprint {
+    flex: 1;
+    min-width: 0;
+    align-self: stretch;
+    position: relative;
+    overflow: hidden;
+    opacity: 0.18;
+  }
+
+  .newest-blueprint svg {
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    inset: 0;
+  }
+
+  .newest-blueprint.right svg {
+    transform: scaleX(-1);
+  }
+
+  .newest-inner {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    width: 100%;
+  }
+
+  @media (max-width: 800px) {
+    .newest-blueprint { display: none; }
+  }
+
   /* ===== MODAL ===== */
   .modal-overlay {
     display: none;
@@ -2204,6 +2321,19 @@
       </div>
     </div>
 
+    <!-- Newest acquisition -->
+    <div class="panel" style="margin-bottom:1.5rem;" id="stats-newest-panel">
+      <div class="panel-corner tl"></div><div class="panel-corner tr"></div>
+      <div class="panel-corner bl"></div><div class="panel-corner br"></div>
+      <div class="panel-body">
+        <div class="section-header" style="margin-bottom:1rem;">
+          <span class="section-title">⚡ Latest Acquisition</span>
+          <div class="section-line"></div>
+        </div>
+        <div id="stats-newest"></div>
+      </div>
+    </div>
+
     <!-- Per-set breakdown -->
     <div class="panel">
       <div class="panel-corner tl"></div><div class="panel-corner tr"></div>
@@ -2225,7 +2355,7 @@
         <div class="section-header" style="margin-bottom:1rem;">
           <span class="section-title">⟳ Recently Updated</span>
           <div class="section-line"></div>
-          <button class="sync-btn" style="flex-shrink:0;" onclick="syncFromSheet()">↻ SYNC SHEET</button>
+          <button class="sync-btn" id="stats-sync-btn" style="flex-shrink:0;" onclick="syncFromSheet()">↻ SYNC SHEET</button>
         </div>
         <div id="stats-recent"></div>
       </div>
@@ -2591,6 +2721,144 @@ function renderStats() {
   document.getElementById('stats-overall-label').textContent = `${owned} / ${total} cards owned`;
   document.getElementById('stats-overall-pct').textContent = pct + '%';
 
+  // ===== NEWEST ACQUISITION =====
+  const newestEl = document.getElementById('stats-newest');
+  const parseDate = s => {
+    if (!s) return 0;
+    const [datePart, timePart] = s.split(', ');
+    const [d, m, y] = (datePart || '').split('/');
+    return new Date(`${y}-${m}-${d}T${timePart || '00:00:00'}`).getTime();
+  };
+  const newest = cards
+    .filter(c => c.qty === 1 && c.updatedAt)
+    .sort((a, b) => parseDate(b.updatedAt) - parseDate(a.updatedAt))[0];
+
+  const newestPanel = document.getElementById('stats-newest-panel');
+  if (!newest) {
+    newestPanel.style.display = 'none';
+  } else {
+    newestPanel.style.display = 'block';
+    const idx = cards.indexOf(newest);
+    const acquiredDate = newest.updatedAt ? newest.updatedAt.split(',')[0] : '—';
+
+    const leftBlueprint = `<svg viewBox="0 0 200 600" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice">
+      <!-- Grid -->
+      ${[0,60,120,180,240,300,360,420,480,540,600].map(y => `<line x1="0" y1="${y}" x2="200" y2="${y}" stroke="var(--energon-blue)" stroke-width="0.4"/>`).join('')}
+      ${[0,40,80,120,160,200].map(x => `<line x1="${x}" y1="0" x2="${x}" y2="600" stroke="var(--energon-blue)" stroke-width="0.4"/>`).join('')}
+      <!-- Robot schematic — head -->
+      <rect x="60" y="30" width="80" height="60" fill="none" stroke="var(--energon-blue)" stroke-width="1.5"/>
+      <rect x="74" y="44" width="20" height="18" fill="none" stroke="var(--energon-blue)" stroke-width="1"/>
+      <rect x="106" y="44" width="20" height="18" fill="none" stroke="var(--energon-blue)" stroke-width="1"/>
+      <line x1="84" y1="53" x2="84" y2="53" stroke="var(--energon-blue)" stroke-width="4" stroke-linecap="round"/>
+      <line x1="116" y1="53" x2="116" y2="53" stroke="var(--energon-blue)" stroke-width="4" stroke-linecap="round"/>
+      <rect x="80" y="68" width="40" height="8" fill="none" stroke="var(--energon-blue)" stroke-width="1" rx="2"/>
+      <!-- Neck -->
+      <line x1="100" y1="90" x2="100" y2="115" stroke="var(--energon-blue)" stroke-width="2"/>
+      <line x1="88" y1="105" x2="112" y2="105" stroke="var(--energon-blue)" stroke-width="1"/>
+      <!-- Torso -->
+      <rect x="50" y="115" width="100" height="90" fill="none" stroke="var(--energon-blue)" stroke-width="1.5"/>
+      <rect x="65" y="128" width="30" height="30" fill="none" stroke="var(--energon-blue)" stroke-width="1"/>
+      <rect x="105" y="128" width="30" height="30" fill="none" stroke="var(--energon-blue)" stroke-width="1"/>
+      <polygon points="80,172 100,162 120,172 120,190 100,200 80,190" fill="none" stroke="var(--energon-blue)" stroke-width="1"/>
+      <!-- Arms -->
+      <line x1="50" y1="125" x2="20" y2="140" stroke="var(--energon-blue)" stroke-width="1.5"/>
+      <rect x="5" y="140" width="18" height="50" fill="none" stroke="var(--energon-blue)" stroke-width="1"/>
+      <rect x="5" y="196" width="18" height="20" fill="none" stroke="var(--energon-blue)" stroke-width="1" rx="2"/>
+      <line x1="150" y1="125" x2="178" y2="140" stroke="var(--energon-blue)" stroke-width="1.5"/>
+      <rect x="177" y="140" width="18" height="50" fill="none" stroke="var(--energon-blue)" stroke-width="1"/>
+      <rect x="177" y="196" width="18" height="20" fill="none" stroke="var(--energon-blue)" stroke-width="1" rx="2"/>
+      <!-- Legs -->
+      <line x1="80" y1="205" x2="72" y2="260" stroke="var(--energon-blue)" stroke-width="1.5"/>
+      <line x1="120" y1="205" x2="128" y2="260" stroke="var(--energon-blue)" stroke-width="1.5"/>
+      <rect x="55" y="260" width="34" height="60" fill="none" stroke="var(--energon-blue)" stroke-width="1"/>
+      <rect x="111" y="260" width="34" height="60" fill="none" stroke="var(--energon-blue)" stroke-width="1"/>
+      <rect x="58" y="320" width="28" height="20" fill="none" stroke="var(--energon-blue)" stroke-width="1" rx="2"/>
+      <rect x="114" y="320" width="28" height="20" fill="none" stroke="var(--energon-blue)" stroke-width="1" rx="2"/>
+      <!-- Dimension lines -->
+      <line x1="18" y1="30" x2="18" y2="205" stroke="var(--energon-blue)" stroke-width="0.6" stroke-dasharray="3,3"/>
+      <line x1="13" y1="30" x2="23" y2="30" stroke="var(--energon-blue)" stroke-width="0.6"/>
+      <line x1="13" y1="205" x2="23" y2="205" stroke="var(--energon-blue)" stroke-width="0.6"/>
+      <!-- Corner marks -->
+      <path d="M0 15 L15 15 L15 0" fill="none" stroke="var(--energon-blue)" stroke-width="1.5"/>
+      <path d="M200 15 L185 15 L185 0" fill="none" stroke="var(--energon-blue)" stroke-width="1.5"/>
+      <path d="M0 585 L15 585 L15 600" fill="none" stroke="var(--energon-blue)" stroke-width="1.5"/>
+      <path d="M200 585 L185 585 L185 600" fill="none" stroke="var(--energon-blue)" stroke-width="1.5"/>
+      <!-- Callout labels -->
+      <line x1="140" y1="53" x2="170" y2="40" stroke="var(--energon-blue)" stroke-width="0.6"/>
+      <circle cx="170" cy="38" r="2" fill="var(--energon-blue)"/>
+      <line x1="60" y1="181" x2="30" y2="195" stroke="var(--energon-blue)" stroke-width="0.6"/>
+      <circle cx="28" cy="196" r="2" fill="var(--energon-blue)"/>
+    </svg>`;
+
+    const rightBlueprint = `<svg viewBox="0 0 200 600" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice">
+      <!-- Grid -->
+      ${[0,60,120,180,240,300,360,420,480,540,600].map(y => `<line x1="0" y1="${y}" x2="200" y2="${y}" stroke="var(--energon-blue)" stroke-width="0.4"/>`).join('')}
+      ${[0,40,80,120,160,200].map(x => `<line x1="${x}" y1="0" x2="${x}" y2="600" stroke="var(--energon-blue)" stroke-width="0.4"/>`).join('')}
+      <!-- Cybertronian city map top-down -->
+      <rect x="20" y="20" width="160" height="120" fill="none" stroke="var(--energon-blue)" stroke-width="1.5"/>
+      <rect x="35" y="35" width="50" height="40" fill="none" stroke="var(--energon-blue)" stroke-width="1"/>
+      <rect x="115" y="35" width="50" height="40" fill="none" stroke="var(--energon-blue)" stroke-width="1"/>
+      <rect x="70" y="90" width="60" height="35" fill="none" stroke="var(--energon-blue)" stroke-width="1"/>
+      <line x1="85" y1="75" x2="85" y2="90" stroke="var(--energon-blue)" stroke-width="1"/>
+      <line x1="115" y1="75" x2="115" y2="90" stroke="var(--energon-blue)" stroke-width="1"/>
+      <!-- Roads -->
+      <line x1="20" y1="75" x2="35" y2="75" stroke="var(--energon-blue)" stroke-width="2"/>
+      <line x1="165" y1="75" x2="180" y2="75" stroke="var(--energon-blue)" stroke-width="2"/>
+      <line x1="100" y1="20" x2="100" y2="35" stroke="var(--energon-blue)" stroke-width="2"/>
+      <line x1="100" y1="125" x2="100" y2="140" stroke="var(--energon-blue)" stroke-width="2"/>
+      <!-- Circuit board section -->
+      <path d="M10 180 L40 180 L40 160 L80 160 L80 200 L130 200 L130 165 L190 165" fill="none" stroke="var(--energon-blue)" stroke-width="1.2" stroke-dasharray="5,2"/>
+      <path d="M10 220 L60 220 L60 240 L100 240 L100 210 L150 210 L150 230 L190 230" fill="none" stroke="var(--energon-blue)" stroke-width="1.2" stroke-dasharray="5,2"/>
+      <circle cx="40" cy="180" r="3" fill="var(--energon-blue)"/>
+      <circle cx="80" cy="180" r="3" fill="none" stroke="var(--energon-blue)" stroke-width="1"/>
+      <circle cx="130" cy="200" r="3" fill="var(--energon-blue)"/>
+      <circle cx="60" cy="220" r="3" fill="none" stroke="var(--energon-blue)" stroke-width="1"/>
+      <circle cx="100" cy="240" r="3" fill="var(--energon-blue)"/>
+      <circle cx="150" cy="210" r="3" fill="none" stroke="var(--energon-blue)" stroke-width="1"/>
+      <!-- Energon crystal structure -->
+      <polygon points="100,290 120,310 115,335 85,335 80,310" fill="none" stroke="var(--energon-blue)" stroke-width="1.5"/>
+      <polygon points="100,300 114,316 110,330 90,330 86,316" fill="none" stroke="var(--energon-blue)" stroke-width="0.75" opacity="0.5"/>
+      <line x1="100" y1="270" x2="100" y2="290" stroke="var(--energon-blue)" stroke-width="1"/>
+      <line x1="100" y1="335" x2="100" y2="355" stroke="var(--energon-blue)" stroke-width="1"/>
+      <line x1="75" y1="312" x2="55" y2="312" stroke="var(--energon-blue)" stroke-width="1"/>
+      <line x1="125" y1="312" x2="145" y2="312" stroke="var(--energon-blue)" stroke-width="1"/>
+      <!-- Targeting reticle -->
+      <circle cx="100" cy="430" r="40" fill="none" stroke="var(--energon-blue)" stroke-width="1"/>
+      <circle cx="100" cy="430" r="25" fill="none" stroke="var(--energon-blue)" stroke-width="0.75"/>
+      <circle cx="100" cy="430" r="5" fill="none" stroke="var(--energon-blue)" stroke-width="1"/>
+      <circle cx="100" cy="430" r="2" fill="var(--energon-blue)"/>
+      <line x1="55" y1="430" x2="70" y2="430" stroke="var(--energon-blue)" stroke-width="1"/>
+      <line x1="130" y1="430" x2="145" y2="430" stroke="var(--energon-blue)" stroke-width="1"/>
+      <line x1="100" y1="385" x2="100" y2="400" stroke="var(--energon-blue)" stroke-width="1"/>
+      <line x1="100" y1="460" x2="100" y2="475" stroke="var(--energon-blue)" stroke-width="1"/>
+      <!-- Waveform -->
+      <path d="M10 530 L30 530 L40 510 L50 550 L60 510 L70 550 L80 530 L190 530" fill="none" stroke="var(--energon-blue)" stroke-width="1.2"/>
+      <!-- Corner marks -->
+      <path d="M0 15 L15 15 L15 0" fill="none" stroke="var(--energon-blue)" stroke-width="1.5"/>
+      <path d="M200 15 L185 15 L185 0" fill="none" stroke="var(--energon-blue)" stroke-width="1.5"/>
+      <path d="M0 585 L15 585 L15 600" fill="none" stroke="var(--energon-blue)" stroke-width="1.5"/>
+      <path d="M200 585 L185 585 L185 600" fill="none" stroke="var(--energon-blue)" stroke-width="1.5"/>
+    </svg>`;
+
+    newestEl.innerHTML = `
+      <div class="newest-card-wrap">
+        <div class="newest-acquired-badge">
+          <span class="newest-acquired-dot"></span> ACQUIRED ${acquiredDate}
+        </div>
+        <div class="newest-inner">
+          <div class="newest-blueprint left">${leftBlueprint}</div>
+          <div class="newest-card-img-wrap" onclick="openCardModal(${idx})" style="cursor:pointer;">
+            <div class="newest-card-border"></div>
+            <div class="newest-card-border-inner"></div>
+            ${newest.front
+              ? `<img class="newest-card-img" src="${newest.front}" alt="${newest.name}" onerror="this.style.display='none'">`
+              : `<div class="newest-card-img" style="background:var(--steel);display:flex;align-items:center;justify-content:center;color:var(--chrome);font-size:0.7rem;letter-spacing:0.1em;width:357px;">NO IMAGE</div>`}
+          </div>
+          <div class="newest-blueprint right">${rightBlueprint}</div>
+        </div>
+      </div>`;
+  }
+
   // Per-set breakdown
   const sets = [...new Set(cards.map(c => c.set).filter(Boolean))].sort();
   const container = document.getElementById('stats-by-set');
@@ -2851,7 +3119,7 @@ async function syncFromSheet() {
     showPage('settings');
     return;
   }
-  const btns = ['coll-sync-btn', 'cfg-sync-btn'].map(id => document.getElementById(id)).filter(Boolean);
+  const btns = ['coll-sync-btn', 'cfg-sync-btn', 'stats-sync-btn'].map(id => document.getElementById(id)).filter(Boolean);
   btns.forEach(b => { b.disabled = true; b.textContent = '⟳ SYNCING...'; });
   try {
     const [fetched, artMap] = await Promise.all([fetchSheetData(), fetchCombinerArt()]);
@@ -3201,6 +3469,14 @@ function resetCollectionFilters() {
   document.getElementById('coll-filter-type').value = '';
   document.getElementById('coll-filter-owned').value = '';
   document.getElementById('coll-sort').value = 'set';
+  // Reset list sort state
+  listSortKey = 'set';
+  listSortAsc = true;
+  document.querySelectorAll('.collection-list th').forEach(th => {
+    th.classList.remove('sorted');
+    const arrow = th.querySelector('.sort-arrow');
+    if (arrow) arrow.textContent = '↕';
+  });
   renderCollection();
 }
 
