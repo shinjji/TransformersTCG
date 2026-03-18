@@ -859,6 +859,82 @@
     opacity: 0.6;
   }
 
+  /* ===== KEYWORD FILTER ROW ===== */
+  .keyword-filters {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    margin-bottom: 1rem;
+    padding: 0.75rem 1rem;
+    background: var(--steel);
+    border: 1px solid var(--steel-mid);
+    border-left: 3px solid var(--energon-blue);
+  }
+
+  .keyword-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+    min-width: 0;
+  }
+
+  .keyword-group-label {
+    font-family: 'Orbitron', monospace;
+    font-size: 0.5rem;
+    font-weight: 700;
+    letter-spacing: 0.2em;
+    color: var(--energon-blue);
+    text-transform: uppercase;
+    margin-bottom: 0.2rem;
+  }
+
+  .keyword-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.35rem;
+  }
+
+  .keyword-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    padding: 0.2rem 0.55rem;
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    cursor: pointer;
+    border: 1px solid var(--steel-mid);
+    background: var(--card-bg);
+    color: var(--chrome);
+    transition: all 0.15s;
+    user-select: none;
+    line-height: 1.4;
+  }
+
+  .keyword-chip:hover {
+    border-color: var(--chrome);
+    color: var(--chrome-bright);
+  }
+
+  .keyword-chip.active {
+    border-color: var(--energon-blue);
+    background: rgba(0,207,255,0.12);
+    color: var(--energon-blue);
+    box-shadow: 0 0 6px var(--glow-blue);
+  }
+
+  .keyword-chip input[type="checkbox"] {
+    display: none;
+  }
+
+  .keyword-group-divider {
+    width: 1px;
+    background: var(--steel-mid);
+    align-self: stretch;
+    margin: 0 0.25rem;
+  }
+
   /* ===== COMBINERS PAGE ===== */
   .combiners-controls {
     display: flex;
@@ -2186,6 +2262,31 @@
       <button class="sync-btn" id="coll-sync-btn" onclick="syncFromSheet()">↻ SYNC SHEET</button>
     </div>
 
+    <!-- Keyword filter row -->
+    <div id="keyword-filters-wrap" style="display:none; margin-bottom:1rem;">
+      <button onclick="toggleKeywordPanel()" id="kw-toggle-btn" style="background:var(--steel);border:1px solid var(--steel-mid);border-left:3px solid var(--energon-blue);color:var(--chrome);font-family:'Orbitron',monospace;font-size:0.6rem;font-weight:700;letter-spacing:0.15em;padding:0.5rem 1rem;cursor:pointer;width:100%;text-align:left;display:flex;align-items:center;gap:0.5rem;transition:all 0.2s;">
+        <span id="kw-toggle-arrow" style="color:var(--energon-blue);font-size:0.8rem;">▶</span>
+        ⬡ KEYWORD FILTERS
+        <span id="kw-active-count" style="color:var(--warning-yellow);margin-left:auto;display:none;"></span>
+      </button>
+      <div class="keyword-filters" id="keyword-filters" style="display:none;">
+        <div class="keyword-group" id="kw-group-keywords">
+          <div class="keyword-group-label">⬡ Keywords</div>
+          <div class="keyword-chips" id="kw-chips-keywords"></div>
+        </div>
+        <div class="keyword-group-divider" id="kw-div-1"></div>
+        <div class="keyword-group" id="kw-group-charKeywords">
+          <div class="keyword-group-label">◈ Character</div>
+          <div class="keyword-chips" id="kw-chips-charKeywords"></div>
+        </div>
+        <div class="keyword-group-divider" id="kw-div-2"></div>
+        <div class="keyword-group" id="kw-group-faction">
+          <div class="keyword-group-label">⟁ Faction</div>
+          <div class="keyword-chips" id="kw-chips-faction"></div>
+        </div>
+      </div>
+    </div>
+
     <!-- Card grid view -->
     <div class="collection-grid" id="collection-grid">
       <div class="empty-state" style="grid-column:1/-1;">
@@ -2450,6 +2551,18 @@
                 <label class="form-label">Updated At</label>
                 <input type="number" class="form-input" id="col-updated-at" value="9" min="1">
               </div>
+              <div class="form-group">
+                <label class="form-label">Keywords</label>
+                <input type="number" class="form-input" id="col-keywords" value="10" min="1">
+              </div>
+              <div class="form-group">
+                <label class="form-label">Character Keywords</label>
+                <input type="number" class="form-input" id="col-char-keywords" value="11" min="1">
+              </div>
+              <div class="form-group">
+                <label class="form-label">Faction</label>
+                <input type="number" class="form-input" id="col-faction" value="12" min="1">
+              </div>
             </div>
           </div>
 
@@ -2609,13 +2722,14 @@
 <script>
 // ===== STATE =====
 let cards = [];
-let combinerArt = {}; // map of combiner name → proxied image URL
+let combinerArt = {};
 let config = {};
 let currentCardIndex = null;
 let modalQty = 0;
-let collectionView = 'grid'; // 'grid' or 'list'
+let collectionView = 'grid';
 let listSortKey = 'set';
 let listSortAsc = true;
+const activeKeywords = { keywords: new Set(), charKeywords: new Set(), faction: new Set() };
 
 const COLS = {
   front: 'col-front', back: 'col-back', set: 'col-set', type: 'col-type',
@@ -2684,6 +2798,9 @@ function saveConfig() {
       qty: parseInt(document.getElementById('col-qty').value) || 7,
       combiner: parseInt(document.getElementById('col-combiner').value) || 8,
       updatedAt: parseInt(document.getElementById('col-updated-at').value) || 9,
+      keywords: parseInt(document.getElementById('col-keywords').value) || 10,
+      charKeywords: parseInt(document.getElementById('col-char-keywords').value) || 11,
+      faction: parseInt(document.getElementById('col-faction').value) || 12,
     }
   };
   localStorage.setItem('tcg_config', JSON.stringify(config));
@@ -3019,7 +3136,8 @@ function showPage(name) {
 // ===== GOOGLE SHEETS API =====
 function getColIndex(key) {
   return (config.cols && config.cols[key]) ? config.cols[key] - 1 : {
-    front:0, back:1, set:2, type:3, number:4, name:5, qty:6, combiner:7, updatedAt:8
+    front:0, back:1, set:2, type:3, number:4, name:5, qty:6, combiner:7, updatedAt:8,
+    keywords:9, charKeywords:10, faction:11
   }[key];
 }
 
@@ -3048,7 +3166,10 @@ function rowToCard(row, rowIndex) {
     name: row[getColIndex('name')] || '',
     qty: parseInt(row[getColIndex('qty')]) || 0,
     combiner: row[getColIndex('combiner')] || '',
-    updatedAt: row[getColIndex('updatedAt')] || ''
+    updatedAt: row[getColIndex('updatedAt')] || '',
+    keywords: (row[getColIndex('keywords')] || '').split(',').map(s => s.trim()).filter(Boolean),
+    charKeywords: (row[getColIndex('charKeywords')] || '').split(',').map(s => s.trim()).filter(Boolean),
+    faction: (row[getColIndex('faction')] || '').split(',').map(s => s.trim()).filter(Boolean),
   };
 }
 
@@ -3477,6 +3598,12 @@ function resetCollectionFilters() {
     const arrow = th.querySelector('.sort-arrow');
     if (arrow) arrow.textContent = '↕';
   });
+  // Reset keyword filters
+  activeKeywords.keywords.clear();
+  activeKeywords.charKeywords.clear();
+  activeKeywords.faction.clear();
+  document.querySelectorAll('.keyword-chip.active').forEach(el => el.classList.remove('active'));
+  updateKeywordActiveCount();
   renderCollection();
 }
 
@@ -3558,7 +3685,10 @@ function renderCollection() {
     const matchSet = !setF || c.set === setF;
     const matchType = !typeF || c.type === typeF;
     const matchOwned = !ownedF || (ownedF === 'owned' ? c.qty > 0 : c.qty === 0);
-    return matchQ && matchSet && matchType && matchOwned;
+    const matchKeywords = activeKeywords.keywords.size === 0 || [...activeKeywords.keywords].every(kw => (c.keywords || []).includes(kw));
+    const matchCharKeywords = activeKeywords.charKeywords.size === 0 || [...activeKeywords.charKeywords].every(kw => (c.charKeywords || []).includes(kw));
+    const matchFaction = activeKeywords.faction.size === 0 || [...activeKeywords.faction].some(f => (c.faction || []).includes(f));
+    return matchQ && matchSet && matchType && matchOwned && matchKeywords && matchCharKeywords && matchFaction;
   });
 
   filtered.sort((a, b) => multiSort(a, b, sort, sortAsc));
@@ -3789,7 +3919,107 @@ function populateFilters() {
   });
 
   populateCombinerSelect();
+  populateKeywordFilters();
 }
+
+// ===== KEYWORD FILTERS =====
+function populateKeywordFilters() {
+  const groups = {
+    keywords: { field: 'keywords', containerId: 'kw-chips-keywords' },
+    charKeywords: { field: 'charKeywords', containerId: 'kw-chips-charKeywords' },
+    faction: { field: 'faction', containerId: 'kw-chips-faction' },
+  };
+
+  let anyValues = false;
+
+  Object.entries(groups).forEach(([key, { field, containerId }]) => {
+    const values = [...new Set(cards.flatMap(c => c[field] || []).filter(Boolean))].sort();
+    const container = document.getElementById(containerId);
+    if (!container) return;
+    if (values.length) anyValues = true;
+
+    container.innerHTML = values.map(v => {
+      const isActive = activeKeywords[key].has(v);
+      const safeV = v.replace(/'/g, '&#39;');
+      return `<button class="keyword-chip ${isActive ? 'active' : ''}" data-group="${key}" data-value="${safeV.replace(/"/g, '&quot;')}">${v}</button>`;
+    }).join('');
+
+    const group = document.getElementById(`kw-group-${key}`);
+    if (group) group.style.display = values.length ? '' : 'none';
+  });
+
+  const kw = document.getElementById('kw-group-keywords');
+  const ck = document.getElementById('kw-group-charKeywords');
+  const fa = document.getElementById('kw-group-faction');
+  const d1 = document.getElementById('kw-div-1');
+  const d2 = document.getElementById('kw-div-2');
+  if (d1) d1.style.display = (kw?.style.display !== 'none' && ck?.style.display !== 'none') ? '' : 'none';
+  if (d2) d2.style.display = (ck?.style.display !== 'none' && fa?.style.display !== 'none') ? '' : 'none';
+
+  const wrap = document.getElementById('keyword-filters-wrap');
+  if (wrap) wrap.style.display = anyValues ? 'block' : 'none';
+  updateKeywordActiveCount();
+}
+
+function toggleKeywordPanel() {
+  const panel = document.getElementById('keyword-filters');
+  const arrow = document.getElementById('kw-toggle-arrow');
+  const isOpen = panel.style.display !== 'none';
+  panel.style.display = isOpen ? 'none' : 'flex';
+  arrow.textContent = isOpen ? '▶' : '▼';
+}
+
+function updateKeywordActiveCount() {
+  const total = activeKeywords.keywords.size + activeKeywords.charKeywords.size + activeKeywords.faction.size;
+  const badge = document.getElementById('kw-active-count');
+  if (!badge) return;
+  if (total > 0) {
+    badge.textContent = `${total} active`;
+    badge.style.display = 'inline';
+  } else {
+    badge.style.display = 'none';
+  }
+}
+
+function toggleKeyword(group, value, el) {
+  if (activeKeywords[group].has(value)) {
+    activeKeywords[group].delete(value);
+    el.classList.remove('active');
+  } else {
+    activeKeywords[group].add(value);
+    el.classList.add('active');
+  }
+  updateKeywordActiveCount();
+  renderCollection();
+}
+
+// Delegated click handler for keyword chips
+document.addEventListener('click', e => {
+  const chip = e.target.closest('.keyword-chip');
+  if (!chip) return;
+  const group = chip.dataset.group;
+  const value = chip.dataset.value;
+  if (!group || value === undefined) return;
+
+  // Faction and charKeywords are single-select — clear others in group first
+  if (group === 'faction' || group === 'charKeywords') {
+    const alreadyActive = activeKeywords[group].has(value);
+    // Clear all chips in this group visually
+    chip.closest('.keyword-chips').querySelectorAll('.keyword-chip').forEach(c => c.classList.remove('active'));
+    activeKeywords[group].clear();
+    // If it wasn't already active, select it; otherwise leave cleared (acts as deselect)
+    if (!alreadyActive) {
+      activeKeywords[group].add(value);
+      chip.classList.add('active');
+    }
+  } else {
+    toggleKeyword(group, value, chip);
+    return;
+  }
+
+  updateKeywordActiveCount();
+  renderCollection();
+});
 
 // ===== STATS =====
 function updateStats() {
