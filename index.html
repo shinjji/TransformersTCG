@@ -1,0 +1,3665 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AUTOBOT ARCHIVE — Transformers TCG Collection</title>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg viewBox='0 0 100 100' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M50 5 L65 20 L80 15 L75 30 L90 40 L75 45 L80 65 L65 60 L50 75 L35 60 L20 65 L25 45 L10 40 L25 30 L20 15 L35 20 Z' fill='%23e31e24' opacity='0.9'/%3E%3Cpath d='M50 20 L60 30 L70 27 L67 38 L78 44 L67 48 L70 60 L60 57 L50 65 L40 57 L30 60 L33 48 L22 44 L33 38 L30 27 L40 30 Z' fill='%231a1f2e'/%3E%3Ccircle cx='50' cy='44' r='10' fill='%23e31e24' opacity='0.8'/%3E%3Cpath d='M50 34 L55 42 L50 48 L45 42 Z' fill='%23ff4444'/%3E%3Cpath d='M40 48 L50 42 L60 48' stroke='%23ff8888' stroke-width='2' fill='none'/%3E%3C/svg%3E">
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;400;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --autobot-red: #e31e24;
+    --decepticon-purple: #7b2d8b;
+    --energon-blue: #00cfff;
+    --steel: #1a1f2e;
+    --steel-light: #252b3b;
+    --steel-mid: #2f3650;
+    --chrome: #8fa0b8;
+    --chrome-bright: #c8d8e8;
+    --warning-yellow: #f5c518;
+    --dark-bg: #0d1117;
+    --card-bg: #161c2a;
+    --glow-blue: rgba(0,207,255,0.25);
+    --glow-red: rgba(227,30,36,0.3);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--dark-bg);
+    color: var(--chrome-bright);
+    font-family: 'Rajdhani', sans-serif;
+    font-weight: 400;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* Animated grid background */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(0,207,255,0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(0,207,255,0.03) 1px, transparent 1px);
+    background-size: 40px 40px;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  /* Scanline overlay */
+  body::after {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background: repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 2px,
+      rgba(0,0,0,0.08) 2px,
+      rgba(0,0,0,0.08) 4px
+    );
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  /* ===== HEADER ===== */
+  header {
+    position: relative;
+    z-index: 10;
+    background: linear-gradient(180deg, #0a0e18 0%, var(--steel) 100%);
+    border-bottom: 2px solid var(--energon-blue);
+    box-shadow: 0 0 30px var(--glow-blue), 0 4px 0 var(--autobot-red);
+    padding: 0 2rem;
+  }
+
+  .header-inner {
+    max-width: 1400px;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1rem 0;
+  }
+
+  .logo-area {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+  }
+
+  .autobot-symbol {
+    width: 52px;
+    height: 52px;
+    filter: drop-shadow(0 0 8px var(--autobot-red));
+    animation: pulse-logo 3s ease-in-out infinite;
+  }
+
+  @keyframes pulse-logo {
+    0%, 100% { filter: drop-shadow(0 0 8px var(--autobot-red)); }
+    50% { filter: drop-shadow(0 0 18px var(--autobot-red)) drop-shadow(0 0 30px rgba(227,30,36,0.4)); }
+  }
+
+  .logo-text {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .logo-title {
+    font-family: 'Orbitron', monospace;
+    font-weight: 900;
+    font-size: 1.5rem;
+    letter-spacing: 0.15em;
+    color: var(--energon-blue);
+    text-shadow: 0 0 20px var(--energon-blue), 0 0 40px rgba(0,207,255,0.4);
+    line-height: 1;
+  }
+
+  .logo-sub {
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 0.7rem;
+    letter-spacing: 0.3em;
+    color: var(--chrome);
+    text-transform: uppercase;
+  }
+
+  nav {
+    display: flex;
+    gap: 0.25rem;
+  }
+
+  nav button {
+    background: transparent;
+    border: 1px solid transparent;
+    color: var(--chrome);
+    font-family: 'Orbitron', monospace;
+    font-size: 0.65rem;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    padding: 0.6rem 1.2rem;
+    cursor: pointer;
+    text-transform: uppercase;
+    transition: all 0.2s;
+    position: relative;
+    clip-path: polygon(8px 0%, 100% 0%, calc(100% - 8px) 100%, 0% 100%);
+  }
+
+  nav button:hover, nav button.active {
+    background: var(--steel-mid);
+    border-color: var(--energon-blue);
+    color: var(--energon-blue);
+    box-shadow: 0 0 12px var(--glow-blue);
+  }
+
+  nav button.active {
+    background: linear-gradient(135deg, var(--steel-mid), var(--steel-light));
+    color: var(--energon-blue);
+    text-shadow: 0 0 10px var(--energon-blue);
+  }
+
+  .collection-stats {
+    display: flex;
+    gap: 1.5rem;
+    align-items: center;
+  }
+
+  .stat-item {
+    text-align: center;
+  }
+
+  .stat-num {
+    font-family: 'Orbitron', monospace;
+    font-size: 1.2rem;
+    font-weight: 900;
+    color: var(--warning-yellow);
+    text-shadow: 0 0 10px rgba(245,197,24,0.5);
+    display: block;
+  }
+
+  .stat-label {
+    font-size: 0.6rem;
+    letter-spacing: 0.2em;
+    color: var(--chrome);
+    text-transform: uppercase;
+  }
+
+  /* ===== OFFLINE INDICATOR ===== */
+  #offline-indicator {
+    display: none;
+    align-items: center;
+    gap: 0.4rem;
+    background: rgba(227,30,36,0.12);
+    border: 1px solid rgba(227,30,36,0.4);
+    padding: 0.3rem 0.75rem;
+    font-family: 'Orbitron', monospace;
+    font-size: 0.55rem;
+    font-weight: 700;
+    letter-spacing: 0.15em;
+    color: var(--autobot-red);
+    text-transform: uppercase;
+    white-space: nowrap;
+  }
+
+  #offline-indicator.visible { display: flex; }
+
+  #offline-indicator .offline-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--autobot-red);
+    animation: blink 1.5s ease-in-out infinite;
+    flex-shrink: 0;
+  }
+
+  /* ===== MAIN CONTENT ===== */
+  main {
+    position: relative;
+    z-index: 1;
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 2rem;
+  }
+
+  .page { display: none; }
+  .page.active { display: block; }
+
+  /* ===== SECTION HEADERS ===== */
+  .section-header {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .section-title {
+    font-family: 'Orbitron', monospace;
+    font-size: 0.9rem;
+    font-weight: 700;
+    letter-spacing: 0.2em;
+    color: var(--energon-blue);
+    text-transform: uppercase;
+    text-shadow: 0 0 10px var(--energon-blue);
+  }
+
+  .section-line {
+    flex: 1;
+    height: 1px;
+    background: linear-gradient(90deg, var(--energon-blue), transparent);
+    opacity: 0.4;
+  }
+
+  /* ===== HOME PAGE ===== */
+  .home-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem;
+  }
+
+  @media (max-width: 900px) {
+    .home-grid { grid-template-columns: 1fr; }
+  }
+
+  /* ===== PANEL ===== */
+  .panel {
+    background: var(--card-bg);
+    border: 1px solid var(--steel-mid);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .panel::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, var(--energon-blue), transparent);
+    opacity: 0.6;
+  }
+
+  .panel-corner {
+    position: absolute;
+    width: 12px; height: 12px;
+    border-color: var(--energon-blue);
+    border-style: solid;
+    opacity: 0.7;
+  }
+  .panel-corner.tl { top: 4px; left: 4px; border-width: 2px 0 0 2px; }
+  .panel-corner.tr { top: 4px; right: 4px; border-width: 2px 2px 0 0; }
+  .panel-corner.bl { bottom: 4px; left: 4px; border-width: 0 0 2px 2px; }
+  .panel-corner.br { bottom: 4px; right: 4px; border-width: 0 2px 2px 0; }
+
+  .panel-body { padding: 1.5rem; }
+
+  /* ===== CARD OF THE DAY ===== */
+  .cotd-panel {
+    grid-column: 1;
+  }
+
+  /* Tighten spacing inside the COTD panel only */
+  .cotd-panel .panel-body { padding: 12px; }
+  .cotd-panel .section-header { margin-bottom: 12px; }
+
+  .cotd-sub {
+    font-family: 'Orbitron', monospace;
+    font-size: 0.6rem;
+    font-weight: 700;
+    letter-spacing: 0.25em;
+    color: var(--chrome);
+    text-transform: uppercase;
+    margin-bottom: 0.75rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid var(--steel-mid);
+  }
+
+  .cotd-inner {
+    display: flex;
+    gap: 1.25rem;
+    align-items: flex-start;
+  }
+
+  .cotd-card-wrap {
+    position: relative;
+    flex-shrink: 0;
+  }
+
+  .cotd-img {
+    width: 154px;
+    height: 215px;
+    object-fit: cover;
+    border: 2px solid var(--steel-mid);
+    display: block;
+    cursor: pointer;
+    transition: all 0.3s;
+    position: relative;
+    z-index: 1;
+  }
+
+  .cotd-img:hover {
+    border-color: var(--energon-blue);
+    box-shadow: 0 0 20px var(--glow-blue);
+  }
+
+  .cotd-img-placeholder {
+    width: 154px;
+    height: 215px;
+    background: var(--steel-mid);
+    border: 2px dashed var(--steel-light);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--chrome);
+    font-size: 0.7rem;
+    text-align: center;
+    letter-spacing: 0.1em;
+  }
+
+  .cotd-divider {
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--steel-mid), transparent);
+    margin: 12px 0;
+  }
+
+  .flip-hint {
+    text-align: center;
+    font-size: 0.6rem;
+    color: var(--chrome);
+    letter-spacing: 0.15em;
+    margin-top: 0.4rem;
+    opacity: 0.7;
+  }
+
+  .cotd-info { flex: 1; }
+
+  .cotd-name {
+    font-family: 'Orbitron', monospace;
+    font-size: 1.2rem;
+    font-weight: 900;
+    color: var(--warning-yellow);
+    text-shadow: 0 0 15px rgba(245,197,24,0.4);
+    margin-bottom: 0.5rem;
+    line-height: 1.2;
+  }
+
+  .cotd-meta {
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+    margin-bottom: 1rem;
+  }
+
+  .meta-row {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .meta-label {
+    font-size: 0.65rem;
+    letter-spacing: 0.2em;
+    color: var(--chrome);
+    text-transform: uppercase;
+    min-width: 70px;
+  }
+
+  .meta-value {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--chrome-bright);
+  }
+
+  .badge {
+    display: inline-block;
+    padding: 0.15rem 0.6rem;
+    font-size: 0.6rem;
+    font-weight: 700;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    clip-path: polygon(4px 0%, 100% 0%, calc(100% - 4px) 100%, 0% 100%);
+  }
+
+  .badge-autobot { background: var(--autobot-red); color: white; }
+  .badge-decepticon { background: var(--decepticon-purple); color: white; }
+  .badge-set { background: var(--steel-mid); color: var(--energon-blue); border: 1px solid var(--energon-blue); }
+  .badge-combiner { background: var(--warning-yellow); color: #000; }
+
+  .cotd-refresh {
+    margin-top: 1rem;
+    background: transparent;
+    border: 1px solid var(--energon-blue);
+    color: var(--energon-blue);
+    font-family: 'Orbitron', monospace;
+    font-size: 0.6rem;
+    font-weight: 700;
+    letter-spacing: 0.15em;
+    padding: 0.5rem 1rem;
+    cursor: pointer;
+    text-transform: uppercase;
+    clip-path: polygon(6px 0%, 100% 0%, calc(100% - 6px) 100%, 0% 100%);
+    transition: all 0.2s;
+  }
+
+  .cotd-refresh:hover {
+    background: var(--energon-blue);
+    color: var(--dark-bg);
+    box-shadow: 0 0 15px var(--glow-blue);
+  }
+
+  /* ===== SEARCH PANEL ===== */
+  .search-panel {
+    grid-column: 2;
+  }
+
+  .search-input-wrap {
+    position: relative;
+    margin-bottom: 1rem;
+  }
+
+  /* In collection controls, the wrapper needs no bottom margin and full height */
+  .collection-controls .search-input-wrap {
+    margin-bottom: 0;
+    display: flex;
+    align-items: stretch;
+  }
+
+  .search-input {
+    width: 100%;
+    background: var(--steel);
+    border: 1px solid var(--steel-mid);
+    border-top-color: var(--energon-blue);
+    color: var(--chrome-bright);
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 1rem;
+    font-weight: 600;
+    padding: 0.75rem 1rem 0.75rem 2.5rem;
+    outline: none;
+    transition: all 0.2s;
+    letter-spacing: 0.05em;
+  }
+
+  /* Tighter height when inside collection controls to match selects */
+  .collection-controls .search-input {
+    padding-top: 0.5rem;
+    padding-bottom: 0.5rem;
+    font-size: 0.85rem;
+    border-top-color: var(--steel-mid);
+    border-left-color: var(--energon-blue);
+  }
+
+  .collection-controls .search-icon {
+    top: 50%;
+  }
+
+  .search-input:focus {
+    border-color: var(--energon-blue);
+    box-shadow: 0 0 15px var(--glow-blue), inset 0 0 10px rgba(0,207,255,0.05);
+  }
+
+  .search-input::placeholder { color: var(--chrome); opacity: 0.5; }
+
+  .search-icon {
+    position: absolute;
+    left: 0.75rem;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--energon-blue);
+    font-size: 0.9rem;
+    opacity: 0.7;
+  }
+
+  .filter-row {
+    display: flex;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+    flex-wrap: wrap;
+  }
+
+  .filter-select {
+    flex: 1;
+    min-width: 100px;
+    background: var(--steel);
+    border: 1px solid var(--steel-mid);
+    color: var(--chrome-bright);
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 0.8rem;
+    font-weight: 600;
+    padding: 0.5rem 0.75rem;
+    outline: none;
+    cursor: pointer;
+    letter-spacing: 0.05em;
+  }
+
+  .filter-select:focus { border-color: var(--energon-blue); }
+  .filter-select option { background: var(--steel); }
+
+  .search-results {
+    max-height: 350px;
+    min-height: 320px;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .search-results::-webkit-scrollbar { width: 4px; }
+  .search-results::-webkit-scrollbar-track { background: var(--steel); }
+  .search-results::-webkit-scrollbar-thumb { background: var(--energon-blue); opacity: 0.5; }
+
+  .result-card {
+    background: var(--steel);
+    border: 1px solid var(--steel-mid);
+    padding: 0.75rem 1rem;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    cursor: pointer;
+    transition: all 0.15s;
+    position: relative;
+  }
+
+  .result-card:hover {
+    border-color: var(--energon-blue);
+    background: var(--steel-mid);
+    box-shadow: inset 3px 0 0 var(--energon-blue);
+  }
+
+  .result-thumb {
+    width: 36px;
+    height: 50px;
+    object-fit: cover;
+    border: 1px solid var(--steel-mid);
+    flex-shrink: 0;
+  }
+
+  .result-thumb-placeholder {
+    width: 36px;
+    height: 50px;
+    background: var(--steel-mid);
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.5rem;
+    color: var(--chrome);
+  }
+
+  .result-info { flex: 1; min-width: 0; }
+
+  .result-name {
+    font-family: 'Orbitron', monospace;
+    font-size: 0.7rem;
+    font-weight: 700;
+    color: var(--chrome-bright);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    margin-bottom: 0.2rem;
+  }
+
+  .result-sub {
+    font-size: 0.7rem;
+    color: var(--chrome);
+    letter-spacing: 0.05em;
+  }
+
+  .result-qty {
+    font-family: 'Orbitron', monospace;
+    font-size: 0.8rem;
+    font-weight: 900;
+    color: var(--warning-yellow);
+    flex-shrink: 0;
+  }
+
+  .no-results {
+    text-align: center;
+    padding: 2rem;
+    color: var(--chrome);
+    font-size: 0.8rem;
+    letter-spacing: 0.1em;
+    opacity: 0.6;
+  }
+
+  .form-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.75rem;
+  }
+
+  .form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+  }
+
+  .form-group.full { grid-column: 1 / 3; }
+
+  .form-label {
+    font-size: 0.65rem;
+    letter-spacing: 0.2em;
+    color: var(--chrome);
+    text-transform: uppercase;
+    font-weight: 600;
+  }
+
+  .form-input, .form-select {
+    background: var(--steel);
+    border: 1px solid var(--steel-mid);
+    color: var(--chrome-bright);
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 0.9rem;
+    font-weight: 600;
+    padding: 0.5rem 0.75rem;
+    outline: none;
+    transition: border-color 0.2s;
+    letter-spacing: 0.03em;
+    width: 100%;
+  }
+
+  .form-input:focus, .form-select:focus {
+    border-color: var(--energon-blue);
+    box-shadow: 0 0 8px var(--glow-blue);
+  }
+
+  .form-input::placeholder { color: var(--chrome); opacity: 0.4; }
+  .form-select option { background: var(--steel); }
+
+  .submit-btn {
+    width: 100%;
+    margin-top: 1rem;
+    background: linear-gradient(135deg, var(--autobot-red), #b01519);
+    border: none;
+    color: white;
+    font-family: 'Orbitron', monospace;
+    font-size: 0.75rem;
+    font-weight: 900;
+    letter-spacing: 0.2em;
+    padding: 0.85rem;
+    cursor: pointer;
+    text-transform: uppercase;
+    clip-path: polygon(10px 0%, 100% 0%, calc(100% - 10px) 100%, 0% 100%);
+    transition: all 0.2s;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .submit-btn::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
+    transform: translateX(-100%);
+    transition: transform 0.4s;
+  }
+
+  .submit-btn:hover::after { transform: translateX(100%); }
+  .submit-btn:hover { box-shadow: 0 0 20px var(--glow-red), 0 4px 20px rgba(0,0,0,0.5); }
+  .submit-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+  /* ===== COLLECTION PAGE ===== */
+  .collection-controls {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+    align-items: stretch;
+    flex-wrap: wrap;
+  }
+
+  .collection-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 1rem;
+  }
+
+  .card-tile {
+    background: var(--card-bg);
+    border: 1px solid var(--steel-mid);
+    cursor: pointer;
+    transition: all 0.2s;
+    position: relative;
+  }
+
+  .card-tile.unowned {
+    border-color: var(--autobot-red);
+  }
+
+  .card-tile-img-wrap {
+    overflow: hidden;
+    width: 100%;
+    position: relative;
+  }
+
+  .card-tile:hover {
+    border-color: var(--energon-blue);
+    transform: translateY(-3px);
+    box-shadow: 0 8px 25px rgba(0,0,0,0.5), 0 0 15px var(--glow-blue);
+  }
+
+  .card-tile-img {
+    width: 100%;
+    aspect-ratio: 2/3;
+    object-fit: cover;
+    display: block;
+    transition: opacity 0.2s;
+  }
+
+  .card-tile-img-front { position: relative; z-index: 1; }
+
+  .card-tile-img-back {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    opacity: 0;
+    transition: opacity 0.25s;
+    z-index: 2;
+  }
+
+  .card-tile:hover .card-tile-img-back { opacity: 1; }
+
+  /* COTD character card flip */
+  .cotd-flip-wrap { border: 2px solid var(--steel-mid); transition: border-color 0.2s, box-shadow 0.2s; }
+  .cotd-flip-wrap:hover { border-color: var(--energon-blue); box-shadow: 0 0 20px var(--glow-blue); }
+  .cotd-flip-wrap:hover .card-tile-img-back { opacity: 1; }
+  .cotd-flip-wrap:hover .card-tile-img-front { opacity: 0; }
+
+  .card-tile-img-placeholder {
+    width: 100%;
+    aspect-ratio: 2/3;
+    background: var(--steel);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--chrome);
+    font-size: 0.6rem;
+    letter-spacing: 0.1em;
+    text-align: center;
+    padding: 0.5rem;
+  }
+
+  .card-tile-info {
+    padding: 0.5rem;
+    border-top: 1px solid var(--steel-mid);
+  }
+
+  .card-tile-name {
+    font-family: 'Orbitron', monospace;
+    font-size: 0.55rem;
+    font-weight: 700;
+    color: var(--chrome-bright);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    margin-bottom: 0.3rem;
+    position: relative;
+  }
+
+  .card-tile-set {
+    font-size: 0.6rem;
+    color: var(--chrome);
+    letter-spacing: 0.05em;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 70%;
+    position: relative;
+  }
+
+  .card-tile-meta {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  /* ===== JS TOOLTIP ===== */
+  #tile-tooltip {
+    position: fixed;
+    background: var(--steel);
+    border: 1px solid var(--energon-blue);
+    color: var(--chrome-bright);
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    padding: 0.3rem 0.7rem;
+    white-space: nowrap;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.15s;
+    z-index: 9999;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.7);
+  }
+
+  #tile-tooltip.visible { opacity: 1; }
+
+  .card-tile-qty {
+    font-family: 'Orbitron', monospace;
+    font-size: 0.7rem;
+    font-weight: 900;
+    color: var(--warning-yellow);
+  }
+
+  .card-tile-qty-zero { color: var(--autobot-red); opacity: 0.6; }
+  .card-tile-qty-single { color: #00e676; }
+
+  /* Greyscale images for unowned cards */
+  .card-img-unowned {
+    filter: grayscale(100%);
+    opacity: 0.6;
+    transition: filter 0.2s, opacity 0.2s;
+  }
+
+  .card-tile:hover .card-img-unowned {
+    filter: grayscale(60%);
+    opacity: 0.8;
+  }
+
+  /* Back image on non-battle unowned tiles — stays fully greyscale, no lift */
+  .card-img-unowned-back {
+    filter: grayscale(100%);
+    opacity: 0.6;
+  }
+
+  /* ===== COMBINERS PAGE ===== */
+  .combiners-controls {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+    flex-wrap: wrap;
+  }
+
+  .combiners-label {
+    font-family: 'Orbitron', monospace;
+    font-size: 0.65rem;
+    font-weight: 700;
+    letter-spacing: 0.2em;
+    color: var(--energon-blue);
+    text-transform: uppercase;
+    white-space: nowrap;
+  }
+
+  .combiners-select {
+    background: var(--steel);
+    border: 1px solid var(--energon-blue);
+    color: var(--chrome-bright);
+    font-family: 'Orbitron', monospace;
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    padding: 0.55rem 1rem;
+    outline: none;
+    cursor: pointer;
+    min-width: 220px;
+    box-shadow: 0 0 10px var(--glow-blue);
+    transition: border-color 0.2s;
+  }
+
+  .combiners-select:focus { border-color: var(--chrome-bright); }
+  .combiners-select option { background: var(--steel); font-family: sans-serif; }
+
+  .combiner-nav-btn {
+    background: var(--steel);
+    border: 1px solid var(--energon-blue);
+    color: var(--energon-blue);
+    font-size: 1.4rem;
+    font-weight: 700;
+    width: 36px;
+    height: 36px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+    flex-shrink: 0;
+    line-height: 1;
+  }
+
+  .combiner-nav-btn:hover {
+    background: var(--energon-blue);
+    color: var(--dark-bg);
+    box-shadow: 0 0 12px var(--glow-blue);
+  }
+
+  .combiner-nav-btn:disabled {
+    opacity: 0.3;
+    cursor: not-allowed;
+  }
+
+  .combiners-layout {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 1.5rem;
+    align-items: start;
+  }
+
+  @media (max-width: 800px) {
+    .combiners-layout { grid-template-columns: 1fr; }
+  }
+
+  .combiners-left {
+    min-width: 0;
+  }
+
+  .combiners-heading {
+    font-family: 'Orbitron', monospace;
+    font-size: 0.75rem;
+    font-weight: 900;
+    letter-spacing: 0.2em;
+    color: var(--warning-yellow);
+    text-shadow: 0 0 12px rgba(245,197,24,0.4);
+    text-transform: uppercase;
+    margin-bottom: 0.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+  }
+
+  .combiners-heading::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: linear-gradient(90deg, var(--warning-yellow), transparent);
+    opacity: 0.3;
+  }
+
+  .combiners-parts-count {
+    font-family: 'Orbitron', monospace;
+    font-size: 0.6rem;
+    font-weight: 700;
+    color: var(--warning-yellow);
+    letter-spacing: 0.2em;
+    background: rgba(245,197,24,0.08);
+    border: 1px solid rgba(245,197,24,0.2);
+    padding: 0.25rem 0.75rem;
+    display: inline-block;
+    margin-bottom: 0.85rem;
+  }
+
+  .combiners-card-grid {
+    display: grid;
+    gap: 0.5rem;
+  }
+
+  .combiners-right {
+    position: sticky;
+    top: 1.5rem;
+  }
+
+  .combiner-artwork {
+    width: 100%;
+    height: calc((100vh - 140px) * 0.81);
+    max-height: 632px;
+    min-height: 243px;
+    background: var(--card-bg);
+    border: 1px solid var(--steel-mid);
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .combiner-artwork::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background:
+      linear-gradient(135deg, rgba(0,207,255,0.04) 0%, transparent 50%),
+      linear-gradient(225deg, rgba(227,30,36,0.04) 0%, transparent 50%);
+  }
+
+  /* Animated corner accents */
+  .combiner-artwork .art-corner {
+    position: absolute;
+    width: 24px; height: 24px;
+    border-color: var(--energon-blue);
+    border-style: solid;
+    opacity: 0.5;
+    animation: pulse-corner 3s ease-in-out infinite;
+    z-index: 2;
+  }
+  .combiner-artwork .art-corner.tl { top: 8px; left: 8px; border-width: 2px 0 0 2px; }
+  .combiner-artwork .art-corner.tr { top: 8px; right: 8px; border-width: 2px 2px 0 0; animation-delay: 0.75s; }
+  .combiner-artwork .art-corner.bl { bottom: 8px; left: 8px; border-width: 0 0 2px 2px; animation-delay: 1.5s; }
+  .combiner-artwork .art-corner.br { bottom: 8px; right: 8px; border-width: 0 2px 2px 0; animation-delay: 2.25s; }
+
+  @keyframes pulse-corner {
+    0%, 100% { opacity: 0.4; }
+    50% { opacity: 1; }
+  }
+
+  .combiner-artwork-inner {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 1.25rem;
+    padding: 2rem;
+    text-align: center;
+    position: relative;
+    z-index: 1;
+  }
+
+  /* Big combiner icon placeholder */
+  .combiner-icon-placeholder {
+    width: 100px;
+    height: 100px;
+    position: relative;
+  }
+
+  .combiner-icon-placeholder svg {
+    width: 100%;
+    height: 100%;
+    opacity: 0.15;
+    filter: drop-shadow(0 0 12px var(--energon-blue));
+  }
+
+  .combiner-artwork-name {
+    font-family: 'Orbitron', monospace;
+    font-size: 1.4rem;
+    font-weight: 900;
+    color: var(--chrome-bright);
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    text-shadow: 0 0 20px var(--energon-blue), 0 0 40px rgba(0,207,255,0.2);
+    line-height: 1.2;
+  }
+
+  .combiner-artwork-sub {
+    font-size: 0.7rem;
+    letter-spacing: 0.25em;
+    color: var(--chrome);
+    text-transform: uppercase;
+  }
+
+  .combiner-artwork-count { display: none; } /* moved to left side */
+
+  .combiner-empty {
+    text-align: center;
+    padding: 3rem 1rem;
+    color: var(--chrome);
+    opacity: 0.5;
+  }
+
+  .combiner-empty p {
+    font-size: 0.8rem;
+    letter-spacing: 0.1em;
+    margin-top: 0.5rem;
+  }
+
+  /* Card sizing in combiner grid — width auto, height fixed */
+  #combiner-card-grid .card-tile-img,
+  #combiner-card-grid .card-tile-img-front {
+    aspect-ratio: unset;
+    width: 100%;
+    height: 162px;
+    object-fit: cover;
+  }
+
+  #combiner-card-grid .card-tile-img-placeholder {
+    aspect-ratio: unset;
+    width: 100%;
+    height: 162px;
+  }
+
+  #combiner-card-grid .card-tile-img-back {
+    width: 100%;
+    height: 162px;
+  }
+
+  #combiner-card-grid .card-tile-img-wrap {
+    width: 100%;
+  }
+
+  #combiner-card-grid .card-tile {
+    width: 100%;
+  }
+
+  /* ===== STATS PAGE ===== */
+  .stats-summary-row {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+  }
+
+  @media (max-width: 600px) {
+    .stats-summary-row { grid-template-columns: repeat(2, 1fr); }
+  }
+
+  .stats-big-card {
+    background: var(--card-bg);
+    border: 1px solid var(--steel-mid);
+    padding: 1.25rem 1rem;
+    text-align: center;
+    position: relative;
+  }
+
+  .stats-big-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, var(--energon-blue), transparent);
+    opacity: 0.5;
+  }
+
+  .stats-big-num {
+    font-family: 'Orbitron', monospace;
+    font-size: 2rem;
+    font-weight: 900;
+    color: var(--warning-yellow);
+    text-shadow: 0 0 15px rgba(245,197,24,0.3);
+    line-height: 1;
+    margin-bottom: 0.4rem;
+  }
+
+  .stats-big-label {
+    font-size: 0.6rem;
+    letter-spacing: 0.2em;
+    color: var(--chrome);
+    text-transform: uppercase;
+  }
+
+  .stats-progress-track {
+    height: 10px;
+    background: var(--steel-mid);
+    border: 1px solid var(--steel);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .stats-progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--energon-blue), #00e676);
+    transition: width 0.6s ease;
+    position: relative;
+  }
+
+  .stats-progress-fill::after {
+    content: '';
+    position: absolute;
+    top: 0; right: 0; bottom: 0;
+    width: 20px;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2));
+  }
+
+  .stats-set-row {
+    margin-bottom: 1rem;
+  }
+
+  .stats-set-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    margin-bottom: 0.35rem;
+  }
+
+  .stats-set-name {
+    font-family: 'Orbitron', monospace;
+    font-size: 0.65rem;
+    font-weight: 700;
+    color: var(--chrome-bright);
+    letter-spacing: 0.1em;
+  }
+
+  .stats-set-fraction {
+    font-family: 'Orbitron', monospace;
+    font-size: 0.6rem;
+    color: var(--chrome);
+    letter-spacing: 0.1em;
+  }
+
+  .stats-set-pct {
+    font-family: 'Orbitron', monospace;
+    font-size: 0.6rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    min-width: 38px;
+    text-align: right;
+  }
+
+  .stats-set-meta {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+  }
+
+  /* ===== MODAL ===== */
+  .modal-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.85);
+    z-index: 100;
+    align-items: center;
+    justify-content: center;
+    backdrop-filter: blur(4px);
+  }
+
+  .modal-overlay.open { display: flex; }
+
+  .modal {
+    background: var(--card-bg);
+    border: 1px solid var(--energon-blue);
+    box-shadow: 0 0 60px var(--glow-blue), 0 0 120px rgba(0,0,0,0.8);
+    max-width: 900px;
+    width: 96%;
+    max-height: 92vh;
+    overflow-y: auto;
+    overflow-x: hidden;
+    position: relative;
+  }
+
+  .modal::-webkit-scrollbar { width: 4px; }
+  .modal::-webkit-scrollbar-thumb { background: var(--energon-blue); }
+
+  .modal-header {
+    background: var(--steel);
+    padding: 1rem 1.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 1px solid var(--steel-mid);
+    position: sticky;
+    top: 0;
+    z-index: 1;
+  }
+
+  .modal-title {
+    font-family: 'Orbitron', monospace;
+    font-size: 0.85rem;
+    font-weight: 900;
+    color: var(--energon-blue);
+    letter-spacing: 0.15em;
+    text-shadow: 0 0 10px var(--energon-blue);
+  }
+
+  .modal-close {
+    background: transparent;
+    border: 1px solid var(--chrome);
+    color: var(--chrome);
+    font-size: 1rem;
+    width: 30px;
+    height: 30px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+  }
+
+  .modal-close:hover { border-color: var(--autobot-red); color: var(--autobot-red); }
+
+  .modal-body { padding: 1.5rem; }
+
+  .modal-card-view {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1.5rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .modal-card-images {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    flex-shrink: 0;
+  }
+
+  .modal-img-label {
+    font-size: 0.6rem;
+    letter-spacing: 0.2em;
+    color: var(--chrome);
+    text-align: center;
+    text-transform: uppercase;
+  }
+
+  .modal-card-img {
+    width: 210px;
+    height: 294px;
+    object-fit: cover;
+    border: 2px solid var(--steel-mid);
+    transition: border-color 0.2s, width 0.2s, height 0.2s;
+    cursor: zoom-in;
+    position: relative;
+    z-index: 1;
+  }
+
+  .modal-card-img:hover { border-color: var(--energon-blue); }
+
+  .modal-card-img.zoomed {
+    width: 358px;
+    height: 500px;
+    z-index: 10;
+    box-shadow: 0 8px 30px rgba(0,0,0,0.8);
+    cursor: zoom-out;
+  }
+
+  .modal-card-img-placeholder {
+    width: 210px;
+    height: 294px;
+    background: var(--steel);
+    border: 2px dashed var(--steel-mid);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--chrome);
+    font-size: 0.65rem;
+    text-align: center;
+  }
+
+  .modal-card-details { flex: 1; }
+
+  .modal-card-name {
+    font-family: 'Orbitron', monospace;
+    font-size: 1.3rem;
+    font-weight: 900;
+    color: var(--warning-yellow);
+    text-shadow: 0 0 15px rgba(245,197,24,0.4);
+    margin-bottom: 1rem;
+    line-height: 1.2;
+  }
+
+  .detail-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.75rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .detail-item { display: flex; flex-direction: column; gap: 0.2rem; }
+  .detail-label { font-size: 0.6rem; letter-spacing: 0.2em; color: var(--chrome); text-transform: uppercase; }
+  .detail-value { font-size: 0.9rem; font-weight: 600; color: var(--chrome-bright); }
+
+  .qty-editor {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 1.5rem;
+    background: var(--steel);
+    padding: 0.75rem 1rem;
+    border: 1px solid var(--steel-mid);
+  }
+
+  .qty-label { font-size: 0.7rem; letter-spacing: 0.15em; color: var(--chrome); text-transform: uppercase; flex: 1; }
+
+  .qty-btn {
+    background: var(--steel-mid);
+    border: 1px solid var(--steel-light);
+    color: var(--chrome-bright);
+    font-family: 'Orbitron', monospace;
+    font-size: 1rem;
+    font-weight: 900;
+    width: 32px;
+    height: 32px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.15s;
+  }
+
+  .qty-btn:hover { background: var(--energon-blue); color: var(--dark-bg); border-color: var(--energon-blue); }
+
+  .qty-display {
+    font-family: 'Orbitron', monospace;
+    font-size: 1.5rem;
+    font-weight: 900;
+    color: var(--warning-yellow);
+    min-width: 40px;
+    text-align: center;
+    text-shadow: 0 0 10px rgba(245,197,24,0.4);
+  }
+
+  .modal-actions {
+    display: flex;
+    gap: 0.75rem;
+  }
+
+  .btn-save {
+    flex: 1;
+    background: linear-gradient(135deg, var(--energon-blue), #0090b8);
+    border: none;
+    color: var(--dark-bg);
+    font-family: 'Orbitron', monospace;
+    font-size: 0.7rem;
+    font-weight: 900;
+    letter-spacing: 0.15em;
+    padding: 0.75rem;
+    cursor: pointer;
+    text-transform: uppercase;
+    clip-path: polygon(8px 0%, 100% 0%, calc(100% - 8px) 100%, 0% 100%);
+    transition: all 0.2s;
+  }
+
+  .btn-save:hover { box-shadow: 0 0 20px var(--glow-blue); }
+  .btn-save:disabled { opacity: 0.5; cursor: not-allowed; }
+
+  /* ===== SETTINGS PAGE ===== */
+  .settings-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; }
+
+  .settings-section-title {
+    font-family: 'Orbitron', monospace;
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: var(--energon-blue);
+    letter-spacing: 0.15em;
+    margin-bottom: 1rem;
+    text-transform: uppercase;
+    text-shadow: 0 0 8px var(--energon-blue);
+  }
+
+  .api-status {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+    padding: 0.75rem 1rem;
+    background: var(--steel);
+    border: 1px solid var(--steel-mid);
+  }
+
+  .status-dot {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+
+  .status-dot.connected { background: #00e676; box-shadow: 0 0 8px #00e676; animation: blink 2s infinite; }
+  .status-dot.disconnected { background: var(--autobot-red); }
+  .status-dot.loading { background: var(--warning-yellow); animation: blink 0.5s infinite; }
+
+  @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
+
+  .status-text { font-size: 0.75rem; letter-spacing: 0.1em; color: var(--chrome); }
+
+  .setup-steps {
+    counter-reset: steps;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .setup-step {
+    display: flex;
+    gap: 1rem;
+    padding: 1rem;
+    background: var(--steel);
+    border: 1px solid var(--steel-mid);
+    border-left: 3px solid var(--energon-blue);
+  }
+
+  .step-num {
+    font-family: 'Orbitron', monospace;
+    font-size: 1.2rem;
+    font-weight: 900;
+    color: var(--energon-blue);
+    flex-shrink: 0;
+    opacity: 0.5;
+    min-width: 24px;
+  }
+
+  .step-content {}
+  .step-title { font-size: 0.8rem; font-weight: 700; color: var(--chrome-bright); margin-bottom: 0.3rem; letter-spacing: 0.05em; }
+  .step-desc { font-size: 0.75rem; color: var(--chrome); line-height: 1.6; }
+  .step-desc a { color: var(--energon-blue); text-decoration: none; }
+  .step-desc a:hover { text-decoration: underline; }
+  .step-desc code {
+    background: var(--dark-bg);
+    padding: 0.1rem 0.4rem;
+    font-size: 0.7rem;
+    color: var(--warning-yellow);
+    border: 1px solid var(--steel-mid);
+  }
+
+  .info-box {
+    background: rgba(0,207,255,0.05);
+    border: 1px solid rgba(0,207,255,0.2);
+    padding: 1rem;
+    margin-top: 1rem;
+    font-size: 0.75rem;
+    line-height: 1.7;
+    color: var(--chrome);
+  }
+
+  .info-box strong { color: var(--energon-blue); }
+
+  /* ===== TOAST ===== */
+  .toast-container {
+    position: fixed;
+    bottom: 2rem;
+    right: 2rem;
+    z-index: 200;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .toast {
+    background: var(--card-bg);
+    border: 1px solid var(--steel-mid);
+    border-left: 3px solid var(--energon-blue);
+    padding: 0.75rem 1.25rem;
+    font-size: 0.8rem;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    color: var(--chrome-bright);
+    box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+    animation: slideIn 0.3s ease, fadeOut 0.3s ease 2.7s forwards;
+    max-width: 300px;
+  }
+
+  .toast.success { border-left-color: #00e676; }
+  .toast.error { border-left-color: var(--autobot-red); }
+
+  @keyframes slideIn {
+    from { transform: translateX(100%); opacity: 0; }
+    to { transform: translateX(0); opacity: 1; }
+  }
+
+  @keyframes fadeOut {
+    to { opacity: 0; transform: translateX(100%); }
+  }
+
+  /* ===== LOADING ===== */
+  .loading-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.7);
+    z-index: 150;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .loading-overlay.active { display: flex; }
+
+  .loading-spinner {
+    width: 50px;
+    height: 50px;
+    border: 3px solid var(--steel-mid);
+    border-top-color: var(--energon-blue);
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+  }
+
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  .loading-text {
+    font-family: 'Orbitron', monospace;
+    font-size: 0.7rem;
+    letter-spacing: 0.2em;
+    color: var(--energon-blue);
+    text-shadow: 0 0 10px var(--energon-blue);
+  }
+
+  /* ===== BURGER MENU ===== */
+  .burger-btn {
+    display: none;
+    background: transparent;
+    border: 1px solid var(--steel-mid);
+    color: var(--chrome);
+    cursor: pointer;
+    padding: 0.5rem 0.7rem;
+    flex-direction: column;
+    gap: 4px;
+    align-items: center;
+    justify-content: center;
+    transition: border-color 0.2s;
+  }
+
+  .burger-btn:hover { border-color: var(--energon-blue); color: var(--energon-blue); }
+
+  .burger-btn span {
+    display: block;
+    width: 18px;
+    height: 2px;
+    background: currentColor;
+    transition: all 0.2s;
+  }
+
+  .burger-btn.open span:nth-child(1) { transform: translateY(6px) rotate(45deg); }
+  .burger-btn.open span:nth-child(2) { opacity: 0; }
+  .burger-btn.open span:nth-child(3) { transform: translateY(-6px) rotate(-45deg); }
+
+  .nav-dropdown {
+    display: none;
+    position: absolute;
+    top: 100%;
+    right: 0;
+    background: var(--steel);
+    border: 1px solid var(--energon-blue);
+    border-top: none;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.6);
+    z-index: 50;
+    min-width: 180px;
+    flex-direction: column;
+  }
+
+  .nav-dropdown.open { display: flex; }
+
+  .nav-dropdown button {
+    clip-path: none !important;
+    border: none !important;
+    border-bottom: 1px solid var(--steel-mid) !important;
+    width: 100%;
+    text-align: left;
+    padding: 0.85rem 1.25rem !important;
+  }
+
+  .nav-dropdown button:last-child { border-bottom: none !important; }
+
+  /* ===== RESPONSIVE ===== */
+  @media (max-width: 900px) {
+    .home-grid { grid-template-columns: 1fr; }
+    .search-panel { grid-column: 1; grid-row: auto; }
+    .settings-grid { grid-template-columns: 1fr; }
+    .modal-card-view { justify-content: center; }
+    .collection-stats { display: none; }
+  }
+
+  @media (max-width: 700px) {
+    nav { display: none; }
+    .burger-btn { display: flex; }
+  }
+
+  /* ===== ENERGON DIVIDER ===== */
+  .energon-divider {
+    height: 2px;
+    background: linear-gradient(90deg, transparent, var(--energon-blue), var(--autobot-red), var(--energon-blue), transparent);
+    margin: 1.5rem 0;
+    opacity: 0.4;
+  }
+
+  /* ===== EMPTY STATE ===== */
+  .empty-state {
+    text-align: center;
+    padding: 4rem 2rem;
+    color: var(--chrome);
+  }
+
+  .empty-state-icon {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+    opacity: 0.3;
+  }
+
+  .empty-state h3 {
+    font-family: 'Orbitron', monospace;
+    font-size: 0.9rem;
+    letter-spacing: 0.2em;
+    margin-bottom: 0.5rem;
+    color: var(--chrome-bright);
+  }
+
+  .empty-state p { font-size: 0.8rem; letter-spacing: 0.05em; opacity: 0.7; }
+
+  .sync-btn {
+    background: transparent;
+    border: 1px solid var(--warning-yellow);
+    color: var(--warning-yellow);
+    font-family: 'Orbitron', monospace;
+    font-size: 0.6rem;
+    font-weight: 700;
+    letter-spacing: 0.15em;
+    padding: 0.5rem 1rem;
+    cursor: pointer;
+    text-transform: uppercase;
+    transition: all 0.2s;
+    clip-path: polygon(6px 0%, 100% 0%, calc(100% - 6px) 100%, 0% 100%);
+  }
+
+  .sync-btn:hover {
+    background: var(--warning-yellow);
+    color: var(--dark-bg);
+  }
+
+  .img-two-col {
+    display: flex;
+    gap: 0.75rem;
+  }
+
+  /* ===== VIEW TOGGLE ===== */
+  .view-toggle {
+    display: flex;
+    gap: 0;
+    border: 1px solid var(--steel-mid);
+    overflow: hidden;
+    flex-shrink: 0;
+  }
+
+  .view-toggle-btn {
+    background: var(--steel);
+    border: none;
+    color: var(--chrome);
+    font-family: 'Orbitron', monospace;
+    font-size: 0.65rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    padding: 0.5rem 0.9rem;
+    cursor: pointer;
+    text-transform: uppercase;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+  }
+
+  .view-toggle-btn + .view-toggle-btn {
+    border-left: 1px solid var(--steel-mid);
+  }
+
+  .view-toggle-btn.active {
+    background: var(--steel-mid);
+    color: var(--energon-blue);
+    box-shadow: inset 0 -2px 0 var(--energon-blue);
+  }
+
+  .view-toggle-btn:hover:not(.active) {
+    background: var(--steel-mid);
+    color: var(--chrome-bright);
+  }
+
+  /* ===== LIST VIEW ===== */
+  .collection-list {
+    width: 100%;
+    border-collapse: collapse;
+    font-family: 'Rajdhani', sans-serif;
+  }
+
+  .collection-list thead {
+    position: sticky;
+    top: 0;
+    z-index: 5;
+  }
+
+  .collection-list thead tr {
+    background: var(--steel);
+    border-bottom: 2px solid var(--energon-blue);
+  }
+
+  .collection-list th {
+    font-family: 'Orbitron', monospace;
+    font-size: 0.6rem;
+    font-weight: 700;
+    letter-spacing: 0.18em;
+    color: var(--energon-blue);
+    text-transform: uppercase;
+    padding: 0.75rem 1rem;
+    text-align: left;
+    white-space: nowrap;
+    cursor: pointer;
+    user-select: none;
+    text-shadow: 0 0 8px var(--energon-blue);
+    transition: color 0.15s;
+  }
+
+  .collection-list th:hover { color: var(--chrome-bright); }
+
+  .collection-list th .sort-arrow {
+    display: inline-block;
+    margin-left: 0.3rem;
+    opacity: 0.4;
+    font-size: 0.6rem;
+  }
+
+  .collection-list th.sorted .sort-arrow { opacity: 1; color: var(--warning-yellow); }
+
+  .collection-list tbody tr {
+    border-bottom: 1px solid var(--steel-mid);
+    transition: background 0.12s;
+    cursor: pointer;
+  }
+
+  .collection-list tbody tr:hover {
+    background: var(--steel-mid);
+    box-shadow: inset 3px 0 0 var(--energon-blue);
+  }
+
+  .collection-list tbody tr.missing-row {
+    opacity: 0.5;
+  }
+
+  .collection-list td {
+    padding: 0.6rem 1rem;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--chrome-bright);
+    letter-spacing: 0.03em;
+    vertical-align: middle;
+  }
+
+  .list-thumb-cell {
+    width: 32px;
+    padding: 0.4rem 0.5rem 0.4rem 1rem !important;
+  }
+
+  .list-thumb {
+    width: 28px;
+    height: 38px;
+    object-fit: cover;
+    border: 1px solid var(--steel-mid);
+    display: block;
+  }
+
+  .list-thumb-ph {
+    width: 28px;
+    height: 38px;
+    background: var(--steel-mid);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.45rem;
+    color: var(--chrome);
+    letter-spacing: 0.05em;
+  }
+
+  .list-name {
+    font-family: 'Orbitron', monospace;
+    font-size: 0.65rem;
+    font-weight: 700;
+    color: var(--chrome-bright);
+  }
+
+  .list-qty {
+    font-family: 'Orbitron', monospace;
+    font-size: 0.8rem;
+    font-weight: 900;
+    color: var(--warning-yellow);
+    text-align: center;
+  }
+
+  .list-qty-zero {
+    color: var(--autobot-red) !important;
+    opacity: 0.6;
+  }
+
+  .card-tile-qty-single, .list-qty.card-tile-qty-single { color: #00e676 !important; }
+
+  .list-combiner-yes {
+    display: inline-block;
+    background: var(--warning-yellow);
+    color: #000;
+    font-size: 0.55rem;
+    font-weight: 700;
+    padding: 0.1rem 0.4rem;
+    letter-spacing: 0.1em;
+  }
+
+  .collection-list-wrap {
+    overflow-x: auto;
+    background: var(--card-bg);
+    border: 1px solid var(--steel-mid);
+  }
+
+  .collection-list-wrap::-webkit-scrollbar { height: 4px; }
+  .collection-list-wrap::-webkit-scrollbar-thumb { background: var(--energon-blue); }
+
+  .img-col { display: flex; flex-direction: column; align-items: center; gap: 0.25rem; }
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header>
+  <div class="header-inner">
+    <div class="logo-area" onclick="showPage('home')" style="cursor:pointer;" title="Home">
+      <!-- Autobot Symbol SVG -->
+      <svg class="autobot-symbol" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M50 5 L65 20 L80 15 L75 30 L90 40 L75 45 L80 65 L65 60 L50 75 L35 60 L20 65 L25 45 L10 40 L25 30 L20 15 L35 20 Z" fill="#e31e24" opacity="0.9"/>
+        <path d="M50 20 L60 30 L70 27 L67 38 L78 44 L67 48 L70 60 L60 57 L50 65 L40 57 L30 60 L33 48 L22 44 L33 38 L30 27 L40 30 Z" fill="#1a1f2e"/>
+        <circle cx="50" cy="44" r="10" fill="#e31e24" opacity="0.8"/>
+        <path d="M50 34 L55 42 L50 48 L45 42 Z" fill="#ff4444"/>
+        <path d="M40 48 L50 42 L60 48" stroke="#ff8888" stroke-width="2" fill="none"/>
+      </svg>
+      <div class="logo-text">
+        <span class="logo-title">AUTOBOT ARCHIVE</span>
+        <span class="logo-sub">Transformers TCG — Collection Manager</span>
+      </div>
+    </div>
+
+    <nav>
+      <button onclick="showPage('collection')" id="nav-collection">◈ COLLECTION</button>
+      <button onclick="showPage('combiners')" id="nav-combiners">⟁ COMBINERS</button>
+      <button onclick="showPage('stats')" id="nav-stats">◎ STATS</button>
+      <button onclick="showPage('settings')" id="nav-settings">⚙ CONFIGURE</button>
+    </nav>
+
+    <!-- Burger menu (small screens) -->
+    <div style="position:relative;">
+      <button class="burger-btn" id="burger-btn" onclick="toggleBurger()" aria-label="Menu">
+        <span></span><span></span><span></span>
+      </button>
+      <div class="nav-dropdown" id="nav-dropdown">
+        <button onclick="showPage('collection');closeBurger()" id="nav-collection-m">◈ COLLECTION</button>
+        <button onclick="showPage('combiners');closeBurger()" id="nav-combiners-m">⟁ COMBINERS</button>
+        <button onclick="showPage('stats');closeBurger()" id="nav-stats-m">◎ STATS</button>
+        <button onclick="showPage('settings');closeBurger()" id="nav-settings-m">⚙ CONFIGURE</button>
+      </div>
+    </div>
+
+    <div class="collection-stats">
+      <div id="offline-indicator" title="Viewing cached data — sheet unreachable">
+        <span class="offline-dot"></span> CACHED
+      </div>
+      <div class="stat-item">
+        <span class="stat-num" id="stat-total">—</span>
+        <span class="stat-label">Unique Cards</span>
+      </div>
+      <div class="stat-item">
+        <span class="stat-num" id="stat-owned">—</span>
+        <span class="stat-label">Total Owned</span>
+      </div>
+      <div class="stat-item">
+        <span class="stat-num" id="stat-missing" style="color:var(--autobot-red);">—</span>
+        <span class="stat-label">Missing</span>
+      </div>
+    </div>
+  </div>
+</header>
+
+<main>
+
+  <!-- ===== HOME PAGE ===== -->
+  <div id="page-home" class="page active">
+    <div class="home-grid">
+
+      <!-- Card of the Day -->
+      <div class="panel cotd-panel">
+        <div class="panel-corner tl"></div>
+        <div class="panel-corner tr"></div>
+        <div class="panel-corner bl"></div>
+        <div class="panel-corner br"></div>
+        <div class="panel-body">
+          <div class="section-header">
+            <span class="section-title">⚡ Cards of the Day</span>
+            <div class="section-line"></div>
+          </div>
+
+          <div id="cotd-battle">
+            <div style="text-align:center; padding: 1.5rem; color: var(--chrome); opacity: 0.5;">
+              <p style="font-size:0.8rem; letter-spacing:0.1em;">Sync your collection to reveal cards</p>
+            </div>
+          </div>
+
+          <div class="cotd-divider" style="margin-top:12px;"></div>
+
+          <div id="cotd-character" style="margin-top:12px;">
+            <div style="text-align:center; padding: 1.5rem; color: var(--chrome); opacity: 0.5;">
+              <p style="font-size:0.8rem; letter-spacing:0.1em;">Sync your collection to reveal cards</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Search Panel -->
+      <div class="panel search-panel">
+        <div class="panel-corner tl"></div>
+        <div class="panel-corner tr"></div>
+        <div class="panel-corner bl"></div>
+        <div class="panel-corner br"></div>
+        <div class="panel-body">
+          <div class="section-header">
+            <span class="section-title">◈ Search Collection</span>
+            <div class="section-line"></div>
+          </div>
+
+          <div class="search-input-wrap">
+            <span class="search-icon">⌕</span>
+            <input type="text" class="search-input" id="search-input" placeholder="Search by name, set, type..." oninput="handleSearch(this.value)">
+          </div>
+
+          <div class="filter-row">
+            <select class="filter-select" id="filter-set" onchange="handleSearch(document.getElementById('search-input').value)">
+              <option value="">All Sets</option>
+            </select>
+            <select class="filter-select" id="filter-type" onchange="handleSearch(document.getElementById('search-input').value)">
+              <option value="">All Types</option>
+            </select>
+          </div>
+
+          <div class="search-results" id="search-results">
+            <div id="search-placeholder" style="display:flex;align-items:center;justify-content:center;height:100%;padding:1rem 0;">
+              <img src="https://wsrv.nl/?url=https://drive.google.com/uc?export=view%26id=1cxShgSlCeWcTq0k1goNRzeeXPG2Xgndp" alt="" style="max-width:100%;max-height:300px;object-fit:contain;opacity:0.85;" onerror="this.style.display='none'">
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ===== COLLECTION PAGE ===== -->
+  <div id="page-collection" class="page">
+    <div class="collection-controls">
+      <button class="cotd-refresh" onclick="resetCollectionFilters()" title="Reset all filters" style="margin-top:0; flex-shrink:0;">✕ RESET</button>
+      <div class="search-input-wrap" style="flex:1; min-width:200px;">
+        <span class="search-icon">⌕</span>
+        <input type="text" class="search-input" id="coll-search" placeholder="Filter collection..." oninput="renderCollection()">
+      </div>
+      <select class="filter-select" id="coll-filter-set" onchange="renderCollection()" style="width:auto;">
+        <option value="">All Sets</option>
+      </select>
+      <select class="filter-select" id="coll-filter-type" onchange="renderCollection()" style="width:auto;">
+        <option value="">All Types</option>
+      </select>
+      <select class="filter-select" id="coll-filter-owned" onchange="renderCollection()" style="width:auto;">
+        <option value="">All Cards</option>
+        <option value="owned">Owned</option>
+        <option value="missing">Not Owned</option>
+      </select>
+      <select class="filter-select" id="coll-sort" onchange="renderCollection()" style="width:auto;">
+        <option value="name">Sort: Name</option>
+        <option value="set" selected>Sort: Set</option>
+        <option value="qty-desc">Sort: Qty ↓</option>
+        <option value="qty-asc">Sort: Qty ↑</option>
+        <option value="number">Sort: No.</option>
+      </select>
+      <div class="view-toggle">
+        <button class="view-toggle-btn active" id="toggle-grid" onclick="setCollectionView('grid')" title="Card Grid">
+          ⊞ GRID
+        </button>
+        <button class="view-toggle-btn" id="toggle-list" onclick="setCollectionView('list')" title="List View">
+          ☰ LIST
+        </button>
+      </div>
+      <button class="sync-btn" id="coll-sync-btn" onclick="syncFromSheet()">↻ SYNC SHEET</button>
+    </div>
+
+    <!-- Card grid view -->
+    <div class="collection-grid" id="collection-grid">
+      <div class="empty-state" style="grid-column:1/-1;">
+        <div class="empty-state-icon">📦</div>
+        <h3>NO CARDS LOADED</h3>
+        <p>Configure your Google Sheet in the Settings page, then sync your collection.</p>
+      </div>
+    </div>
+
+    <!-- List view -->
+    <div id="collection-list-wrap" class="collection-list-wrap" style="display:none;">
+      <table class="collection-list" id="collection-list-table">
+        <thead>
+          <tr>
+            <th class="list-thumb-cell"></th>
+            <th onclick="listSort('name')">NAME <span class="sort-arrow">↕</span></th>
+            <th onclick="listSort('set')">SET <span class="sort-arrow">↕</span></th>
+            <th onclick="listSort('type')">TYPE <span class="sort-arrow">↕</span></th>
+            <th onclick="listSort('number')">NO. <span class="sort-arrow">↕</span></th>
+            <th onclick="listSort('combiner')">COMBINER <span class="sort-arrow">↕</span></th>
+            <th onclick="listSort('qty-desc')" style="text-align:center;">QTY <span class="sort-arrow">↕</span></th>
+          </tr>
+        </thead>
+        <tbody id="collection-list-body"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- ===== COMBINERS PAGE ===== -->
+  <div id="page-combiners" class="page">
+
+    <div class="combiners-controls">
+      <span class="combiners-label">⟁ Combiner Bots</span>
+      <button class="combiner-nav-btn" id="combiner-prev" onclick="navigateCombiner(-1)" title="Previous">‹</button>
+      <select class="combiners-select" id="combiner-select" onchange="renderCombinerPage()">
+        <option value="">— Select a Combiner —</option>
+      </select>
+      <button class="combiner-nav-btn" id="combiner-next" onclick="navigateCombiner(1)" title="Next">›</button>
+    </div>
+
+    <div class="combiners-layout" id="combiners-layout">
+
+      <!-- Left: card grid -->
+      <div class="combiners-left" style="display:flex;flex-direction:column;">
+        <div class="combiners-heading" id="combiner-grid-heading">CARDS</div>
+        <div class="collection-grid" id="combiner-card-grid">
+          <div class="combiner-empty" style="grid-column:1/-1;">
+            <p>Select a combiner team above</p>
+          </div>
+        </div>
+        <div style="text-align:center; margin-top:0.85rem;">
+          <div class="combiners-parts-count" id="combiner-parts-left" style="display:none;"></div>
+          <div id="combiner-progress-wrap" style="display:none; margin-top:0.5rem;">
+            <div class="stats-progress-track" style="height:6px;">
+              <div class="stats-progress-fill" id="combiner-progress-bar" style="width:0%;"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right: artwork -->
+      <div class="combiners-right">
+        <div class="combiner-artwork" id="combiner-artwork">
+          <div class="art-corner tl"></div>
+          <div class="art-corner tr"></div>
+          <div class="art-corner bl"></div>
+          <div class="art-corner br"></div>
+          <!-- Combined form image (shown when available) -->
+          <img id="combiner-art-img" src="" alt="" onclick="window.open(this.src,'_blank')" style="display:none; width:100%; height:100%; object-fit:contain; position:absolute; inset:0; cursor:pointer; z-index:1;">
+          <div class="combiner-artwork-inner" id="combiner-artwork-inner">
+            <div class="combiner-icon-placeholder">
+              <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+                <polygon points="50,5 95,27.5 95,72.5 50,95 5,72.5 5,27.5" fill="none" stroke="var(--energon-blue)" stroke-width="3"/>
+                <polygon points="50,20 80,35 80,65 50,80 20,65 20,35" fill="none" stroke="var(--energon-blue)" stroke-width="2" opacity="0.5"/>
+                <circle cx="50" cy="50" r="12" fill="none" stroke="var(--energon-blue)" stroke-width="2"/>
+                <line x1="50" y1="5" x2="50" y2="20" stroke="var(--energon-blue)" stroke-width="2"/>
+                <line x1="50" y1="80" x2="50" y2="95" stroke="var(--energon-blue)" stroke-width="2"/>
+                <line x1="5" y1="27.5" x2="20" y2="35" stroke="var(--energon-blue)" stroke-width="2"/>
+                <line x1="80" y1="35" x2="95" y2="27.5" stroke="var(--energon-blue)" stroke-width="2"/>
+                <line x1="5" y1="72.5" x2="20" y2="65" stroke="var(--energon-blue)" stroke-width="2"/>
+                <line x1="80" y1="65" x2="95" y2="72.5" stroke="var(--energon-blue)" stroke-width="2"/>
+              </svg>
+            </div>
+            <div class="combiner-artwork-name" id="combiner-artwork-name">SELECT A TEAM</div>
+            <div class="combiner-artwork-sub" id="combiner-artwork-sub">Combined form artwork coming soon</div>
+            <div class="combiner-artwork-count" id="combiner-artwork-count" style="display:none;"></div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ===== STATS PAGE ===== -->
+  <div id="page-stats" class="page">
+
+    <!-- Overall summary row -->
+    <div class="stats-summary-row">
+      <div class="stats-big-card">
+        <div class="stats-big-num" id="stats-total">—</div>
+        <div class="stats-big-label">Total Cards</div>
+      </div>
+      <div class="stats-big-card">
+        <div class="stats-big-num" style="color:var(--energon-blue);" id="stats-owned-count">—</div>
+        <div class="stats-big-label">Owned</div>
+      </div>
+      <div class="stats-big-card">
+        <div class="stats-big-num" style="color:var(--autobot-red);" id="stats-missing-count">—</div>
+        <div class="stats-big-label">Missing</div>
+      </div>
+      <div class="stats-big-card">
+        <div class="stats-big-num" style="color:var(--warning-yellow);" id="stats-pct">—</div>
+        <div class="stats-big-label">Complete</div>
+      </div>
+    </div>
+
+    <!-- Overall progress bar -->
+    <div class="panel" style="margin-bottom:1.5rem;">
+      <div class="panel-corner tl"></div><div class="panel-corner tr"></div>
+      <div class="panel-corner bl"></div><div class="panel-corner br"></div>
+      <div class="panel-body" style="padding:1.25rem 1.5rem;">
+        <div class="section-header" style="margin-bottom:0.75rem;">
+          <span class="section-title">◎ Overall Collection</span>
+          <div class="section-line"></div>
+        </div>
+        <div class="stats-progress-track">
+          <div class="stats-progress-fill" id="stats-overall-bar" style="width:0%"></div>
+        </div>
+        <div style="display:flex;justify-content:space-between;margin-top:0.4rem;">
+          <span style="font-size:0.65rem;color:var(--chrome);letter-spacing:0.1em;" id="stats-overall-label">0 / 0 cards owned</span>
+          <span style="font-size:0.65rem;color:var(--warning-yellow);font-family:'Orbitron',monospace;font-weight:700;" id="stats-overall-pct">0%</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Per-set breakdown -->
+    <div class="panel">
+      <div class="panel-corner tl"></div><div class="panel-corner tr"></div>
+      <div class="panel-corner bl"></div><div class="panel-corner br"></div>
+      <div class="panel-body">
+        <div class="section-header" style="margin-bottom:1rem;">
+          <span class="section-title">◈ Progress by Set</span>
+          <div class="section-line"></div>
+        </div>
+        <div id="stats-by-set"></div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ===== SETTINGS PAGE ===== -->
+  <div id="page-settings" class="page">
+    <div class="settings-grid">
+
+      <div class="panel" style="grid-column:1/-1;">
+        <div class="panel-corner tl"></div>
+        <div class="panel-corner tr"></div>
+        <div class="panel-corner bl"></div>
+        <div class="panel-corner br"></div>
+        <div class="panel-body">
+          <div class="settings-section-title">⚡ Google Sheets Connection</div>
+
+          <div class="api-status">
+            <div class="status-dot disconnected" id="status-dot"></div>
+            <span class="status-text" id="status-text">Not connected — enter your credentials below</span>
+          </div>
+
+          <div class="form-grid" style="max-width:700px;">
+            <div class="form-group full">
+              <label class="form-label">Google Sheets API Key</label>
+              <input type="password" class="form-input" id="cfg-apikey" placeholder="AIza...">
+            </div>
+            <div class="form-group full">
+              <label class="form-label">Spreadsheet ID</label>
+              <input type="text" class="form-input" id="cfg-sheetid" placeholder="Paste the ID from your Sheet URL">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Sheet / Tab Name</label>
+              <input type="text" class="form-input" id="cfg-sheetname" placeholder="e.g. Sheet1" value="Sheet1">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Header Row</label>
+              <input type="number" class="form-input" id="cfg-headerrow" placeholder="1" value="1" min="1">
+            </div>
+          </div>
+
+          <div style="margin-top:1rem; display:flex; gap:0.75rem; flex-wrap:wrap; align-items:center;">
+            <button class="submit-btn" onclick="saveConfig()" style="width:auto; padding:0.75rem 2rem;">💾 SAVE CONFIG</button>
+            <button class="cotd-refresh" onclick="testConnection()">TEST CONNECTION</button>
+            <button class="sync-btn" id="cfg-sync-btn" onclick="syncFromSheet()" style="margin-top:16px;">↻ SYNC SHEET</button>
+          </div>
+
+          <div class="info-box" style="margin-top:1rem;">
+            <strong>Column Order Expected:</strong> The app reads your sheet in this order:<br>
+            Column A: Card Front (image URL) &nbsp;|&nbsp; B: Card Back (image URL) &nbsp;|&nbsp; C: Set &nbsp;|&nbsp; D: Type &nbsp;|&nbsp; E: No. &nbsp;|&nbsp; F: Name &nbsp;|&nbsp; G: Quantity &nbsp;|&nbsp; H: Combiner<br><br>
+            <strong>Note:</strong> You can customise column mapping below if your sheet differs.
+          </div>
+
+          <div style="margin-top:1rem;">
+            <div class="settings-section-title" style="font-size:0.65rem; margin-bottom:0.75rem;">COLUMN MAPPING</div>
+            <div class="form-grid" style="max-width:700px;">
+              <div class="form-group">
+                <label class="form-label">Card Front</label>
+                <input type="number" class="form-input" id="col-front" value="1" min="1">
+              </div>
+              <div class="form-group">
+                <label class="form-label">Card Back</label>
+                <input type="number" class="form-input" id="col-back" value="2" min="1">
+              </div>
+              <div class="form-group">
+                <label class="form-label">Set</label>
+                <input type="number" class="form-input" id="col-set" value="3" min="1">
+              </div>
+              <div class="form-group">
+                <label class="form-label">Type</label>
+                <input type="number" class="form-input" id="col-type" value="4" min="1">
+              </div>
+              <div class="form-group">
+                <label class="form-label">No.</label>
+                <input type="number" class="form-input" id="col-number" value="5" min="1">
+              </div>
+              <div class="form-group">
+                <label class="form-label">Name</label>
+                <input type="number" class="form-input" id="col-name" value="6" min="1">
+              </div>
+              <div class="form-group">
+                <label class="form-label">Quantity</label>
+                <input type="number" class="form-input" id="col-qty" value="7" min="1">
+              </div>
+              <div class="form-group">
+                <label class="form-label">Combiner</label>
+                <input type="number" class="form-input" id="col-combiner" value="8" min="1">
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- Setup Guide -->
+      <div class="panel" style="grid-column:1/-1;">
+        <div class="panel-corner tl"></div>
+        <div class="panel-corner tr"></div>
+        <div class="panel-corner bl"></div>
+        <div class="panel-corner br"></div>
+        <div class="panel-body">
+          <div class="settings-section-title">📋 Setup Guide — Google Cloud API Key</div>
+          <div class="setup-steps">
+
+            <div class="setup-step">
+              <span class="step-num">1</span>
+              <div class="step-content">
+                <div class="step-title">Create a Google Cloud Project</div>
+                <div class="step-desc">Go to <a href="https://console.cloud.google.com" target="_blank">console.cloud.google.com</a> and sign in with your Google account. Click <strong>New Project</strong>, give it a name like "TCG Collection", and create it.</div>
+              </div>
+            </div>
+
+            <div class="setup-step">
+              <span class="step-num">2</span>
+              <div class="step-content">
+                <div class="step-title">Enable the Google Sheets API</div>
+                <div class="step-desc">In your project, go to <strong>APIs & Services → Library</strong>. Search for "Google Sheets API" and click <strong>Enable</strong>.</div>
+              </div>
+            </div>
+
+            <div class="setup-step">
+              <span class="step-num">3</span>
+              <div class="step-content">
+                <div class="step-title">Create an API Key</div>
+                <div class="step-desc">Go to <strong>APIs & Services → Credentials</strong>. Click <strong>+ Create Credentials → API Key</strong>. Copy the key and paste it into the field above.<br><br>
+                <strong>⚠️ Important:</strong> Click <strong>Restrict Key</strong> and limit it to the Google Sheets API only for security.</div>
+              </div>
+            </div>
+
+            <div class="setup-step">
+              <span class="step-num">4</span>
+              <div class="step-content">
+                <div class="step-title">Make Your Sheet "Anyone with the link can view"</div>
+                <div class="step-desc">Open your Google Sheet. Click <strong>Share → General Access → Anyone with the link → Viewer</strong>. This is required for API key access (read). For <strong>write access</strong> (adding/editing cards), see step 5.</div>
+              </div>
+            </div>
+
+            <div class="setup-step">
+              <span class="step-num">5</span>
+              <div class="step-content">
+                <div class="step-title">Enable Write Access via Service Account (for adding/editing cards)</div>
+                <div class="step-desc">
+                  For write access, you need a <strong>Service Account</strong> instead of just an API key:<br>
+                  — Go to <strong>Credentials → + Create Credentials → Service Account</strong><br>
+                  — Once created, go to it and click <strong>Keys → Add Key → JSON</strong> — download the file<br>
+                  — In your Google Sheet, click <strong>Share</strong> and add the service account email (ends in <code>@...iam.gserviceaccount.com</code>) as an <strong>Editor</strong><br><br>
+                  Then paste the entire JSON key file content into the field below:
+                </div>
+              </div>
+            </div>
+
+          </div>
+
+          <div class="form-group full" style="margin-top:1rem;">
+            <label class="form-label">Service Account JSON Key (for write access — paste full JSON)</label>
+            <textarea class="form-input" id="cfg-servicekey" rows="5" placeholder='{"type": "service_account", "project_id": "...", ...}' style="resize:vertical; font-size:0.7rem; font-family:monospace;"></textarea>
+          </div>
+
+          <div class="form-group full" style="margin-top:0.75rem;">
+            <label class="form-label">Find your Spreadsheet ID in the URL:</label>
+            <div class="info-box" style="margin-top:0.5rem;">
+              <code style="font-size:0.75rem; color:var(--warning-yellow);">https://docs.google.com/spreadsheets/d/<strong style="color:#fff">YOUR_SPREADSHEET_ID_IS_HERE</strong>/edit</code>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+</main>
+
+<!-- ===== CARD DETAIL MODAL ===== -->
+<div class="modal-overlay" id="card-modal">
+  <div class="modal">
+    <div class="modal-header">
+      <span class="modal-title" id="modal-title">CARD DETAILS</span>
+      <button class="modal-close" onclick="closeModal()">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="modal-card-view">
+        <div class="modal-card-images">
+          <div class="img-two-col">
+            <div class="img-col">
+              <div class="modal-img-label">FRONT</div>
+              <img class="modal-card-img" id="modal-img-front" src="" alt="Front" onerror="this.style.display='none'; document.getElementById('modal-front-ph').style.display='flex';" style="display:none;">
+              <div class="modal-card-img-placeholder" id="modal-front-ph">NO IMAGE</div>
+            </div>
+            <div class="img-col">
+              <div class="modal-img-label">BACK</div>
+              <img class="modal-card-img" id="modal-img-back" src="" alt="Back" onerror="this.style.display='none'; document.getElementById('modal-back-ph').style.display='flex';" style="display:none;">
+              <div class="modal-card-img-placeholder" id="modal-back-ph">NO IMAGE</div>
+            </div>
+          </div>
+        </div>
+        <div class="modal-card-details">
+          <div class="modal-card-name" id="modal-name"></div>
+          <div class="detail-grid">
+            <div class="detail-item">
+              <span class="detail-label">Set</span>
+              <span class="detail-value" id="modal-set"></span>
+            </div>
+            <div class="detail-item">
+              <span class="detail-label">No.</span>
+              <span class="detail-value" id="modal-number"></span>
+            </div>
+            <div class="detail-item">
+              <span class="detail-label">Type</span>
+              <span class="detail-value" id="modal-type"></span>
+            </div>
+            <div class="detail-item">
+              <span class="detail-label">Combiner</span>
+              <span class="detail-value" id="modal-combiner"></span>
+            </div>
+
+          <div class="qty-editor">
+            <span class="qty-label">Your Quantity</span>
+            <button class="qty-btn" onclick="adjustQty(-1)">−</button>
+            <span class="qty-display" id="modal-qty">0</span>
+            <button class="qty-btn" onclick="adjustQty(1)">+</button>
+          </div>
+
+          <div class="modal-actions">
+            <button class="btn-save" onclick="saveCardQty()" id="modal-save-btn">💾 SAVE TO SHEET</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- LOADING OVERLAY -->
+<div class="loading-overlay" id="loading-overlay">
+  <div class="loading-spinner"></div>
+  <div class="loading-text" id="loading-text">ACCESSING CYBERTRON DATABASE...</div>
+</div>
+
+<!-- TOOLTIP -->
+<div id="tile-tooltip"></div>
+
+<!-- TOAST CONTAINER -->
+<div class="toast-container" id="toast-container"></div>
+
+<script>
+// ===== STATE =====
+let cards = [];
+let combinerArt = {}; // map of combiner name → proxied image URL
+let config = {};
+let currentCardIndex = null;
+let modalQty = 0;
+let collectionView = 'grid'; // 'grid' or 'list'
+let listSortKey = 'set';
+let listSortAsc = true;
+
+const COLS = {
+  front: 'col-front', back: 'col-back', set: 'col-set', type: 'col-type',
+  number: 'col-number', name: 'col-name', qty: 'col-qty', combiner: 'col-combiner'
+};
+
+// ===== INIT =====
+document.addEventListener('DOMContentLoaded', () => {
+  loadConfig();
+  loadLocalCards();
+  try { combinerArt = JSON.parse(localStorage.getItem('tcg_combiner_art') || '{}'); } catch(e) { combinerArt = {}; }
+  // Show cached indicator if we have local cards but no API config to sync from
+  if (cards.length && (!config.apiKey || !config.sheetId)) setOfflineIndicator(true);
+  updateStats();
+  populateFilters();
+  showRandomCard();
+});
+
+function loadConfig() {
+  try {
+    const saved = localStorage.getItem('tcg_config');
+    if (saved) {
+      config = JSON.parse(saved);
+      if (config.apiKey) document.getElementById('cfg-apikey').value = config.apiKey;
+      if (config.sheetId) document.getElementById('cfg-sheetid').value = config.sheetId;
+      if (config.sheetName) document.getElementById('cfg-sheetname').value = config.sheetName;
+      if (config.headerRow) document.getElementById('cfg-headerrow').value = config.headerRow;
+      if (config.serviceKey) document.getElementById('cfg-servicekey').value = config.serviceKey;
+      // Column mapping
+      if (config.cols) {
+        Object.keys(config.cols).forEach(k => {
+          const el = document.getElementById('col-' + k);
+          if (el) el.value = config.cols[k];
+        });
+      }
+    }
+  } catch(e) {}
+}
+
+function loadLocalCards() {
+  try {
+    const saved = localStorage.getItem('tcg_cards');
+    if (saved) cards = JSON.parse(saved);
+  } catch(e) { cards = []; }
+}
+
+function saveLocalCards() {
+  localStorage.setItem('tcg_cards', JSON.stringify(cards));
+}
+
+// ===== CONFIG =====
+function saveConfig() {
+  config = {
+    apiKey: document.getElementById('cfg-apikey').value.trim(),
+    sheetId: document.getElementById('cfg-sheetid').value.trim(),
+    sheetName: document.getElementById('cfg-sheetname').value.trim() || 'Sheet1',
+    headerRow: parseInt(document.getElementById('cfg-headerrow').value) || 1,
+    serviceKey: document.getElementById('cfg-servicekey').value.trim(),
+    cols: {
+      front: parseInt(document.getElementById('col-front').value) || 1,
+      back: parseInt(document.getElementById('col-back').value) || 2,
+      set: parseInt(document.getElementById('col-set').value) || 3,
+      type: parseInt(document.getElementById('col-type').value) || 4,
+      number: parseInt(document.getElementById('col-number').value) || 5,
+      name: parseInt(document.getElementById('col-name').value) || 6,
+      qty: parseInt(document.getElementById('col-qty').value) || 7,
+      combiner: parseInt(document.getElementById('col-combiner').value) || 8,
+    }
+  };
+  localStorage.setItem('tcg_config', JSON.stringify(config));
+  showToast('Configuration saved!', 'success');
+}
+
+// ===== OFFLINE INDICATOR =====
+function setOfflineIndicator(offline) {
+  const el = document.getElementById('offline-indicator');
+  if (!el) return;
+  el.classList.toggle('visible', offline);
+}
+
+// Returns the CSS class for a quantity badge based on card type and qty
+function qtyClass(c) {
+  if (c.qty === 0) return 'card-tile-qty-zero';
+  const isCharacter = (c.type || '').toLowerCase().includes('character');
+  if (isCharacter && c.qty === 1) return 'card-tile-qty-single';
+  if (!isCharacter && c.qty === 3) return 'card-tile-qty-single';
+  return '';
+}
+
+// ===== STATS =====
+function renderStats() {
+  const total = cards.length;
+  const owned = cards.filter(c => c.qty > 0).length;
+  const missing = total - owned;
+  const pct = total ? Math.round((owned / total) * 100) : 0;
+
+  document.getElementById('stats-total').textContent = total;
+  document.getElementById('stats-owned-count').textContent = owned;
+  document.getElementById('stats-missing-count').textContent = missing;
+  document.getElementById('stats-pct').textContent = pct + '%';
+  document.getElementById('stats-overall-bar').style.width = pct + '%';
+  document.getElementById('stats-overall-label').textContent = `${owned} / ${total} cards owned`;
+  document.getElementById('stats-overall-pct').textContent = pct + '%';
+
+  // Per-set breakdown
+  const sets = [...new Set(cards.map(c => c.set).filter(Boolean))].sort();
+  const container = document.getElementById('stats-by-set');
+
+  if (!sets.length) {
+    container.innerHTML = `<div style="text-align:center;padding:2rem;color:var(--chrome);opacity:0.5;font-size:0.8rem;letter-spacing:0.1em;">Sync your collection to see stats</div>`;
+    return;
+  }
+
+  container.innerHTML = sets.map(set => {
+    const setCards = cards.filter(c => c.set === set);
+    const setOwned = setCards.filter(c => c.qty > 0).length;
+    const setTotal = setCards.length;
+    const setPct = setTotal ? Math.round((setOwned / setTotal) * 100) : 0;
+    const colour = setPct === 100 ? '#00e676' : setPct >= 50 ? '#3dd6f5' : '#ff6b6b';
+    return `<div class="stats-set-row">
+      <div class="stats-set-header">
+        <span class="stats-set-name">${set}</span>
+        <div class="stats-set-meta">
+          <span class="stats-set-fraction" style="color:var(--chrome);">${setOwned} / ${setTotal}</span>
+          <span class="stats-set-pct" style="color:${colour};">${setPct}%</span>
+        </div>
+      </div>
+      <div class="stats-progress-track">
+        <div class="stats-progress-fill" style="width:${setPct}%;background:linear-gradient(90deg,${colour},${colour}cc);transition:width 0.6s ease;"></div>
+      </div>
+    </div>`;
+  });
+
+  const waveSets = sets.filter(s => cards.filter(c => c.set === s).length >= 16);
+  const otherSets = sets.filter(s => cards.filter(c => c.set === s).length < 16);
+
+  function renderSetRows(setList) {
+    return setList.map(set => {
+      const setCards = cards.filter(c => c.set === set);
+      const setOwned = setCards.filter(c => c.qty > 0).length;
+      const setTotal = setCards.length;
+      const setPct = setTotal ? Math.round((setOwned / setTotal) * 100) : 0;
+      const colour = setPct === 100 ? '#00e676' : setPct >= 50 ? '#3dd6f5' : '#ff6b6b';
+      return `<div class="stats-set-row">
+        <div class="stats-set-header">
+          <span class="stats-set-name">${set}</span>
+          <div class="stats-set-meta">
+            <span class="stats-set-fraction" style="color:var(--chrome);">${setOwned} / ${setTotal}</span>
+            <span class="stats-set-pct" style="color:${colour};">${setPct}%</span>
+          </div>
+        </div>
+        <div class="stats-progress-track">
+          <div class="stats-progress-fill" style="width:${setPct}%;background:linear-gradient(90deg,${colour},${colour}cc);transition:width 0.6s ease;"></div>
+        </div>
+      </div>`;
+    }).join('');
+  }
+
+  const divider = waveSets.length && otherSets.length
+    ? `<div style="height:1px;background:linear-gradient(90deg,transparent,var(--steel-mid),transparent);margin:1.25rem 0;"></div>`
+    : '';
+
+  container.innerHTML = renderSetRows(waveSets) + divider + renderSetRows(otherSets);
+}
+
+// ===== BURGER MENU =====
+function toggleBurger() {
+  document.getElementById('burger-btn').classList.toggle('open');
+  document.getElementById('nav-dropdown').classList.toggle('open');
+}
+
+function closeBurger() {
+  document.getElementById('burger-btn').classList.remove('open');
+  document.getElementById('nav-dropdown').classList.remove('open');
+}
+
+document.addEventListener('click', e => {
+  const burger = document.getElementById('burger-btn');
+  const dropdown = document.getElementById('nav-dropdown');
+  if (!burger.contains(e.target) && !dropdown.contains(e.target)) {
+    closeBurger();
+  }
+});
+
+// ===== NAVIGATION =====
+function showPage(name) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('nav button, .nav-dropdown button').forEach(b => b.classList.remove('active'));
+  document.getElementById('page-' + name).classList.add('active');
+  const desktopBtn = document.getElementById('nav-' + name);
+  const mobileBtn = document.getElementById('nav-' + name + '-m');
+  if (desktopBtn) desktopBtn.classList.add('active');
+  if (mobileBtn) mobileBtn.classList.add('active');
+  if (name === 'collection') renderCollection();
+  if (name === 'stats') renderStats();
+  if (name === 'combiners') {
+    populateCombinerSelect();
+    if (!document.getElementById('combiner-select').value) pickRandomCombiner();
+    else renderCombinerPage();
+  }
+}
+
+// ===== GOOGLE SHEETS API =====
+function getColIndex(key) {
+  return (config.cols && config.cols[key]) ? config.cols[key] - 1 : {
+    front:0, back:1, set:2, type:3, number:4, name:5, qty:6, combiner:7
+  }[key];
+}
+
+// ===== IMAGE PROXY =====
+// Wraps Google Drive (or any) URL in wsrv.nl for CORS-safe loading
+function proxyImg(url) {
+  if (!url) return '';
+  url = url.trim();
+  // Already a wsrv.nl URL — leave as-is
+  if (url.includes('wsrv.nl')) return url;
+  return 'https://wsrv.nl/?url=' + encodeURIComponent(url);
+}
+
+const DEFAULT_BACK = 'https://drive.google.com/uc?export=view&id=13gf4UvUgxPp-5ewCdxBjY_FGcOhT4jF6';
+
+function rowToCard(row, rowIndex) {
+  const rawBack = row[getColIndex('back')] || '';
+  return {
+    rowIndex,
+    front: proxyImg(row[getColIndex('front')] || ''),
+    back: proxyImg(rawBack || DEFAULT_BACK),
+    hasBack: !!rawBack.trim(),
+    set: row[getColIndex('set')] || '',
+    type: row[getColIndex('type')] || '',
+    number: row[getColIndex('number')] || '',
+    name: row[getColIndex('name')] || '',
+    qty: parseInt(row[getColIndex('qty')]) || 0,
+    combiner: row[getColIndex('combiner')] || ''
+  };
+}
+
+async function testConnection() {
+  if (!config.sheetId && !document.getElementById('cfg-sheetid').value.trim()) {
+    showToast('Enter a Spreadsheet ID first', 'error'); return;
+  }
+  saveConfig();
+  setStatus('loading', 'Testing connection...');
+  showLoading('CONNECTING TO CYBERTRON...');
+  try {
+    await fetchSheetData(true);
+    setStatus('connected', 'Connected successfully!');
+    showToast('Connection successful!', 'success');
+  } catch(e) {
+    setStatus('disconnected', 'Connection failed: ' + e.message);
+    showToast('Connection failed: ' + e.message, 'error');
+  }
+  hideLoading();
+}
+
+async function fetchSheetData(testOnly = false) {
+  const key = config.apiKey;
+  const id = config.sheetId;
+  const sheet = encodeURIComponent(config.sheetName || 'Sheet1');
+  const headerRow = config.headerRow || 1;
+
+  if (!key || !id) throw new Error('API Key and Sheet ID required');
+
+  const url = `https://sheets.googleapis.com/v4/spreadsheets/${id}/values/${sheet}?key=${key}`;
+  const resp = await fetch(url);
+  if (!resp.ok) {
+    const err = await resp.json();
+    throw new Error(err.error?.message || 'API Error ' + resp.status);
+  }
+  const data = await resp.json();
+  const rows = data.values || [];
+  if (testOnly) return rows;
+
+  // Skip header row(s)
+  const dataRows = rows.slice(headerRow);
+  return dataRows.map((row, i) => rowToCard(row, i + headerRow + 1)); // +1 for 1-indexed, +headerRow for offset
+}
+
+async function fetchCombinerArt() {
+  const key = config.apiKey;
+  const id = config.sheetId;
+  if (!key || !id) return {};
+  const sheet = encodeURIComponent('TransformersCombinerImages');
+  const url = `https://sheets.googleapis.com/v4/spreadsheets/${id}/values/${sheet}?key=${key}`;
+  const resp = await fetch(url);
+  if (!resp.ok) return {}; // silently skip if tab doesn't exist yet
+  const data = await resp.json();
+  const rows = data.values || [];
+  const map = {};
+  // Skip header row, col A = name, col B = URL
+  rows.slice(1).forEach(row => {
+    const name = (row[0] || '').trim();
+    const imgUrl = (row[1] || '').trim();
+    if (name && imgUrl) map[name] = proxyImg(imgUrl);
+  });
+  return map;
+}
+
+async function syncFromSheet() {
+  if (!config.sheetId || !config.apiKey) {
+    showToast('Configure API key and Sheet ID in Settings first', 'error');
+    showPage('settings');
+    return;
+  }
+  const btns = ['coll-sync-btn', 'cfg-sync-btn'].map(id => document.getElementById(id)).filter(Boolean);
+  btns.forEach(b => { b.disabled = true; b.textContent = '⟳ SYNCING...'; });
+  try {
+    const [fetched, artMap] = await Promise.all([fetchSheetData(), fetchCombinerArt()]);
+    cards = fetched.filter(c => c.name);
+    combinerArt = artMap;
+    saveLocalCards();
+    localStorage.setItem('tcg_combiner_art', JSON.stringify(combinerArt));
+    updateStats();
+    populateFilters();
+    showRandomCard();
+    renderCollection();
+    setStatus('connected', 'Synced — ' + cards.length + ' cards loaded');
+    showToast('Synced ' + cards.length + ' cards!', 'success');
+    setOfflineIndicator(false);
+  } catch(e) {
+    showToast('Sync failed: ' + e.message, 'error');
+    setStatus('disconnected', 'Sync failed: ' + e.message);
+    setOfflineIndicator(true);
+  }
+  btns.forEach(b => { b.disabled = false; b.textContent = '↻ SYNC SHEET'; });
+}
+
+// ===== WRITE BACK TO SHEET (using fetch + service account) =====
+// NOTE: Direct OAuth from a static HTML file requires an OAuth flow or a proxy.
+// We implement two modes: (a) API key = read-only, (b) service account JSON = full access via direct REST.
+// For simplicity in a local HTML file, we use the Sheets REST API with a service account JWT.
+
+async function getAccessToken() {
+  const keyJson = config.serviceKey;
+  if (!keyJson) throw new Error('Service Account key not configured. Add it in Settings for write access.');
+
+  let key;
+  try { key = typeof keyJson === 'string' ? JSON.parse(keyJson) : keyJson; }
+  catch(e) { throw new Error('Invalid service account JSON'); }
+
+  // Build JWT
+  const now = Math.floor(Date.now() / 1000);
+  const header = { alg: 'RS256', typ: 'JWT' };
+  const claim = {
+    iss: key.client_email,
+    scope: 'https://www.googleapis.com/auth/spreadsheets',
+    aud: 'https://oauth2.googleapis.com/token',
+    exp: now + 3600,
+    iat: now
+  };
+
+  const b64Header = btoa(JSON.stringify(header)).replace(/=/g,'').replace(/\+/g,'-').replace(/\//g,'_');
+  const b64Claim = btoa(JSON.stringify(claim)).replace(/=/g,'').replace(/\+/g,'-').replace(/\//g,'_');
+  const sigInput = b64Header + '.' + b64Claim;
+
+  // Import private key
+  const pemBody = key.private_key.replace(/-----[^-]+-----/g, '').replace(/\s/g, '');
+  const derBuf = Uint8Array.from(atob(pemBody), c => c.charCodeAt(0)).buffer;
+  const cryptoKey = await crypto.subtle.importKey(
+    'pkcs8', derBuf,
+    { name: 'RSASSA-PKCS1-v1_5', hash: 'SHA-256' },
+    false, ['sign']
+  );
+
+  const enc = new TextEncoder();
+  const sig = await crypto.subtle.sign('RSASSA-PKCS1-v1_5', cryptoKey, enc.encode(sigInput));
+  const b64Sig = btoa(String.fromCharCode(...new Uint8Array(sig))).replace(/=/g,'').replace(/\+/g,'-').replace(/\//g,'_');
+
+  const jwt = sigInput + '.' + b64Sig;
+
+  // Exchange JWT for access token
+  const tokenResp = await fetch('https://oauth2.googleapis.com/token', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+    body: `grant_type=urn%3Aietf%3Aparams%3Aoauth%3Agrant-type%3Ajwt-bearer&assertion=${jwt}`
+  });
+  const tokenData = await tokenResp.json();
+  if (!tokenData.access_token) throw new Error(tokenData.error_description || 'Could not get access token');
+  return tokenData.access_token;
+}
+
+// Strip wsrv.nl proxy to recover the raw URL before writing back to sheet
+function unproxyImg(url) {
+  if (!url) return '';
+  if (url.startsWith('https://wsrv.nl/?url=')) {
+    return decodeURIComponent(url.replace('https://wsrv.nl/?url=', ''));
+  }
+  return url;
+}
+
+async function writeRowToSheet(card) {
+  const token = await getAccessToken();
+  const id = config.sheetId;
+  const sheet = encodeURIComponent(config.sheetName || 'Sheet1');
+  const cols = config.cols || { front:1, back:2, set:3, type:4, number:5, name:6, qty:7, combiner:8 };
+  const maxCol = Math.max(...Object.values(cols));
+
+  // Build row array — strip proxy so raw Drive URLs go back to the sheet
+  const row = new Array(maxCol).fill('');
+  row[cols.front - 1] = unproxyImg(card.front) || '';
+  row[cols.back - 1] = unproxyImg(card.back) || '';
+  row[cols.set - 1] = card.set || '';
+  row[cols.type - 1] = card.type || '';
+  row[cols.number - 1] = card.number || '';
+  row[cols.name - 1] = card.name || '';
+  row[cols.qty - 1] = card.qty !== undefined ? card.qty : 1;
+  row[cols.combiner - 1] = card.combiner || '';
+
+  const url = `https://sheets.googleapis.com/v4/spreadsheets/${id}/values/${sheet}:append?valueInputOption=USER_ENTERED&insertDataOption=INSERT_ROWS`;
+  const resp = await fetch(url, {
+    method: 'POST',
+    headers: { Authorization: 'Bearer ' + token, 'Content-Type': 'application/json' },
+    body: JSON.stringify({ values: [row] })
+  });
+  if (!resp.ok) {
+    const err = await resp.json();
+    throw new Error(err.error?.message || 'Write error');
+  }
+  return await resp.json();
+}
+
+async function updateRowInSheet(card) {
+  if (!card.rowIndex) throw new Error('No row index for this card');
+  const token = await getAccessToken();
+  const id = config.sheetId;
+  const sheet = config.sheetName || 'Sheet1';
+  const cols = config.cols || { front:1, back:2, set:3, type:4, number:5, name:6, qty:7, combiner:8 };
+  const maxCol = Math.max(...Object.values(cols));
+
+  const row = new Array(maxCol).fill('');
+  row[cols.front - 1] = unproxyImg(card.front) || '';
+  row[cols.back - 1] = unproxyImg(card.back) || '';
+  row[cols.set - 1] = card.set || '';
+  row[cols.type - 1] = card.type || '';
+  row[cols.number - 1] = card.number || '';
+  row[cols.name - 1] = card.name || '';
+  row[cols.qty - 1] = card.qty !== undefined ? card.qty : 0;
+  row[cols.combiner - 1] = card.combiner || '';
+
+  const colLetter = String.fromCharCode(64 + maxCol);
+  const range = encodeURIComponent(`${sheet}!A${card.rowIndex}:${colLetter}${card.rowIndex}`);
+  const url = `https://sheets.googleapis.com/v4/spreadsheets/${id}/values/${range}?valueInputOption=USER_ENTERED`;
+
+  const resp = await fetch(url, {
+    method: 'PUT',
+    headers: { Authorization: 'Bearer ' + token, 'Content-Type': 'application/json' },
+    body: JSON.stringify({ values: [row] })
+  });
+  if (!resp.ok) {
+    const err = await resp.json();
+    throw new Error(err.error?.message || 'Update error');
+  }
+  return await resp.json();
+}
+
+// ===== CARD OF THE DAY =====
+// Seeded random using today's date — same card all day, different each day
+function dateSeededIndex(pool, salt) {
+  const today = new Date();
+  const seed = today.getFullYear() * 10000 + (today.getMonth() + 1) * 100 + today.getDate() + salt;
+  // Simple hash
+  let h = seed;
+  h = ((h >>> 16) ^ h) * 0x45d9f3b;
+  h = ((h >>> 16) ^ h) * 0x45d9f3b;
+  h = (h >>> 16) ^ h;
+  return Math.abs(h) % pool.length;
+}
+
+function showRandomCard() {
+  rollBattleCard();
+  rollCharacterCard();
+}
+
+function rollBattleCard(forceRandom = false) {
+  const container = document.getElementById('cotd-battle');
+  if (!container) return;
+  if (!cards.length) {
+    container.innerHTML = `<div style="text-align:center;padding:1.5rem;color:var(--chrome);opacity:0.5;"><p style="font-size:0.8rem;letter-spacing:0.1em;">Sync your collection to reveal cards</p></div>`;
+    return;
+  }
+
+  const pool = cards.filter(c => (c.type || '').toLowerCase().includes('battle') && c.qty > 0);
+  if (!pool.length) {
+    container.innerHTML = `<div class="cotd-sub">⚔ Battle Card</div><div style="padding:0.75rem 0;color:var(--chrome);opacity:0.5;font-size:0.8rem;letter-spacing:0.1em;">No battle cards found</div>`;
+    return;
+  }
+
+  // Use date seed unless user manually re-rolled
+  const idx_pool = forceRandom
+    ? Math.floor(Math.random() * pool.length)
+    : dateSeededIndex(pool, 1);
+  const card = pool[idx_pool];
+  const idx = cards.indexOf(card);
+
+  container.innerHTML = `
+    <div class="cotd-sub">⚔ Battle Card</div>
+    <div class="cotd-inner">
+      <div class="cotd-card-wrap">
+        ${card.front
+          ? `<img class="cotd-img${card.qty === 0 ? ' card-img-unowned' : ''}" src="${card.front}" alt="${card.name}" onclick="openCardModal(${idx})" onerror="this.style.display='none'">`
+          : `<div class="cotd-img-placeholder">NO IMAGE</div>`}
+      </div>
+      <div class="cotd-info">
+        <div class="cotd-name">${card.name}</div>
+        <div class="cotd-meta">
+          <div class="meta-row">
+            <span class="meta-label">Set</span>
+            <span class="badge badge-set">${card.set || '—'}</span>
+          </div>
+          ${card.number ? `<div class="meta-row">
+            <span class="meta-label">No.</span>
+            <span class="meta-value">${card.number}</span>
+          </div>` : ''}
+          <div class="meta-row">
+            <span class="meta-label">Owned</span>
+            <span class="meta-value" style="color:${card.qty === 3 ? '#00e676' : 'var(--warning-yellow)'};font-family:'Orbitron',monospace;">${card.qty}×</span>
+          </div>
+        </div>
+        <div style="display:flex;gap:0.5rem;margin-top:0.75rem;flex-wrap:wrap;">
+          <button class="cotd-refresh" style="margin-top:0;flex:1;" onclick="openCardModal(${idx})">VIEW CARD</button>
+          <button class="cotd-refresh" style="margin-top:0;" onclick="rollBattleCard(true)">↻ ROLL BATTLE CARD</button>
+        </div>
+      </div>
+    </div>`;
+}
+
+function rollCharacterCard(forceRandom = false) {
+  const container = document.getElementById('cotd-character');
+  if (!container) return;
+  if (!cards.length) {
+    container.innerHTML = `<div style="text-align:center;padding:1.5rem;color:var(--chrome);opacity:0.5;"><p style="font-size:0.8rem;letter-spacing:0.1em;">Sync your collection to reveal cards</p></div>`;
+    return;
+  }
+
+  const pool = cards.filter(c => (c.type || '').toLowerCase().includes('character') && c.qty > 0);
+  if (!pool.length) {
+    container.innerHTML = `<div class="cotd-sub">◈ Character Card</div><div style="padding:0.75rem 0;color:var(--chrome);opacity:0.5;font-size:0.8rem;letter-spacing:0.1em;">No character cards found</div>`;
+    return;
+  }
+
+  const idx_pool = forceRandom
+    ? Math.floor(Math.random() * pool.length)
+    : dateSeededIndex(pool, 2);
+  const card = pool[idx_pool];
+  const idx = cards.indexOf(card);
+  const isCombiner = !!card.combiner;
+
+  container.innerHTML = `
+    <div class="cotd-sub">◈ Character Card</div>
+    <div class="cotd-inner">
+      <div class="card-tile-img-wrap cotd-flip-wrap" style="width:154px;height:215px;flex-shrink:0;cursor:pointer;" onclick="openCardModal(${idx})">
+        ${card.front
+          ? `<img class="card-tile-img card-tile-img-front${card.qty === 0 ? ' card-img-unowned' : ''}" src="${card.front}" alt="${card.name}" style="width:154px;height:215px;" onerror="this.style.display='none';">`
+          : `<div class="cotd-img-placeholder">NO IMAGE</div>`}
+        ${card.back
+          ? `<img class="card-tile-img-back${card.qty === 0 ? ' card-img-unowned-back' : ''}" src="${card.back}" alt="${card.name} back" style="width:154px;height:215px;">`
+          : ''}
+      </div>
+      <div class="cotd-info">
+        <div class="cotd-name">${card.name}</div>
+        <div class="cotd-meta">
+          <div class="meta-row">
+            <span class="meta-label">Set</span>
+            <span class="badge badge-set">${card.set || '—'}</span>
+          </div>
+          ${card.number ? `<div class="meta-row">
+            <span class="meta-label">No.</span>
+            <span class="meta-value">${card.number}</span>
+          </div>` : ''}
+          ${isCombiner ? `<div class="meta-row">
+            <span class="meta-label">Combiner</span>
+            <button onclick="goToCombiner('${card.combiner}')" style="background:transparent;border:none;cursor:pointer;padding:0;">
+              <span class="badge badge-combiner" style="cursor:pointer;text-decoration:underline;text-underline-offset:2px;">${card.combiner} ↗</span>
+            </button>
+          </div>` : ''}
+          <div class="meta-row">
+            <span class="meta-label">Owned</span>
+            <span class="meta-value" style="color:${card.qty === 1 ? '#00e676' : 'var(--warning-yellow)'};font-family:'Orbitron',monospace;">${card.qty}×</span>
+          </div>
+        </div>
+        <div style="display:flex;gap:0.5rem;margin-top:0.75rem;flex-wrap:wrap;">
+          <button class="cotd-refresh" style="margin-top:0;flex:1;" onclick="openCardModal(${idx})">VIEW CARD</button>
+          <button class="cotd-refresh" style="margin-top:0;" onclick="rollCharacterCard(true)">↻ ROLL CHARACTER CARD</button>
+        </div>
+      </div>
+    </div>`;
+}
+
+function goToCombiner(name) {
+  showPage('combiners');
+  populateCombinerSelect();
+  document.getElementById('combiner-select').value = name;
+  renderCombinerPage();
+}
+
+// ===== SEARCH =====
+function handleSearch(query) {
+  const setFilter = document.getElementById('filter-set').value;
+  const typeFilter = document.getElementById('filter-type').value;
+  const results = document.getElementById('search-results');
+
+  const placeholder = document.getElementById('search-placeholder');
+
+  const q = query.toLowerCase().trim();
+
+  if (!q && !setFilter && !typeFilter) {
+    results.innerHTML = '';
+    if (placeholder) { results.appendChild(placeholder); placeholder.style.display = 'flex'; }
+    return;
+  }
+
+  if (placeholder) placeholder.style.display = 'none';
+  let filtered = cards.filter(c => {
+    const matchQ = !q || c.name.toLowerCase().includes(q) || c.set.toLowerCase().includes(q) || c.type.toLowerCase().includes(q) || c.number.toLowerCase().includes(q);
+    const matchSet = !setFilter || c.set === setFilter;
+    const matchType = !typeFilter || c.type === typeFilter;
+    return matchQ && matchSet && matchType;
+  });
+
+  if (!filtered.length) {
+    results.innerHTML = `<div class="no-results">${cards.length ? 'No cards match your search' : 'Sync your collection first'}</div>`;
+    return;
+  }
+
+  results.innerHTML = filtered.slice(0, 30).map(c => {
+    const idx = cards.indexOf(c);
+    return `<div class="result-card" onclick="openCardModal(${idx})">
+      ${c.front ? `<img class="result-thumb" src="${c.front}" alt="${c.name}" onerror="this.style.display='none'">` : `<div class="result-thumb-placeholder">?</div>`}
+      <div class="result-info">
+        <div class="result-name">${c.name}</div>
+        <div class="result-sub">${[c.set, c.type, c.number].filter(Boolean).join(' · ')}</div>
+      </div>
+      <div class="result-qty">${c.qty}×</div>
+    </div>`;
+  }).join('');
+  if (filtered.length > 30) {
+    results.innerHTML += `<div class="no-results" style="opacity:0.5;">${filtered.length - 30} more — refine your search</div>`;
+  }
+}
+
+function resetCollectionFilters() {
+  document.getElementById('coll-search').value = '';
+  document.getElementById('coll-filter-set').value = '';
+  document.getElementById('coll-filter-type').value = '';
+  document.getElementById('coll-filter-owned').value = '';
+  document.getElementById('coll-sort').value = 'set';
+  renderCollection();
+}
+
+// ===== VIEW TOGGLE =====
+function setCollectionView(view) {
+  collectionView = view;
+  document.getElementById('collection-grid').style.display = view === 'grid' ? 'grid' : 'none';
+  document.getElementById('collection-list-wrap').style.display = view === 'list' ? 'block' : 'none';
+  document.getElementById('toggle-grid').classList.toggle('active', view === 'grid');
+  document.getElementById('toggle-list').classList.toggle('active', view === 'list');
+  renderCollection();
+}
+
+function listSort(key) {
+  if (listSortKey === key || (key === 'qty-desc' && listSortKey === 'qty')) {
+    listSortAsc = !listSortAsc;
+  } else {
+    listSortKey = key === 'qty-desc' ? 'qty' : key;
+    listSortAsc = key !== 'qty-desc';
+  }
+  // Update header arrows
+  document.querySelectorAll('.collection-list th').forEach(th => {
+    th.classList.remove('sorted');
+    const arrow = th.querySelector('.sort-arrow');
+    if (arrow) arrow.textContent = '↕';
+  });
+  const headers = { name:1, set:2, type:3, number:4, combiner:5, qty:6 };
+  const colIdx = headers[listSortKey];
+  if (colIdx !== undefined) {
+    const th = document.querySelectorAll('.collection-list th')[colIdx];
+    if (th) {
+      th.classList.add('sorted');
+      const arrow = th.querySelector('.sort-arrow');
+      if (arrow) arrow.textContent = listSortAsc ? '↑' : '↓';
+    }
+  }
+  renderCollection();
+}
+
+// ===== COLLECTION RENDER =====
+function multiSort(a, b, primaryKey, primaryAsc) {
+  // Primary sort (user-selected), then always fall back to set → type → number
+  const cmp = (x, y) => (x || '').toString().localeCompare((y || '').toString(), undefined, { numeric: true });
+  const numCmp = (x, y) => (x || 0) - (y || 0);
+
+  if (primaryKey && primaryKey !== 'set') {
+    let result;
+    if (primaryKey === 'qty') result = primaryAsc ? numCmp(a.qty, b.qty) : numCmp(b.qty, a.qty);
+    else result = primaryAsc ? cmp(a[primaryKey], b[primaryKey]) : cmp(b[primaryKey], a[primaryKey]);
+    if (result !== 0) return result;
+  }
+
+  // set → type → number
+  return cmp(a.set, b.set) || cmp(a.type, b.type) || cmp(a.number, b.number);
+}
+
+function renderCollection() {
+  const q = (document.getElementById('coll-search')?.value || '').toLowerCase();
+  const setF = document.getElementById('coll-filter-set')?.value || '';
+  const typeF = document.getElementById('coll-filter-type')?.value || '';
+  const ownedF = document.getElementById('coll-filter-owned')?.value || '';
+  const sortRaw = collectionView === 'list' ? listSortKey : (document.getElementById('coll-sort')?.value || 'set');
+  const sort = sortRaw === 'qty-desc' ? 'qty' : (sortRaw === 'qty-asc' ? 'qty' : sortRaw);
+  const sortAsc = collectionView === 'list' ? listSortAsc : sortRaw !== 'qty-desc';
+
+  if (!cards.length) {
+    const emptyHtml = `<div class="empty-state" style="grid-column:1/-1;">
+      <div class="empty-state-icon">📦</div>
+      <h3>NO CARDS LOADED</h3>
+      <p>Configure your Google Sheet in Settings and sync your collection.</p>
+    </div>`;
+    document.getElementById('collection-grid').innerHTML = emptyHtml;
+    document.getElementById('collection-list-body').innerHTML = `<tr><td colspan="7" style="text-align:center;padding:2rem;color:var(--chrome);opacity:0.5;letter-spacing:0.1em;font-size:0.8rem;">No cards loaded — sync your collection</td></tr>`;
+    return;
+  }
+
+  let filtered = cards.filter(c => {
+    const matchQ = !q || c.name.toLowerCase().includes(q) || c.set.toLowerCase().includes(q) || (c.type||'').toLowerCase().includes(q);
+    const matchSet = !setF || c.set === setF;
+    const matchType = !typeF || c.type === typeF;
+    const matchOwned = !ownedF || (ownedF === 'owned' ? c.qty > 0 : c.qty === 0);
+    return matchQ && matchSet && matchType && matchOwned;
+  });
+
+  filtered.sort((a, b) => multiSort(a, b, sort, sortAsc));
+
+  if (collectionView === 'grid') {
+    renderGrid(filtered);
+  } else {
+    renderList(filtered);
+  }
+}
+
+function renderGrid(filtered) {
+  const grid = document.getElementById('collection-grid');
+  grid.innerHTML = filtered.map(c => {
+    const idx = cards.indexOf(c);
+    const displayName = c.combiner ? `${c.name} - ${c.combiner}` : c.name;
+    const greyClass = c.qty === 0 ? 'card-img-unowned' : '';
+    const unownedClass = c.qty === 0 ? 'unowned' : '';
+    const qClass = qtyClass(c);
+    return `<div class="card-tile ${unownedClass}" onclick="openCardModal(${idx})">
+      <div class="card-tile-img-wrap">
+        ${c.front
+          ? `<img class="card-tile-img card-tile-img-front ${greyClass}" src="${c.front}" alt="${displayName}" loading="lazy" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+             <div class="card-tile-img-placeholder" style="display:none;">${displayName}</div>`
+          : `<div class="card-tile-img-placeholder">${displayName}</div>`}
+        ${!((c.type || '').toLowerCase().includes('battle')) && c.back && c.qty > 0 ? `<img class="card-tile-img-back" src="${c.back}" alt="${displayName} back" loading="lazy">` : ''}
+      </div>
+      <div class="card-tile-info">
+        <div class="card-tile-name" data-tooltip="${displayName}">${displayName}</div>
+        <div class="card-tile-meta">
+          <span class="card-tile-set" data-tooltip="${c.set}">${c.set}</span>
+          <span class="card-tile-qty ${qClass}">${c.qty}×</span>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function renderList(filtered) {
+  const tbody = document.getElementById('collection-list-body');
+  if (!filtered.length) {
+    tbody.innerHTML = `<tr><td colspan="7" style="text-align:center;padding:2rem;color:var(--chrome);opacity:0.5;letter-spacing:0.1em;font-size:0.8rem;">No cards match your filters</td></tr>`;
+    return;
+  }
+  tbody.innerHTML = filtered.map(c => {
+    const idx = cards.indexOf(c);
+    const missing = !c.qty || c.qty < 1;
+    return `<tr class="${missing ? 'missing-row' : ''}" onclick="openCardModal(${idx})">
+      <td class="list-thumb-cell">
+        ${c.front
+          ? `<img class="list-thumb ${missing ? 'card-img-unowned' : ''}" src="${c.front}" alt="${c.name}" loading="lazy" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+             <div class="list-thumb-ph" style="display:none;">?</div>`
+          : `<div class="list-thumb-ph">?</div>`}
+      </td>
+      <td class="list-name">${c.name}</td>
+      <td>${c.set || '—'}</td>
+      <td>${c.type || '—'}</td>
+      <td style="color:var(--chrome);font-size:0.8rem;">${c.number || '—'}</td>
+      <td>${c.combiner ? `<span class="list-combiner-yes">${c.combiner}</span>` : '<span style="color:var(--chrome);opacity:0.4;">—</span>'}</td>
+      <td class="list-qty ${missing ? 'list-qty-zero' : qtyClass(c)}">${c.qty}</td>
+    </tr>`;
+  }).join('');
+}
+
+// ===== MODAL =====
+function openCardModal(idx) {
+  currentCardIndex = idx;
+  const card = cards[idx];
+  if (!card) return;
+
+  modalQty = card.qty;
+  document.getElementById('modal-title').textContent = card.name.toUpperCase();
+  document.getElementById('modal-name').textContent = card.name;
+  document.getElementById('modal-set').textContent = card.set || '—';
+  document.getElementById('modal-number').textContent = card.number || '—';
+  document.getElementById('modal-type').textContent = card.type || '—';
+
+  // Combiner — clickable link if present
+  const combinerEl = document.getElementById('modal-combiner');
+  if (card.combiner) {
+    combinerEl.innerHTML = '';
+    const btn = document.createElement('button');
+    btn.onclick = () => { closeModal(); goToCombiner(card.combiner); };
+    btn.style.cssText = 'background:transparent;border:none;cursor:pointer;padding:0;';
+    btn.innerHTML = `<span class="badge badge-combiner" style="cursor:pointer;text-decoration:underline;text-underline-offset:2px;">${card.combiner} ↗</span>`;
+    combinerEl.appendChild(btn);
+  } else {
+    combinerEl.textContent = '—';
+  }
+  document.getElementById('modal-qty').textContent = modalQty;
+
+  // Front image
+  const frontImg = document.getElementById('modal-img-front');
+  const frontPh = document.getElementById('modal-front-ph');
+  if (card.front) {
+    frontImg.src = card.front; frontImg.style.display = 'block'; frontPh.style.display = 'none';
+  } else {
+    frontImg.style.display = 'none'; frontPh.style.display = 'flex';
+  }
+  // Back image
+  const backImg = document.getElementById('modal-img-back');
+  const backPh = document.getElementById('modal-back-ph');
+  if (card.back) {
+    backImg.src = card.back; backImg.style.display = 'block'; backPh.style.display = 'none';
+  } else {
+    backImg.style.display = 'none'; backPh.style.display = 'flex';
+  }
+
+  document.getElementById('card-modal').classList.add('open');
+}
+
+function closeModal() {
+  document.getElementById('card-modal').classList.remove('open');
+  document.querySelectorAll('.modal-card-img.zoomed').forEach(el => el.classList.remove('zoomed'));
+  currentCardIndex = null;
+}
+
+document.getElementById('card-modal').addEventListener('click', e => {
+  if (e.target === document.getElementById('card-modal')) closeModal();
+});
+
+function adjustQty(delta) {
+  modalQty = Math.max(0, modalQty + delta);
+  document.getElementById('modal-qty').textContent = modalQty;
+}
+
+async function saveCardQty() {
+  if (currentCardIndex === null) return;
+  const card = { ...cards[currentCardIndex], qty: modalQty };
+  const btn = document.getElementById('modal-save-btn');
+  btn.disabled = true;
+  btn.textContent = '⚡ SAVING...';
+
+  try {
+    await updateRowInSheet(card);
+    cards[currentCardIndex] = card;
+    saveLocalCards();
+    updateStats();
+    renderCollection();
+    closeModal();
+  } catch(e) {
+    cards[currentCardIndex] = card;
+    saveLocalCards();
+    updateStats();
+    renderCollection();
+    closeModal();
+  }
+
+  btn.disabled = false;
+  btn.textContent = '💾 SAVE TO SHEET';
+}
+
+// ===== ADD CARD =====
+async function addCard() {
+  const name = document.getElementById('add-name').value.trim();
+  const set = document.getElementById('add-set').value.trim();
+  if (!name) { showToast('Card name is required', 'error'); return; }
+
+  const card = {
+    name,
+    set,
+    number: document.getElementById('add-number').value.trim(),
+    type: document.getElementById('add-type').value.trim(),
+    qty: parseInt(document.getElementById('add-qty').value) || 1,
+    front: document.getElementById('add-front').value.trim(),
+    back: document.getElementById('add-back').value.trim(),
+    combiner: document.getElementById('add-combiner').value
+  };
+
+  const btn = document.getElementById('add-btn');
+  btn.disabled = true;
+  btn.textContent = '⚡ ADDING...';
+
+  try {
+    await writeRowToSheet(card);
+    card.rowIndex = cards.length + (config.headerRow || 1) + 1;
+    cards.push(card);
+    saveLocalCards();
+    updateStats();
+    populateFilters();
+    renderCollection();
+    showToast(card.name + ' added to collection!', 'success');
+    // Clear form
+    ['add-name','add-set','add-number','add-type','add-front','add-back'].forEach(id => {
+      document.getElementById(id).value = '';
+    });
+    document.getElementById('add-qty').value = '1';
+    document.getElementById('add-combiner').value = '';
+  } catch(e) {
+    // Save locally
+    card.rowIndex = null;
+    cards.push(card);
+    saveLocalCards();
+    updateStats();
+    populateFilters();
+    showToast('Saved locally (Sheet write: ' + e.message + ')', 'error');
+  }
+
+  btn.disabled = false;
+  btn.textContent = '⚡ ADD TO COLLECTION';
+}
+
+// ===== FILTERS =====
+function populateFilters() {
+  const sets = [...new Set(cards.map(c => c.set).filter(Boolean))].sort();
+  const types = [...new Set(cards.map(c => c.type).filter(Boolean))].sort();
+
+  ['filter-set', 'coll-filter-set'].forEach(id => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    const cur = el.value;
+    el.innerHTML = '<option value="">All Sets</option>' + sets.map(s => `<option value="${s}">${s}</option>`).join('');
+    if (cur) el.value = cur;
+  });
+
+  ['filter-type', 'coll-filter-type'].forEach(id => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    const cur = el.value;
+    el.innerHTML = '<option value="">All Types</option>' + types.map(t => `<option value="${t}">${t}</option>`).join('');
+    if (cur) el.value = cur;
+  });
+
+  populateCombinerSelect();
+}
+
+// ===== STATS =====
+function updateStats() {
+  document.getElementById('stat-total').textContent = cards.length;
+  document.getElementById('stat-owned').textContent = cards.reduce((s, c) => s + (c.qty || 0), 0);
+  document.getElementById('stat-missing').textContent = cards.filter(c => !c.qty || c.qty < 1).length;
+}
+
+// ===== STATUS =====
+function setStatus(state, text) {
+  const dot = document.getElementById('status-dot');
+  const txt = document.getElementById('status-text');
+  dot.className = 'status-dot ' + state;
+  txt.textContent = text;
+}
+
+// ===== TOAST =====
+function showToast(msg, type = 'info') {
+  const container = document.getElementById('toast-container');
+  const toast = document.createElement('div');
+  toast.className = 'toast ' + type;
+  toast.textContent = msg;
+  container.appendChild(toast);
+  setTimeout(() => toast.remove(), 3100);
+}
+
+// ===== LOADING =====
+function showLoading(text = 'LOADING...') {
+  document.getElementById('loading-text').textContent = text;
+  document.getElementById('loading-overlay').classList.add('active');
+}
+
+function hideLoading() {
+  document.getElementById('loading-overlay').classList.remove('active');
+}
+
+// ===== COMBINERS =====
+function populateCombinerSelect() {
+  const select = document.getElementById('combiner-select');
+  const combiners = [...new Set(cards.map(c => c.combiner).filter(Boolean))].sort();
+  const current = select.value;
+  select.innerHTML = '<option value="">— Select a Combiner —</option>' +
+    combiners.map(c => `<option value="${c}">${c}</option>`).join('');
+  if (current && combiners.includes(current)) select.value = current;
+}
+
+function renderCombinerPage() {
+  const selected = document.getElementById('combiner-select').value;
+  const grid = document.getElementById('combiner-card-grid');
+  const heading = document.getElementById('combiner-grid-heading');
+  const artName = document.getElementById('combiner-artwork-name');
+  const artSub = document.getElementById('combiner-artwork-sub');
+  const artCount = document.getElementById('combiner-artwork-count');
+
+  if (!selected) {
+    heading.textContent = 'CARDS';
+    artName.textContent = 'SELECT A TEAM';
+    artSub.textContent = 'Combined form artwork coming soon';
+    artCount.style.display = 'none';
+    const partsLeft = document.getElementById('combiner-parts-left');
+    if (partsLeft) partsLeft.style.display = 'none';
+    const progressWrap = document.getElementById('combiner-progress-wrap');
+    if (progressWrap) progressWrap.style.display = 'none';
+    const artImg = document.getElementById('combiner-art-img');
+    if (artImg) { artImg.style.display = 'none'; artImg.src = ''; }
+    const artInner = document.getElementById('combiner-artwork-inner');
+    if (artInner) artInner.style.display = 'flex';
+    grid.innerHTML = `<div class="combiner-empty" style="grid-column:1/-1;"><p>Select a combiner team above</p></div>`;
+    return;
+  }
+
+  const members = cards.filter(c => c.combiner === selected)
+    .sort((a, b) => (a.number || '').localeCompare(b.number || '', undefined, { numeric: true }));
+
+  // Pick column count that gives the most even rows
+  const count = members.length;
+  let cols = 3;
+  if (count <= 2) cols = count;
+  else if (count <= 4) cols = 2;
+  else if (count % 3 === 0) cols = 3;
+  else if (count % 4 === 0) cols = 4;
+  else if (count % 2 === 0) cols = count <= 6 ? count / 2 : 4;
+  else cols = 3;
+  grid.style.gridTemplateColumns = `repeat(${cols}, 1fr)`;
+
+  heading.textContent = selected.toUpperCase();
+  artName.textContent = selected.toUpperCase();
+
+  // Show artwork if available, otherwise show placeholder
+  const artImg = document.getElementById('combiner-art-img');
+  const artInner = document.getElementById('combiner-artwork-inner');
+  const artUrl = combinerArt[selected];
+  if (artUrl) {
+    artImg.src = artUrl;
+    artImg.style.display = 'block';
+    artInner.style.display = 'none';
+  } else {
+    artImg.style.display = 'none';
+    artInner.style.display = 'flex';
+    artSub.textContent = 'Combined form artwork coming soon';
+  }
+
+  const owned = members.filter(c => c.qty > 0).length;
+  const isComplete = owned === members.length;
+  const pct = members.length ? Math.round((owned / members.length) * 100) : 0;
+
+  const partsLeft = document.getElementById('combiner-parts-left');
+  if (partsLeft) {
+    partsLeft.textContent = `${owned} / ${members.length} PARTS OWNED`;
+    partsLeft.style.display = 'inline-block';
+  }
+
+  const progressWrap = document.getElementById('combiner-progress-wrap');
+  const progressBar = document.getElementById('combiner-progress-bar');
+  if (progressWrap && progressBar) {
+    progressWrap.style.display = 'block';
+    progressBar.style.width = pct + '%';
+    progressBar.style.background = isComplete
+      ? 'linear-gradient(90deg,#00e676,#00e676)'
+      : 'linear-gradient(90deg, var(--energon-blue), #0090b8)';
+  }
+
+  // Greyscale artwork if set is incomplete
+  if (artUrl) {
+    artImg.style.filter = isComplete ? 'none' : 'grayscale(100%)';
+    artImg.style.opacity = isComplete ? '1' : '0.55';
+  }
+
+  artCount.style.display = 'none';
+
+  // Update prev/next button states
+  const combiners = [...new Set(cards.map(c => c.combiner).filter(Boolean))].sort();
+  const currentIdx = combiners.indexOf(selected);
+  const prevBtn = document.getElementById('combiner-prev');
+  const nextBtn = document.getElementById('combiner-next');
+  if (prevBtn) prevBtn.disabled = currentIdx <= 0;
+  if (nextBtn) nextBtn.disabled = currentIdx >= combiners.length - 1;
+
+  if (!members.length) {
+    grid.innerHTML = `<div class="combiner-empty" style="grid-column:1/-1;"><p>No cards found for this combiner</p></div>`;
+    return;
+  }
+
+  grid.innerHTML = members.map(c => {
+    const idx = cards.indexOf(c);
+    const displayName = c.name;
+    const greyClass = c.qty === 0 ? 'card-img-unowned' : '';
+    const qClass = qtyClass(c);
+    return `<div class="card-tile" onclick="openCardModal(${idx})">
+      <div class="card-tile-img-wrap">
+        ${c.front
+          ? `<img class="card-tile-img ${greyClass}" src="${c.front}" alt="${displayName}" loading="lazy" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+             <div class="card-tile-img-placeholder" style="display:none;">${displayName}</div>`
+          : `<div class="card-tile-img-placeholder">${displayName}</div>`}
+      </div>
+      <div class="card-tile-info">
+        <div class="card-tile-name" data-tooltip="${displayName}">${displayName}</div>
+        <div class="card-tile-meta">
+          <span class="card-tile-set" data-tooltip="${c.set}">${c.set}</span>
+          <span class="card-tile-qty ${qClass}">${c.qty}×</span>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function navigateCombiner(direction) {
+  const combiners = [...new Set(cards.map(c => c.combiner).filter(Boolean))].sort();
+  if (!combiners.length) return;
+  const select = document.getElementById('combiner-select');
+  const currentIdx = combiners.indexOf(select.value);
+  const newIdx = currentIdx + direction;
+  if (newIdx < 0 || newIdx >= combiners.length) return;
+  select.value = combiners[newIdx];
+  renderCombinerPage();
+}
+
+function pickRandomCombiner() {
+  const combiners = [...new Set(cards.map(c => c.combiner).filter(Boolean))];
+  if (!combiners.length) return;
+  const pick = combiners[Math.floor(Math.random() * combiners.length)];
+  document.getElementById('combiner-select').value = pick;
+  renderCombinerPage();
+}
+
+// ===== MODAL IMAGE ZOOM =====
+document.addEventListener('click', e => {
+  const img = e.target.closest('.modal-card-img');
+  if (!img) {
+    // Only unzoom if clicking inside the modal body (not on buttons etc.)
+    if (e.target.closest('.modal')) {
+      document.querySelectorAll('.modal-card-img.zoomed').forEach(el => el.classList.remove('zoomed'));
+    }
+    return;
+  }
+  e.stopPropagation();
+  img.classList.toggle('zoomed');
+});
+
+// ===== KEYBOARD =====
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') closeModal();
+});
+
+// ===== TOOLTIP =====
+const tooltip = document.getElementById('tile-tooltip');
+let tooltipTimeout;
+
+document.addEventListener('mouseover', e => {
+  const el = e.target.closest('[data-tooltip]');
+  if (!el) return;
+  clearTimeout(tooltipTimeout);
+  tooltipTimeout = setTimeout(() => {
+    tooltip.textContent = el.dataset.tooltip;
+    tooltip.classList.add('visible');
+  }, 300);
+});
+
+document.addEventListener('mousemove', e => {
+  if (tooltip.classList.contains('visible')) {
+    tooltip.style.left = (e.clientX + 12) + 'px';
+    tooltip.style.top = (e.clientY - 28) + 'px';
+    // Keep within viewport
+    const rect = tooltip.getBoundingClientRect();
+    if (rect.right > window.innerWidth - 8) {
+      tooltip.style.left = (e.clientX - rect.width - 12) + 'px';
+    }
+    if (rect.top < 8) {
+      tooltip.style.top = (e.clientY + 16) + 'px';
+    }
+  }
+});
+
+document.addEventListener('mouseout', e => {
+  const el = e.target.closest('[data-tooltip]');
+  if (!el) return;
+  clearTimeout(tooltipTimeout);
+  tooltip.classList.remove('visible');
+});
+</script>
+</body>
+</html>
