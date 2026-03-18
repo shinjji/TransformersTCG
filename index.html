@@ -3094,13 +3094,15 @@ function handleSearch(query) {
 
   results.innerHTML = filtered.slice(0, 30).map(c => {
     const idx = cards.indexOf(c);
+    const qc = qtyClass(c);
+    const qColour = qc === 'card-tile-qty-zero' ? 'var(--autobot-red)' : qc === 'card-tile-qty-single' ? '#00e676' : 'var(--warning-yellow)';
     return `<div class="result-card" onclick="openCardModal(${idx})">
       ${c.front ? `<img class="result-thumb" src="${c.front}" alt="${c.name}" onerror="this.style.display='none'">` : `<div class="result-thumb-placeholder">?</div>`}
       <div class="result-info">
         <div class="result-name">${c.name}</div>
         <div class="result-sub">${[c.set, c.type, c.number].filter(Boolean).join(' · ')}</div>
       </div>
-      <div class="result-qty">${c.qty}×</div>
+      <div class="result-qty" style="color:${qColour};">${c.qty}×</div>
     </div>`;
   }).join('');
   if (filtered.length > 30) {
