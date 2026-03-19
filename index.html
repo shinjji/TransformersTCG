@@ -2822,6 +2822,18 @@
               <span class="detail-label">Combiner</span>
               <span class="detail-value" id="modal-combiner"></span>
             </div>
+            <div class="detail-item" id="modal-faction-row" style="display:none;">
+              <span class="detail-label">Faction</span>
+              <span class="detail-value" id="modal-faction"></span>
+            </div>
+            <div class="detail-item" id="modal-charkw-row" style="display:none;">
+              <span class="detail-label">Character</span>
+              <span class="detail-value" id="modal-charkw"></span>
+            </div>
+            <div class="detail-item full" id="modal-keywords-row" style="display:none; grid-column:1/-1;">
+              <span class="detail-label">Keywords</span>
+              <span class="detail-value" id="modal-keywords" style="white-space:normal;line-height:1.6;"></span>
+            </div>
 
           <div class="qty-editor">
             <span class="qty-label">Your Quantity</span>
@@ -3910,6 +3922,37 @@ function openCardModal(idx) {
   } else {
     combinerEl.textContent = '—';
   }
+
+  // Faction
+  const factionRow = document.getElementById('modal-faction-row');
+  const factionEl = document.getElementById('modal-faction');
+  if (card.faction && card.faction.length) {
+    factionEl.textContent = card.faction.join(', ');
+    factionRow.style.display = '';
+  } else {
+    factionRow.style.display = 'none';
+  }
+
+  // Character keywords
+  const charKwRow = document.getElementById('modal-charkw-row');
+  const charKwEl = document.getElementById('modal-charkw');
+  if (card.charKeywords && card.charKeywords.length) {
+    charKwEl.textContent = card.charKeywords.join(', ');
+    charKwRow.style.display = '';
+  } else {
+    charKwRow.style.display = 'none';
+  }
+
+  // Keywords
+  const kwRow = document.getElementById('modal-keywords-row');
+  const kwEl = document.getElementById('modal-keywords');
+  if (card.keywords && card.keywords.length) {
+    kwEl.textContent = card.keywords.join(' · ');
+    kwRow.style.display = '';
+  } else {
+    kwRow.style.display = 'none';
+  }
+
   document.getElementById('modal-qty').textContent = modalQty;
 
   // Front image
