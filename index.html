@@ -2359,12 +2359,17 @@
         <option value="owned">Owned</option>
         <option value="missing">Not Owned</option>
       </select>
+      <select class="filter-select" id="coll-filter-cost" onchange="renderCollection()" style="width:auto;">
+        <option value="">All Costs</option>
+      </select>
       <select class="filter-select" id="coll-sort" onchange="renderCollection()" style="width:auto;">
         <option value="name">Sort: Name</option>
         <option value="set" selected>Sort: Set</option>
         <option value="qty-desc">Sort: Qty ↓</option>
         <option value="qty-asc">Sort: Qty ↑</option>
         <option value="number">Sort: No.</option>
+        <option value="cost-asc">Sort: Cost ↑</option>
+        <option value="cost-desc">Sort: Cost ↓</option>
       </select>
       <div class="view-toggle">
         <button class="view-toggle-btn active" id="toggle-grid" onclick="setCollectionView('grid')" title="Card Grid">
@@ -2695,6 +2700,10 @@
                 <label class="form-label">Faction</label>
                 <input type="number" class="form-input" id="col-faction" value="12" min="1">
               </div>
+              <div class="form-group">
+                <label class="form-label">Cost</label>
+                <input type="number" class="form-input" id="col-cost" value="13" min="1">
+              </div>
             </div>
           </div>
 
@@ -2822,6 +2831,10 @@
               <span class="detail-label">Combiner</span>
               <span class="detail-value" id="modal-combiner"></span>
             </div>
+            <div class="detail-item" id="modal-cost-row" style="display:none;">
+              <span class="detail-label">Cost</span>
+              <span class="detail-value" id="modal-cost"></span>
+            </div>
             <div class="detail-item" id="modal-faction-row" style="display:none;">
               <span class="detail-label">Faction</span>
               <span class="detail-value" id="modal-faction"></span>
@@ -2945,6 +2958,7 @@ function saveConfig() {
       keywords: parseInt(document.getElementById('col-keywords').value) || 10,
       charKeywords: parseInt(document.getElementById('col-char-keywords').value) || 11,
       faction: parseInt(document.getElementById('col-faction').value) || 12,
+      cost: parseInt(document.getElementById('col-cost').value) || 13,
     }
   };
   localStorage.setItem('tcg_config', JSON.stringify(config));
@@ -3281,7 +3295,7 @@ function showPage(name) {
 function getColIndex(key) {
   return (config.cols && config.cols[key]) ? config.cols[key] - 1 : {
     front:0, back:1, set:2, type:3, number:4, name:5, qty:6, combiner:7, updatedAt:8,
-    keywords:9, charKeywords:10, faction:11
+    keywords:9, charKeywords:10, faction:11, cost:12
   }[key];
 }
 
@@ -3314,6 +3328,7 @@ function rowToCard(row, rowIndex) {
     keywords: (row[getColIndex('keywords')] || '').split(',').map(s => s.trim()).filter(Boolean),
     charKeywords: (row[getColIndex('charKeywords')] || '').split(',').map(s => s.trim()).filter(Boolean),
     faction: (row[getColIndex('faction')] || '').split(',').map(s => s.trim()).filter(Boolean),
+    cost: row[getColIndex('cost')] || '',
   };
 }
 
@@ -3733,6 +3748,7 @@ function resetCollectionFilters() {
   document.getElementById('coll-filter-set').value = '';
   document.getElementById('coll-filter-type').value = '';
   document.getElementById('coll-filter-owned').value = '';
+  document.getElementById('coll-filter-cost').value = '';
   document.getElementById('coll-sort').value = 'set';
   // Reset list sort state
   listSortKey = 'set';
@@ -3796,6 +3812,7 @@ function multiSort(a, b, primaryKey, primaryAsc) {
   if (primaryKey && primaryKey !== 'set') {
     let result;
     if (primaryKey === 'qty') result = primaryAsc ? numCmp(a.qty, b.qty) : numCmp(b.qty, a.qty);
+    else if (primaryKey === 'cost') result = primaryAsc ? numCmp(parseFloat(a.cost)||0, parseFloat(b.cost)||0) : numCmp(parseFloat(b.cost)||0, parseFloat(a.cost)||0);
     else result = primaryAsc ? cmp(a[primaryKey], b[primaryKey]) : cmp(b[primaryKey], a[primaryKey]);
     if (result !== 0) return result;
   }
@@ -3809,9 +3826,10 @@ function renderCollection() {
   const setF = document.getElementById('coll-filter-set')?.value || '';
   const typeF = document.getElementById('coll-filter-type')?.value || '';
   const ownedF = document.getElementById('coll-filter-owned')?.value || '';
+  const costF = document.getElementById('coll-filter-cost')?.value || '';
   const sortRaw = collectionView === 'list' ? listSortKey : (document.getElementById('coll-sort')?.value || 'set');
-  const sort = sortRaw === 'qty-desc' ? 'qty' : (sortRaw === 'qty-asc' ? 'qty' : sortRaw);
-  const sortAsc = collectionView === 'list' ? listSortAsc : sortRaw !== 'qty-desc';
+  const sort = sortRaw === 'qty-desc' ? 'qty' : (sortRaw === 'qty-asc' ? 'qty' : sortRaw === 'cost-asc' ? 'cost' : sortRaw === 'cost-desc' ? 'cost' : sortRaw);
+  const sortAsc = collectionView === 'list' ? listSortAsc : (sortRaw !== 'qty-desc' && sortRaw !== 'cost-desc');
 
   if (!cards.length) {
     const emptyHtml = `<div class="empty-state" style="grid-column:1/-1;">
@@ -3829,10 +3847,11 @@ function renderCollection() {
     const matchSet = !setF || c.set === setF;
     const matchType = !typeF || c.type === typeF;
     const matchOwned = !ownedF || (ownedF === 'owned' ? c.qty > 0 : c.qty === 0);
+    const matchCost = !costF || c.cost === costF;
     const matchKeywords = activeKeywords.keywords.size === 0 || [...activeKeywords.keywords].every(kw => (c.keywords || []).includes(kw));
     const matchCharKeywords = activeKeywords.charKeywords.size === 0 || [...activeKeywords.charKeywords].every(kw => (c.charKeywords || []).includes(kw));
     const matchFaction = activeKeywords.faction.size === 0 || [...activeKeywords.faction].some(f => (c.faction || []).includes(f));
-    return matchQ && matchSet && matchType && matchOwned && matchKeywords && matchCharKeywords && matchFaction;
+    return matchQ && matchSet && matchType && matchOwned && matchCost && matchKeywords && matchCharKeywords && matchFaction;
   });
 
   filtered.sort((a, b) => multiSort(a, b, sort, sortAsc));
@@ -3921,6 +3940,14 @@ function openCardModal(idx) {
     combinerEl.appendChild(btn);
   } else {
     combinerEl.textContent = '—';
+  }
+
+  // Cost
+  const costRow = document.getElementById('modal-cost-row');
+  const costEl = document.getElementById('modal-cost');
+  if (costRow && costEl) {
+    if (card.cost) { costEl.textContent = card.cost; costRow.style.display = ''; }
+    else { costRow.style.display = 'none'; }
   }
 
   // Faction
@@ -4092,6 +4119,14 @@ function populateFilters() {
     el.innerHTML = '<option value="">All Types</option>' + types.map(t => `<option value="${t}">${t}</option>`).join('');
     if (cur) el.value = cur;
   });
+
+  const costs = [...new Set(cards.map(c => c.cost).filter(Boolean))].sort((a, b) => parseFloat(b) - parseFloat(a));
+  const costEl = document.getElementById('coll-filter-cost');
+  if (costEl) {
+    const cur = costEl.value;
+    costEl.innerHTML = '<option value="">All Costs</option>' + costs.map(c => `<option value="${c}">${c}</option>`).join('');
+    if (cur) costEl.value = cur;
+  }
 
   populateCombinerSelect();
   populateKeywordFilters();
