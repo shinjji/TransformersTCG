@@ -1422,12 +1422,15 @@
 
   .newest-card-img-wrap {
     position: relative;
-    flex-shrink: 0;
+    flex-shrink: 1;
+    max-width: 100%;
   }
 
   .newest-card-img {
     width: auto;
     height: 500px;
+    max-height: 60vw;
+    max-width: calc(100vw - 4rem);
     object-fit: cover;
     display: block;
     cursor: pointer;
@@ -1523,6 +1526,7 @@
     align-items: center;
     gap: 1.5rem;
     width: 100%;
+    justify-content: center;
   }
 
   @media (max-width: 800px) {
@@ -2764,7 +2768,7 @@
           <div class="form-group full" style="margin-top:0.75rem;">
             <label class="form-label">Find your Spreadsheet ID in the URL:</label>
             <div class="info-box" style="margin-top:0.5rem;">
-              <code style="font-size:0.75rem; color:var(--warning-yellow);">https://docs.google.com/spreadsheets/d/<strong style="color:#fff">YOUR_SPREADSHEET_ID_IS_HERE</strong>/edit</code>
+              <code style="font-size:0.75rem; color:var(--warning-yellow); word-break:break-all; white-space:normal;">https://docs.google.com/spreadsheets/d/<strong style="color:#fff">YOUR_SPREADSHEET_ID_IS_HERE</strong>/edit</code>
             </div>
           </div>
 
