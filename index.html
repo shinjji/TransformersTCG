@@ -3524,30 +3524,34 @@ async function updateRowInSheet(card, stampTime = false) {
   const token = await getAccessToken();
   const id = config.sheetId;
   const sheet = config.sheetName || 'Sheet1';
-  const cols = config.cols || { front:1, back:2, set:3, type:4, number:5, name:6, qty:7, combiner:8, updatedAt:9 };
-  const maxCol = Math.max(...Object.values(cols));
+  const cols = config.cols || { qty:7, updatedAt:9 };
 
   const now = new Date().toLocaleString('en-GB', { day:'2-digit', month:'2-digit', year:'numeric', hour:'2-digit', minute:'2-digit', second:'2-digit' });
 
-  const row = new Array(maxCol).fill('');
-  row[cols.front - 1] = unproxyImg(card.front) || '';
-  row[cols.back - 1] = unproxyImg(card.back) || '';
-  row[cols.set - 1] = card.set || '';
-  row[cols.type - 1] = card.type || '';
-  row[cols.number - 1] = card.number || '';
-  row[cols.name - 1] = card.name || '';
-  row[cols.qty - 1] = card.qty !== undefined ? card.qty : 0;
-  row[cols.combiner - 1] = card.combiner || '';
-  if (cols.updatedAt) row[cols.updatedAt - 1] = stampTime ? now : (card.updatedAt || '');
+  // Build individual cell updates — only qty and updatedAt
+  const data = [];
 
-  const colLetter = String.fromCharCode(64 + maxCol);
-  const range = encodeURIComponent(`${sheet}!A${card.rowIndex}:${colLetter}${card.rowIndex}`);
-  const url = `https://sheets.googleapis.com/v4/spreadsheets/${id}/values/${range}?valueInputOption=USER_ENTERED`;
+  // Qty cell
+  const qtyCol = String.fromCharCode(64 + (cols.qty || 7));
+  data.push({
+    range: `${sheet}!${qtyCol}${card.rowIndex}`,
+    values: [[card.qty !== undefined ? card.qty : 0]]
+  });
 
+  // UpdatedAt cell (only if stampTime or preserving existing)
+  if (cols.updatedAt) {
+    const updatedAtCol = String.fromCharCode(64 + cols.updatedAt);
+    data.push({
+      range: `${sheet}!${updatedAtCol}${card.rowIndex}`,
+      values: [[stampTime ? now : (card.updatedAt || '')]]
+    });
+  }
+
+  const url = `https://sheets.googleapis.com/v4/spreadsheets/${id}/values:batchUpdate`;
   const resp = await fetch(url, {
-    method: 'PUT',
+    method: 'POST',
     headers: { Authorization: 'Bearer ' + token, 'Content-Type': 'application/json' },
-    body: JSON.stringify({ values: [row] })
+    body: JSON.stringify({ valueInputOption: 'USER_ENTERED', data })
   });
   if (!resp.ok) {
     const err = await resp.json();
