@@ -3991,12 +3991,14 @@ async function fetchTfWikiUrl(name) {
   wikiBtn.style.display = 'flex';
 
   const searchName = name.replace(/\s*\(.*?\)\s*/g, '').trim(); // strip parentheticals
-  const apiUrl = `https://tfwiki.net/api.php?action=query&list=search&srsearch=${encodeURIComponent(searchName)}&srlimit=10&format=json&origin=*`;
+  const tfwikiApi = `https://tfwiki.net/api.php?action=query&list=search&srsearch=${encodeURIComponent(searchName)}&srlimit=10&format=json`;
+  const apiUrl = `https://api.allorigins.win/get?url=${encodeURIComponent(tfwikiApi)}`;
 
   try {
     const res = await fetch(apiUrl);
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
-    const data = await res.json();
+    const wrapper = await res.json();
+    const data = JSON.parse(wrapper.contents);
     const results = data?.query?.search || [];
 
     if (!results.length) {
