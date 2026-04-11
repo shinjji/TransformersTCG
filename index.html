@@ -3980,6 +3980,17 @@ function renderList(filtered) {
 // ===== TFWIKI LOOKUP =====
 let currentWikiUrl = null;
 
+const TFWIKI_FACTION_PREFIXES = /^(autobot|decepticon|dinobot|predacon|maximal|vehicon|terrorcon|insecticon|stunticon|combaticon|protectobot|technobots?|throttlebot|targetmaster|headmaster|powermaster|actionmaster)\s+/i;
+
+async function tfwikiSearch(query) {
+  const api = `https://tfwiki.net/api.php?action=query&list=search&srsearch=${encodeURIComponent(query)}&srlimit=10&format=json`;
+  const res = await fetch(`https://api.allorigins.win/get?url=${encodeURIComponent(api)}`);
+  if (!res.ok) throw new Error(`HTTP ${res.status}`);
+  const wrapper = await res.json();
+  const data = JSON.parse(wrapper.contents);
+  return data?.query?.search || [];
+}
+
 async function fetchTfWikiUrl(name) {
   const wikiBtn = document.getElementById('modal-wiki-btn');
   if (!wikiBtn) return;
@@ -3990,49 +4001,56 @@ async function fetchTfWikiUrl(name) {
   wikiBtn.textContent = '';
   wikiBtn.style.display = 'flex';
 
-  const searchName = name.replace(/\s*\(.*?\)\s*/g, '').trim(); // strip parentheticals
-  const tfwikiApi = `https://tfwiki.net/api.php?action=query&list=search&srsearch=${encodeURIComponent(searchName)}&srlimit=10&format=json`;
-  const apiUrl = `https://api.allorigins.win/get?url=${encodeURIComponent(tfwikiApi)}`;
+  // Strip parentheticals from card name (e.g. "Optimus Prime (Leader)" → "Optimus Prime")
+  const cleanName = name.replace(/\s*\(.*?\)\s*/g, '').trim();
+  // Strip faction prefix for retry (e.g. "Autobot Mirage" → "Mirage")
+  const strippedName = cleanName.replace(TFWIKI_FACTION_PREFIXES, '').trim();
+
+  const pickBest = results => results.find(r => r.title.includes('(G1)')) || results[0] || null;
 
   try {
-    const res = await fetch(apiUrl);
-    if (!res.ok) throw new Error(`HTTP ${res.status}`);
-    const wrapper = await res.json();
-    const data = JSON.parse(wrapper.contents);
-    const results = data?.query?.search || [];
+    // Pass 1: full clean name
+    let results = await tfwikiSearch(cleanName);
+    let pick = pickBest(results);
 
-    if (!results.length) {
-      // No results at all — fall back to Google
-      const googleUrl = `https://www.google.com/search?q=${encodeURIComponent('tfwiki ' + searchName)}`;
+    // Pass 2: if no G1 result and name had a strippable prefix, retry without it
+    if ((!pick || !pick.title.includes('(G1)')) && strippedName !== cleanName) {
+      console.info(`[TFWiki] No G1 result for "${cleanName}" — retrying without faction prefix as "${strippedName}"`);
+      const results2 = await tfwikiSearch(strippedName);
+      const pick2 = pickBest(results2);
+      // Prefer the retry pick if it yields a G1 result, or if pass 1 had no results at all
+      if (pick2 && (!pick || pick2.title.includes('(G1)'))) {
+        pick = pick2;
+        results = results2;
+      }
+    }
+
+    if (!pick) {
+      const googleUrl = `https://www.google.com/search?q=${encodeURIComponent('tfwiki ' + strippedName)}`;
       currentWikiUrl = googleUrl;
-      console.warn(`[TFWiki] No results found for "${searchName}" — falling back to Google search: ${googleUrl}`);
+      console.warn(`[TFWiki] No results found for "${cleanName}" or "${strippedName}" — falling back to Google search: ${googleUrl}`);
       wikiBtn.className = 'btn-tfwiki fallback';
       wikiBtn.title = 'No TFWiki entry found — opens Google search';
       wikiBtn.textContent = '?';
       return;
     }
 
-    // Prefer G1 result, else first result
-    const g1 = results.find(r => r.title.includes('(G1)'));
-    const pick = g1 || results[0];
-    const pageTitle = encodeURIComponent(pick.title.replace(/ /g, '_'));
-    currentWikiUrl = `https://tfwiki.net/wiki/${pageTitle}`;
-
-    if (!g1 && results.length > 0) {
-      console.info(`[TFWiki] No G1 page found for "${searchName}" — using first result: "${pick.title}"`);
+    if (!pick.title.includes('(G1)')) {
+      console.info(`[TFWiki] No G1 page found — using first result: "${pick.title}"`);
     }
 
+    const pageTitle = encodeURIComponent(pick.title.replace(/ /g, '_'));
+    currentWikiUrl = `https://tfwiki.net/wiki/${pageTitle}`;
     wikiBtn.className = 'btn-tfwiki';
     wikiBtn.title = `View on TFWiki: ${pick.title}`;
     wikiBtn.textContent = '?';
 
   } catch (err) {
-    // CORS error or network failure — fall back to Google
-    const googleUrl = `https://www.google.com/search?q=${encodeURIComponent('tfwiki ' + searchName)}`;
+    const googleUrl = `https://www.google.com/search?q=${encodeURIComponent('tfwiki ' + strippedName)}`;
     currentWikiUrl = googleUrl;
     const isCors = err instanceof TypeError;
     console.warn(
-      `[TFWiki] ${isCors ? 'CORS/network error' : 'API error'} for "${searchName}" — falling back to Google search: ${googleUrl}`,
+      `[TFWiki] ${isCors ? 'CORS/network error' : 'API error'} for "${cleanName}" — falling back to Google search: ${googleUrl}`,
       err
     );
     wikiBtn.className = 'btn-tfwiki fallback';
