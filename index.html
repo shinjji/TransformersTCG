@@ -3980,7 +3980,7 @@ function renderList(filtered) {
 // ===== TFWIKI LOOKUP =====
 let currentWikiUrl = null;
 
-const TFWIKI_FACTION_PREFIXES = /^(autobot|decepticon|dinobot|predacon|maximal|vehicon|terrorcon|insecticon|stunticon|combaticon|protectobot|technobots?|throttlebot|targetmaster|headmaster|powermaster|actionmaster)\s+/i;
+const TFWIKI_FACTION_PREFIXES = /^(autobot|decepticon|dinobot|insecticon|sergeant|predacon|captain|general|major|private|raider|specialist|lord)\s+/i;
 
 async function tfwikiSearch(query) {
   const api = `https://tfwiki.net/api.php?action=query&list=search&srsearch=${encodeURIComponent(query)}&srlimit=10&format=json`;
@@ -4009,21 +4009,9 @@ async function fetchTfWikiUrl(name) {
   const pickBest = results => results.find(r => r.title.includes('(G1)')) || results[0] || null;
 
   try {
-    // Pass 1: full clean name
-    let results = await tfwikiSearch(cleanName);
-    let pick = pickBest(results);
-
-    // Pass 2: if no G1 result and name had a strippable prefix, retry without it
-    if ((!pick || !pick.title.includes('(G1)')) && strippedName !== cleanName) {
-      console.info(`[TFWiki] No G1 result for "${cleanName}" — retrying without faction prefix as "${strippedName}"`);
-      const results2 = await tfwikiSearch(strippedName);
-      const pick2 = pickBest(results2);
-      // Prefer the retry pick if it yields a G1 result, or if pass 1 had no results at all
-      if (pick2 && (!pick || pick2.title.includes('(G1)'))) {
-        pick = pick2;
-        results = results2;
-      }
-    }
+    // Single search: strip known prefixes before querying
+    const results = await tfwikiSearch(strippedName);
+    const pick = pickBest(results);
 
     if (!pick) {
       const googleUrl = `https://www.google.com/search?q=${encodeURIComponent('tfwiki ' + strippedName)}`;
