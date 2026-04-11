@@ -2030,6 +2030,60 @@
     gap: 0.75rem;
   }
 
+  /* ===== TFWIKI BUTTON ===== */
+  .btn-tfwiki {
+    background: transparent;
+    border: 1px solid var(--chrome);
+    color: var(--chrome);
+    font-family: 'Orbitron', monospace;
+    font-size: 0.7rem;
+    font-weight: 900;
+    width: 30px;
+    height: 30px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+    flex-shrink: 0;
+    position: relative;
+    letter-spacing: 0.05em;
+  }
+
+  .btn-tfwiki:hover:not(:disabled) {
+    border-color: var(--energon-blue);
+    color: var(--energon-blue);
+    box-shadow: 0 0 10px var(--glow-blue);
+  }
+
+  .btn-tfwiki.loading {
+    cursor: default;
+    border-color: var(--steel-mid);
+    color: transparent;
+  }
+
+  .btn-tfwiki.loading::after {
+    content: '';
+    position: absolute;
+    width: 14px;
+    height: 14px;
+    border: 2px solid var(--steel-mid);
+    border-top-color: var(--chrome);
+    border-radius: 50%;
+    animation: spin 0.7s linear infinite;
+  }
+
+  .btn-tfwiki.fallback {
+    border-color: var(--warning-yellow);
+    color: var(--warning-yellow);
+  }
+
+  .btn-tfwiki.fallback:hover {
+    border-color: var(--warning-yellow) !important;
+    color: var(--warning-yellow) !important;
+    box-shadow: 0 0 10px rgba(245,197,24,0.3) !important;
+  }
+
   /* ===== VIEW TOGGLE ===== */
   .view-toggle {
     display: flex;
@@ -2794,7 +2848,10 @@
   <div class="modal">
     <div class="modal-header">
       <span class="modal-title" id="modal-title">CARD DETAILS</span>
-      <button class="modal-close" onclick="closeModal()">✕</button>
+      <div style="display:flex;align-items:center;gap:0.5rem;">
+        <button class="btn-tfwiki" id="modal-wiki-btn" style="display:none;" title="View on TFWiki" onclick="openWikiUrl()"></button>
+        <button class="modal-close" onclick="closeModal()">✕</button>
+      </div>
     </div>
     <div class="modal-body">
       <div class="modal-card-view">
@@ -3920,11 +3977,91 @@ function renderList(filtered) {
   }).join('');
 }
 
+// ===== TFWIKI LOOKUP =====
+let currentWikiUrl = null;
+
+async function fetchTfWikiUrl(name) {
+  const wikiBtn = document.getElementById('modal-wiki-btn');
+  if (!wikiBtn) return;
+
+  currentWikiUrl = null;
+  wikiBtn.className = 'btn-tfwiki loading';
+  wikiBtn.title = 'Searching TFWiki...';
+  wikiBtn.textContent = '';
+  wikiBtn.style.display = 'flex';
+
+  const searchName = name.replace(/\s*\(.*?\)\s*/g, '').trim(); // strip parentheticals
+  const apiUrl = `https://tfwiki.net/api.php?action=query&list=search&srsearch=${encodeURIComponent(searchName)}&srlimit=10&format=json&origin=*`;
+
+  try {
+    const res = await fetch(apiUrl);
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const data = await res.json();
+    const results = data?.query?.search || [];
+
+    if (!results.length) {
+      // No results at all — fall back to Google
+      const googleUrl = `https://www.google.com/search?q=${encodeURIComponent('tfwiki ' + searchName)}`;
+      currentWikiUrl = googleUrl;
+      console.warn(`[TFWiki] No results found for "${searchName}" — falling back to Google search: ${googleUrl}`);
+      wikiBtn.className = 'btn-tfwiki fallback';
+      wikiBtn.title = 'No TFWiki entry found — opens Google search';
+      wikiBtn.textContent = '?';
+      return;
+    }
+
+    // Prefer G1 result, else first result
+    const g1 = results.find(r => r.title.includes('(G1)'));
+    const pick = g1 || results[0];
+    const pageTitle = encodeURIComponent(pick.title.replace(/ /g, '_'));
+    currentWikiUrl = `https://tfwiki.net/wiki/${pageTitle}`;
+
+    if (!g1 && results.length > 0) {
+      console.info(`[TFWiki] No G1 page found for "${searchName}" — using first result: "${pick.title}"`);
+    }
+
+    wikiBtn.className = 'btn-tfwiki';
+    wikiBtn.title = `View on TFWiki: ${pick.title}`;
+    wikiBtn.textContent = '?';
+
+  } catch (err) {
+    // CORS error or network failure — fall back to Google
+    const googleUrl = `https://www.google.com/search?q=${encodeURIComponent('tfwiki ' + searchName)}`;
+    currentWikiUrl = googleUrl;
+    const isCors = err instanceof TypeError;
+    console.warn(
+      `[TFWiki] ${isCors ? 'CORS/network error' : 'API error'} for "${searchName}" — falling back to Google search: ${googleUrl}`,
+      err
+    );
+    wikiBtn.className = 'btn-tfwiki fallback';
+    wikiBtn.title = 'TFWiki unreachable — opens Google search';
+    wikiBtn.textContent = '?';
+  }
+}
+
+function openWikiUrl() {
+  if (currentWikiUrl) window.open(currentWikiUrl, '_blank');
+}
+
 // ===== MODAL =====
 function openCardModal(idx) {
   currentCardIndex = idx;
   const card = cards[idx];
   if (!card) return;
+
+  // Wiki button — show and search for character cards, hide otherwise
+  const wikiBtn = document.getElementById('modal-wiki-btn');
+  const isCharacter = (card.type || '').toLowerCase().includes('character');
+  if (wikiBtn) {
+    currentWikiUrl = null;
+    if (isCharacter) {
+      fetchTfWikiUrl(card.name);
+    } else {
+      wikiBtn.style.display = 'none';
+      wikiBtn.className = 'btn-tfwiki';
+      wikiBtn.textContent = '';
+    }
+  }
 
   modalQty = card.qty;
   document.getElementById('modal-title').textContent = card.name.toUpperCase();
@@ -4009,6 +4146,9 @@ function openCardModal(idx) {
 function closeModal() {
   document.getElementById('card-modal').classList.remove('open');
   document.querySelectorAll('.modal-card-img.zoomed').forEach(el => el.classList.remove('zoomed'));
+  const wikiBtn = document.getElementById('modal-wiki-btn');
+  if (wikiBtn) { wikiBtn.style.display = 'none'; wikiBtn.className = 'btn-tfwiki'; wikiBtn.textContent = ''; }
+  currentWikiUrl = null;
   currentCardIndex = null;
 }
 
