@@ -962,7 +962,12 @@
     font-size: 0.7rem;
     font-weight: 700;
     letter-spacing: 0.1em;
-    padding: 0.5rem 1rem;
+    padding: 0.5rem 2.5rem 0.5rem 1rem;
+    appearance: none;
+    -webkit-appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%2300cfff' stroke-width='1.5' fill='none'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 0.75rem center;
     outline: none;
     cursor: pointer;
     min-width: 200px;
@@ -1956,6 +1961,8 @@
     width: 100%;
     text-align: left;
     padding: 0.85rem 1.25rem !important;
+    display: flex;
+    align-items: center;
   }
 
   .nav-dropdown button:last-child { border-bottom: none !important; }
@@ -2028,6 +2035,253 @@
   .img-two-col {
     display: flex;
     gap: 0.75rem;
+  }
+
+
+  /* ===== CYBERSEARCH PAGE ===== */
+  .cybersearch-hero {
+    text-align: center;
+    padding: 3rem 2rem 2rem;
+    margin: -2rem -2rem 2rem -2rem;
+    position: relative;
+    background: linear-gradient(180deg, rgba(0,207,255,0.04) 0%, transparent 100%);
+  }
+
+
+  .cybersearch-hero::after {
+    content: '';
+    position: absolute;
+    bottom: 0; left: -2rem; right: -2rem;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--steel-mid) 20%, var(--steel-mid) 80%, transparent);
+  }
+  .cybersearch-hero::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(ellipse at 50% 0%, rgba(0,207,255,0.06) 0%, transparent 70%);
+    pointer-events: none;
+  }
+
+  .cybersearch-label {
+    font-family: 'Orbitron', monospace;
+    font-size: 0.55rem;
+    font-weight: 700;
+    letter-spacing: 0.35em;
+    color: var(--chrome);
+    text-transform: uppercase;
+    margin-bottom: 0.75rem;
+    opacity: 0.6;
+  }
+
+  .cybersearch-title {
+    font-family: 'Orbitron', monospace;
+    font-size: clamp(2rem, 6vw, 3.5rem);
+    font-weight: 900;
+    letter-spacing: 0.1em;
+    background: linear-gradient(135deg, var(--energon-blue) 0%, #a855f7 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    text-shadow: none;
+    margin-bottom: 0.5rem;
+    line-height: 1;
+  }
+
+  .cybersearch-sub {
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 0.85rem;
+    font-style: italic;
+    color: var(--chrome);
+    letter-spacing: 0.1em;
+    margin-bottom: 2rem;
+  }
+
+  .cybersearch-input-wrap {
+    display: flex;
+    max-width: 700px;
+    margin: 0 auto;
+    gap: 0;
+  }
+
+  .cybersearch-input {
+    flex: 1;
+    background: var(--steel);
+    border: 2px solid var(--energon-blue);
+    border-right: none;
+    color: var(--chrome-bright);
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 1.1rem;
+    font-weight: 600;
+    padding: 0.9rem 1.25rem;
+    outline: none;
+    letter-spacing: 0.05em;
+    transition: box-shadow 0.2s;
+  }
+
+  .cybersearch-input:focus {
+    box-shadow: 0 0 20px var(--glow-blue), inset 0 0 10px rgba(0,207,255,0.05);
+  }
+
+  .cybersearch-input::placeholder { color: var(--chrome); opacity: 0.5; }
+
+  .cybersearch-btn {
+    background: var(--energon-blue);
+    border: 2px solid var(--energon-blue);
+    color: var(--dark-bg);
+    font-size: 1.3rem;
+    font-weight: 900;
+    padding: 0 1.5rem;
+    cursor: pointer;
+    transition: all 0.2s;
+    flex-shrink: 0;
+  }
+
+  .cybersearch-btn:hover {
+    background: #00a8d4;
+    box-shadow: 0 0 20px var(--glow-blue);
+  }
+
+  .cybersearch-results {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 0 0 3rem;
+  }
+
+  .cybersearch-card {
+    background: var(--card-bg);
+    border: 1px solid var(--steel-mid);
+    padding: 1.5rem;
+    position: relative;
+  }
+
+  .cybersearch-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, var(--energon-blue), #a855f7, transparent);
+  }
+
+  .cybersearch-card-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 1.25rem;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+  }
+
+  .cybersearch-card-name {
+    font-family: 'Orbitron', monospace;
+    font-size: 1.2rem;
+    font-weight: 900;
+    color: var(--warning-yellow);
+    text-shadow: 0 0 15px rgba(245,197,24,0.3);
+    letter-spacing: 0.1em;
+  }
+
+  .cybersearch-wiki-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    background: transparent;
+    border: 1px solid var(--energon-blue);
+    color: var(--energon-blue);
+    font-family: 'Orbitron', monospace;
+    font-size: 0.6rem;
+    font-weight: 700;
+    letter-spacing: 0.15em;
+    padding: 0.4rem 0.9rem;
+    cursor: pointer;
+    text-decoration: none;
+    text-transform: uppercase;
+    transition: all 0.2s;
+    clip-path: polygon(6px 0%, 100% 0%, calc(100% - 6px) 100%, 0% 100%);
+  }
+
+  .cybersearch-wiki-link:hover {
+    background: var(--energon-blue);
+    color: var(--dark-bg);
+    box-shadow: 0 0 12px var(--glow-blue);
+  }
+
+  .cybersearch-images {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    flex-shrink: 0;
+  }
+
+  .cybersearch-img-wrap {
+    flex-shrink: 0;
+  }
+
+  .cybersearch-img {
+    width: 240px;
+    height: auto;
+    max-height: 330px;
+    object-fit: cover;
+    border: 1px solid var(--steel-mid);
+    display: block;
+    transition: border-color 0.2s;
+  }
+
+  .cybersearch-img:hover { border-color: var(--energon-blue); }
+
+  .cybersearch-body {
+    display: flex;
+    gap: 1.5rem;
+    align-items: flex-start;
+  }
+
+  .cybersearch-extract {
+    flex: 1;
+    font-size: 0.9rem;
+    line-height: 1.8;
+    color: var(--chrome-bright);
+    font-weight: 400;
+    letter-spacing: 0.02em;
+  }
+
+  .cybersearch-loading {
+    text-align: center;
+    padding: 3rem;
+    color: var(--chrome);
+    font-family: 'Orbitron', monospace;
+    font-size: 0.7rem;
+    letter-spacing: 0.2em;
+  }
+
+  .cybersearch-loading-dot {
+    display: inline-block;
+    animation: blink 1s ease-in-out infinite;
+  }
+
+  .cybersearch-empty {
+    text-align: center;
+    padding: 4rem 2rem;
+    color: var(--chrome);
+    opacity: 0.5;
+  }
+
+  .cybersearch-empty-icon {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+    display: block;
+  }
+
+  .cybersearch-empty p {
+    font-family: 'Orbitron', monospace;
+    font-size: 0.7rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+  }
+
+  @media (max-width: 600px) {
+    .cybersearch-body { flex-direction: column; }
+    .cybersearch-images { flex-wrap: wrap; }
+    .cybersearch-img { width: 195px; }
   }
 
   /* ===== TFWIKI BUTTON ===== */
@@ -2288,6 +2542,7 @@
       <button onclick="showPage('combiners')" id="nav-combiners">⟁ COMBINERS</button>
       <button onclick="showPage('stats')" id="nav-stats">◎ STATS</button>
       <button onclick="showPage('settings')" id="nav-settings">⚙ CONFIGURE</button>
+      <button onclick="showPage('cybersearch')" id="nav-cybersearch">⌖ CYBERSEARCH</button>
     </nav>
 
     <!-- Burger menu (small screens) -->
@@ -2300,6 +2555,7 @@
         <button onclick="showPage('combiners');closeBurger()" id="nav-combiners-m">⟁ COMBINERS</button>
         <button onclick="showPage('stats');closeBurger()" id="nav-stats-m">◎ STATS</button>
         <button onclick="showPage('settings');closeBurger()" id="nav-settings-m">⚙ CONFIGURE</button>
+        <button onclick="showPage('cybersearch');closeBurger()" id="nav-cybersearch-m">⌖ CYBERSEARCH</button>
       </div>
     </div>
 
@@ -2498,6 +2754,7 @@
       <select class="combiners-select" id="combiner-select" onchange="renderCombinerPage()">
         <option value="">— Select a Combiner —</option>
       </select>
+      <button class="combiner-nav-btn" id="combiner-wiki-btn" onclick="openCombinerCyberSearch()" title="CyberSearch" style="display:none;font-family:'Orbitron',monospace;font-size:0.7rem;font-weight:900;">?</button>
       <button class="combiner-nav-btn" id="combiner-next" onclick="navigateCombiner(1)" title="Next">›</button>
     </div>
 
@@ -2841,6 +3098,22 @@
     </div>
   </div>
 
+  <!-- ===== CYBERSEARCH PAGE ===== -->
+  <div id="page-cybersearch" class="page">
+    <div class="cybersearch-hero">
+      <div class="cybersearch-title-wrap">
+        <div class="cybersearch-label">CYBERTRON INTELLIGENCE NETWORK</div>
+        <div class="cybersearch-title">⌖ CYBERSEARCH</div>
+        <div class="cybersearch-sub">Transformers Wiki Explorer</div>
+      </div>
+      <div class="cybersearch-input-wrap">
+        <input type="text" id="cybersearch-input" class="cybersearch-input" placeholder="Search characters, lore, factions..." onkeydown="if(event.key==='Enter')runCyberSearch()">
+        <button class="cybersearch-btn" onclick="runCyberSearch()">⌕</button>
+      </div>
+    </div>
+    <div id="cybersearch-results" class="cybersearch-results"></div>
+  </div>
+
 </main>
 
 <!-- ===== CARD DETAIL MODAL ===== -->
@@ -2849,7 +3122,7 @@
     <div class="modal-header">
       <span class="modal-title" id="modal-title">CARD DETAILS</span>
       <div style="display:flex;align-items:center;gap:0.5rem;">
-        <button class="btn-tfwiki" id="modal-wiki-btn" style="display:none;" title="View on TFWiki" onclick="openWikiUrl()"></button>
+        <button class="btn-tfwiki" id="modal-wiki-btn" style="display:none;" title="CyberSearch" onclick="openCyberSearch()"></button>
         <button class="modal-close" onclick="closeModal()">✕</button>
       </div>
     </div>
@@ -3983,11 +4256,9 @@ let currentWikiUrl = null;
 const TFWIKI_FACTION_PREFIXES = /^(autobot|decepticon|dinobot|insecticon|sergeant|predacon|captain|general|major|private|raider|specialist|lord)\s+/i;
 
 async function tfwikiSearch(query) {
-  const api = `https://tfwiki.net/api.php?action=query&list=search&srsearch=${encodeURIComponent(query)}&srlimit=10&format=json`;
-  const res = await fetch(`https://api.allorigins.win/get?url=${encodeURIComponent(api)}`);
+  const res = await fetch(`https://bitter-cloud-38b5.markmckay001.workers.dev/?search=${encodeURIComponent(query)}`);
   if (!res.ok) throw new Error(`HTTP ${res.status}`);
-  const wrapper = await res.json();
-  const data = JSON.parse(wrapper.contents);
+  const data = await res.json();
   return data?.query?.search || [];
 }
 
@@ -3997,28 +4268,42 @@ async function fetchTfWikiUrl(name) {
 
   currentWikiUrl = null;
   wikiBtn.className = 'btn-tfwiki loading';
-  wikiBtn.title = 'Searching TFWiki...';
+  wikiBtn.title = 'CyberSearch';
   wikiBtn.textContent = '';
   wikiBtn.style.display = 'flex';
 
   // Strip parentheticals from card name (e.g. "Optimus Prime (Leader)" → "Optimus Prime")
-  const cleanName = name.replace(/\s*\(.*?\)\s*/g, '').trim();
+  const cleanName = name.replace(/\s*\/.*$/, '').replace(/\s*\(.*?\)\s*/g, '').trim();
   // Strip faction prefix for retry (e.g. "Autobot Mirage" → "Mirage")
   const strippedName = cleanName.replace(TFWIKI_FACTION_PREFIXES, '').trim();
 
-  const pickBest = results => results.find(r => r.title.includes('(G1)')) || results[0] || null;
+  const pickBest = (results, query) => {
+    const filtered = results.filter(r => !r.title.includes('/'));
+    const q = (query || '').toLowerCase();
+    // Exact match: title is exactly the query, or query + disambiguation e.g. '(G1)'
+    const exact = filtered.filter(r => {
+      const t = r.title.toLowerCase().replace(/\s*\(.*?\)\s*$/, '').trim();
+      return t === q;
+    });
+    const startsWith = filtered.filter(r => {
+      const t = r.title.toLowerCase().replace(/\s*\(.*?\)\s*$/, '').trim();
+      return t !== q && r.title.toLowerCase().startsWith(q + ' ') || r.title.toLowerCase().startsWith(q + '(');
+    });
+    const pool = exact.length ? exact : startsWith.length ? startsWith : filtered.length ? filtered : results;
+    return pool.find(r => r.title.includes('(G1)')) || pool[0] || null;
+  };
 
   try {
     // Single search: strip known prefixes before querying
     const results = await tfwikiSearch(strippedName);
-    const pick = pickBest(results);
+    const pick = pickBest(results, strippedName);
 
     if (!pick) {
       const googleUrl = `https://www.google.com/search?q=${encodeURIComponent('tfwiki ' + strippedName)}`;
       currentWikiUrl = googleUrl;
       console.warn(`[TFWiki] No results found for "${cleanName}" or "${strippedName}" — falling back to Google search: ${googleUrl}`);
       wikiBtn.className = 'btn-tfwiki fallback';
-      wikiBtn.title = 'No TFWiki entry found — opens Google search';
+      wikiBtn.title = 'CyberSearch';
       wikiBtn.textContent = '?';
       return;
     }
@@ -4027,11 +4312,13 @@ async function fetchTfWikiUrl(name) {
       console.info(`[TFWiki] No G1 page found — using first result: "${pick.title}"`);
     }
 
-    const pageTitle = encodeURIComponent(pick.title.replace(/ /g, '_'));
+    const pageTitle = pick.title.replace(/ /g, '_').replace(/\(/g, '(').replace(/\)/g, ')');
     currentWikiUrl = `https://tfwiki.net/wiki/${pageTitle}`;
     wikiBtn.className = 'btn-tfwiki';
-    wikiBtn.title = `View on TFWiki: ${pick.title}`;
+    wikiBtn.title = 'CyberSearch';
     wikiBtn.textContent = '?';
+
+
 
   } catch (err) {
     const googleUrl = `https://www.google.com/search?q=${encodeURIComponent('tfwiki ' + strippedName)}`;
@@ -4042,13 +4329,103 @@ async function fetchTfWikiUrl(name) {
       err
     );
     wikiBtn.className = 'btn-tfwiki fallback';
-    wikiBtn.title = 'TFWiki unreachable — opens Google search';
+    wikiBtn.title = 'CyberSearch';
     wikiBtn.textContent = '?';
   }
 }
 
-function openWikiUrl() {
-  if (currentWikiUrl) window.open(currentWikiUrl, '_blank');
+// ===== CYBERSEARCH =====
+let cyberSearchWikiUrl = null;
+
+function openCombinerCyberSearch() {
+  const selected = document.getElementById('combiner-select').value;
+  if (!selected) return;
+  const cleanName = selected.replace(TFWIKI_FACTION_PREFIXES, '').replace(/\s*\/.*$/, '').replace(/\s*\(.*?\)\s*/g, '').trim();
+  showPage('cybersearch');
+  document.getElementById('cybersearch-input').value = cleanName;
+  runCyberSearch();
+}
+
+function openCyberSearch() {
+  const card = cards[currentCardIndex];
+  if (!card) return;
+  const wikiUrl = currentWikiUrl;
+  const wikiTitle = wikiUrl ? decodeURIComponent(wikiUrl.split('/wiki/')[1] || '').replace(/_/g, ' ') : null;
+  closeModal();
+  showPage('cybersearch');
+  const cleanName = card.name.replace(TFWIKI_FACTION_PREFIXES, '').replace(/\s*\/.*$/, '').replace(/\s*\(.*?\)\s*/g, '').trim();
+  document.getElementById('cybersearch-input').value = cleanName;
+  if (wikiTitle) {
+    runCyberSearchWithUrl(cleanName, wikiUrl, wikiTitle);
+  } else {
+    runCyberSearch();
+  }
+}
+
+async function runCyberSearch() {
+  const query = document.getElementById('cybersearch-input').value.trim();
+  if (!query) return;
+  const results = document.getElementById('cybersearch-results');
+  results.innerHTML = `<div class="cybersearch-loading">⌖ SCANNING CYBERTRON DATABASE <span class="cybersearch-loading-dot">...</span></div>`;
+
+  try {
+    // Search for page title first
+    const searchRes = await fetch(`https://bitter-cloud-38b5.markmckay001.workers.dev/?search=${encodeURIComponent(query)}`);
+    const searchData = await searchRes.json();
+    const hits = searchData?.query?.search || [];
+    const filtered = hits.filter(r => !r.title.includes('/'));
+    const startsWith = filtered.filter(r => r.title.toLowerCase().startsWith(query.toLowerCase()));
+    const pool = startsWith.length ? startsWith : filtered.length ? filtered : hits;
+    const pick = pool.find(r => r.title.includes('(G1)')) || pool[0];
+    if (!pick) {
+      results.innerHTML = `<div class="cybersearch-empty"><span class="cybersearch-empty-icon">⌖</span><p>No results found for "${query}"</p></div>`;
+      return;
+    }
+    const wikiUrl = `https://tfwiki.net/wiki/${pick.title.replace(/ /g, '_')}`;
+    runCyberSearchWithUrl(query, wikiUrl, pick.title);
+  } catch (err) {
+    results.innerHTML = `<div class="cybersearch-empty"><span class="cybersearch-empty-icon">⌖</span><p>Search failed — check your connection</p></div>`;
+    console.warn('[CyberSearch] Search failed:', err);
+  }
+}
+
+async function runCyberSearchWithUrl(query, wikiUrl, pageTitle) {
+  const results = document.getElementById('cybersearch-results');
+  results.innerHTML = `<div class="cybersearch-loading">⌖ RETRIEVING INTEL <span class="cybersearch-loading-dot">...</span></div>`;
+  cyberSearchWikiUrl = wikiUrl;
+
+  // Extract page title from URL if not passed
+  const title = pageTitle || decodeURIComponent(wikiUrl.split('/wiki/')[1] || query).replace(/_/g, ' ');
+
+  try {
+    const res = await fetch(`https://bitter-cloud-38b5.markmckay001.workers.dev/?title=${encodeURIComponent(title)}`);
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const data = await res.json();
+
+
+    const imgHtml = [data.image, data.image2]
+      .filter(Boolean)
+      .map(src => `<div class="cybersearch-img-wrap"><img class="cybersearch-img" src="${src}" alt="${title}" onerror="this.parentElement.style.display='none'"></div>`)
+      .join('');
+
+
+    const extract = (data.intro || 'No summary available.').replace('This article is a featured article, and considered to be one of the most informative on this wiki.', '').trim();
+
+    results.innerHTML = `
+      <div class="cybersearch-card">
+        <div class="cybersearch-card-header">
+          <div class="cybersearch-card-name">${title.replace(/_(G1|G2|BW|TFA|TFP|RID|WFC)$/i, '').replace(/_/g, ' ')}</div>
+          <a class="cybersearch-wiki-link" href="${wikiUrl}" target="_blank">VIEW ON TFWIKI ↗</a>
+        </div>
+        <div class="cybersearch-body">
+          ${imgHtml ? `<div class="cybersearch-images">${imgHtml}</div>` : ''}
+          <div class="cybersearch-extract">${extract.replace(/\n\n/g, '<br><br>')}</div>
+        </div>
+      </div>`;
+  } catch (err) {
+    results.innerHTML = `<div class="cybersearch-empty"><span class="cybersearch-empty-icon">⌖</span><p>Could not retrieve data — check your connection</p></div>`;
+    console.warn('[CyberSearch] Content fetch failed:', err);
+  }
 }
 
 // ===== MODAL =====
@@ -4156,6 +4533,7 @@ function closeModal() {
   document.querySelectorAll('.modal-card-img.zoomed').forEach(el => el.classList.remove('zoomed'));
   const wikiBtn = document.getElementById('modal-wiki-btn');
   if (wikiBtn) { wikiBtn.style.display = 'none'; wikiBtn.className = 'btn-tfwiki'; wikiBtn.textContent = ''; }
+
   currentWikiUrl = null;
   currentCardIndex = null;
 }
@@ -4437,6 +4815,9 @@ function renderCombinerPage() {
   const artCount = document.getElementById('combiner-artwork-count');
   const artLabel = document.getElementById('combiner-artwork-name'); // now the label above artwork
 
+  const combinerWikiBtn = document.getElementById('combiner-wiki-btn');
+  if (combinerWikiBtn) combinerWikiBtn.style.display = selected ? 'flex' : 'none';
+
   if (!selected) {
     if (heading) heading.textContent = '⟁ PARTS';
     if (artLabel) artLabel.textContent = '⚡ COMBINED FORM';
@@ -4584,7 +4965,7 @@ document.addEventListener('keydown', e => {
   if (e.key === 'Escape') closeModal();
 });
 
-// ===== TOOLTIP =====
+
 const tooltip = document.getElementById('tile-tooltip');
 let tooltipTimeout;
 
