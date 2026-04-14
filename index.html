@@ -4549,6 +4549,7 @@ function openCardModal(idx) {
 function closeModal() {
   document.getElementById('card-modal').classList.remove('open');
   document.querySelectorAll('.modal-card-img.zoomed').forEach(el => el.classList.remove('zoomed'));
+  document.querySelectorAll('.modal-card-img').forEach(el => el.style.display = '');
   const wikiBtn = document.getElementById('modal-wiki-btn');
   if (wikiBtn) { wikiBtn.style.display = 'none'; wikiBtn.className = 'btn-tfwiki'; wikiBtn.textContent = ''; }
 
@@ -4971,11 +4972,25 @@ document.addEventListener('click', e => {
     // Only unzoom if clicking inside the modal body (not on buttons etc.)
     if (e.target.closest('.modal')) {
       document.querySelectorAll('.modal-card-img.zoomed').forEach(el => el.classList.remove('zoomed'));
+      document.querySelectorAll('.modal-card-img').forEach(el => el.style.display = '');
     }
     return;
   }
   e.stopPropagation();
-  img.classList.toggle('zoomed');
+  const isMobile = window.innerWidth <= 500;
+  const isZoomed = img.classList.contains('zoomed');
+  // Unzoom all first
+  document.querySelectorAll('.modal-card-img.zoomed').forEach(el => el.classList.remove('zoomed'));
+  document.querySelectorAll('.modal-card-img').forEach(el => el.style.display = '');
+  if (!isZoomed) {
+    img.classList.add('zoomed');
+    // On mobile, hide the other image so zoomed one has full width
+    if (isMobile) {
+      document.querySelectorAll('.modal-card-img').forEach(el => {
+        if (el !== img) el.style.display = 'none';
+      });
+    }
+  }
 });
 
 // ===== KEYBOARD =====
