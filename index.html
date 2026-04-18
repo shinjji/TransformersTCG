@@ -4310,7 +4310,7 @@ async function fetchTfWikiUrl(name) {
 
   currentWikiUrl = null;
   wikiBtn.className = 'btn-tfwiki loading';
-  wikiBtn.title = 'CyberSearch';
+  wikiBtn.title = 'Loading CyberSearch';
   wikiBtn.textContent = '';
   wikiBtn.style.display = 'flex';
 
@@ -4345,7 +4345,7 @@ async function fetchTfWikiUrl(name) {
       currentWikiUrl = googleUrl;
       console.warn(`[TFWiki] No results found for "${cleanName}" or "${strippedName}" — falling back to Google search: ${googleUrl}`);
       wikiBtn.className = 'btn-tfwiki fallback';
-      wikiBtn.title = 'CyberSearch';
+      wikiBtn.title = 'CyberSearch Failed';
       wikiBtn.textContent = '?';
       return;
     }
@@ -4371,7 +4371,7 @@ async function fetchTfWikiUrl(name) {
       err
     );
     wikiBtn.className = 'btn-tfwiki fallback';
-    wikiBtn.title = 'CyberSearch';
+    wikiBtn.title = 'CyberSearch Failed';
     wikiBtn.textContent = '?';
   }
 }
