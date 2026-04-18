@@ -444,6 +444,40 @@
     box-shadow: 0 0 15px var(--glow-blue);
   }
 
+  @media (max-width: 500px) {
+    .cotd-inner {
+      gap: 0.75rem;
+    }
+    .cotd-img,
+    .cotd-img-placeholder {
+      width: 154px;
+      height: 215px;
+    }
+    .cotd-name {
+      font-size: 0.85rem;
+    }
+    .badge {
+      font-size: 0.5rem;
+      padding: 0.1rem 0.4rem;
+      max-width: 100%;
+      white-space: normal;
+      word-break: break-word;
+    }
+    .cotd-refresh {
+      width: 100%;
+      text-align: center;
+      font-size: 0.55rem;
+      padding: 0.4rem 0.5rem;
+    }
+    .meta-label {
+      min-width: 55px;
+      font-size: 0.55rem;
+    }
+    .meta-value {
+      font-size: 0.75rem;
+    }
+  }
+
   /* ===== SEARCH PANEL ===== */
   .search-panel {
     grid-column: 2;
