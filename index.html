@@ -2453,6 +2453,28 @@
   .collection-list-wrap::-webkit-scrollbar { height: 4px; }
   .collection-list-wrap::-webkit-scrollbar-thumb { background: var(--energon-blue); }
 
+  #page-collection .collection-list-wrap,
+  #page-stats .collection-list-wrap {
+    transform: rotateX(180deg);
+  }
+
+  #page-collection .collection-list,
+  #page-stats .collection-list {
+    transform: rotateX(180deg);
+  }
+
+  #combiner-card-grid {
+    transform: rotateX(180deg);
+    overflow-x: auto;
+  }
+
+  #combiner-card-grid::-webkit-scrollbar { height: 4px; }
+  #combiner-card-grid::-webkit-scrollbar-thumb { background: var(--energon-blue); }
+
+  #combiner-card-grid .collection-list {
+    transform: rotateX(180deg);
+  }
+
   .img-col { display: flex; flex-direction: column; align-items: center; gap: 0.25rem; }
 </style>
 </head>
@@ -3156,7 +3178,6 @@ document.addEventListener('DOMContentLoaded', () => {
   loadConfig();
   loadLocalCards();
   try { combinerArt = JSON.parse(localStorage.getItem('tcg_combiner_art') || '{}'); } catch(e) { combinerArt = {}; }
-  // Show cached indicator if we have local cards but no API config to sync from
   if (cards.length && (!config.apiKey || !config.sheetId)) setOfflineIndicator(true);
   updateStats();
   populateFilters();
