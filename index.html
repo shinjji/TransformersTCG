@@ -2926,6 +2926,10 @@
               <input type="password" class="form-input" id="cfg-apikey" placeholder="AIza...">
             </div>
             <div class="form-group full">
+              <label class="form-label">Cloudflare Worker URL</label>
+              <input type="text" class="form-input" id="cfg-workerurl" placeholder="https://your-worker.your-subdomain.workers.dev">
+            </div>
+            <div class="form-group full">
               <label class="form-label">Spreadsheet ID</label>
               <input type="text" class="form-input" id="cfg-sheetid" placeholder="Paste the ID from your Sheet URL">
             </div>
@@ -3236,6 +3240,7 @@ function loadConfig() {
     if (saved) {
       config = JSON.parse(saved);
       if (config.apiKey) document.getElementById('cfg-apikey').value = config.apiKey;
+      if (config.workerUrl) document.getElementById('cfg-workerurl').value = config.workerUrl;
       if (config.sheetId) document.getElementById('cfg-sheetid').value = config.sheetId;
       if (config.sheetName) document.getElementById('cfg-sheetname').value = config.sheetName;
       if (config.headerRow) document.getElementById('cfg-headerrow').value = config.headerRow;
@@ -3266,6 +3271,7 @@ function saveLocalCards() {
 function saveConfig() {
   config = {
     apiKey: document.getElementById('cfg-apikey').value.trim(),
+    workerUrl: document.getElementById('cfg-workerurl').value.trim().replace(/\/$/, ''),
     sheetId: document.getElementById('cfg-sheetid').value.trim(),
     sheetName: document.getElementById('cfg-sheetname').value.trim() || 'Sheet1',
     headerRow: parseInt(document.getElementById('cfg-headerrow').value) || 1,
@@ -4271,7 +4277,7 @@ let cyberSearchReturnState = null; // { page, scrollY, cardIndex }
 const TFWIKI_FACTION_PREFIXES = /^(autobot|decepticon|dinobot|insecticon|sergeant|predacon|captain|general|major|private|raider|specialist|lord)\s+/i;
 
 async function tfwikiSearch(query) {
-  const res = await fetch(`https://bitter-cloud-38b5.markmckay001.workers.dev/?search=${encodeURIComponent(query)}`);
+  const res = await fetch(`${config.workerUrl || ''}?search=${encodeURIComponent(query)}`);
   if (!res.ok) throw new Error(`HTTP ${res.status}`);
   const data = await res.json();
   return data?.query?.search || [];
@@ -4412,7 +4418,7 @@ async function runCyberSearch() {
 
   try {
     // Search for page title first
-    const searchRes = await fetch(`https://bitter-cloud-38b5.markmckay001.workers.dev/?search=${encodeURIComponent(query)}`);
+    const searchRes = await fetch(`${config.workerUrl || ''}?search=${encodeURIComponent(query)}`);
     const searchData = await searchRes.json();
     const hits = searchData?.query?.search || [];
     const filtered = hits.filter(r => !r.title.includes('/'));
@@ -4440,7 +4446,7 @@ async function runCyberSearchWithUrl(query, wikiUrl, pageTitle) {
   const title = pageTitle || decodeURIComponent(wikiUrl.split('/wiki/')[1] || query).replace(/_/g, ' ');
 
   try {
-    const res = await fetch(`https://bitter-cloud-38b5.markmckay001.workers.dev/?title=${encodeURIComponent(title)}`);
+    const res = await fetch(`${config.workerUrl || ''}?title=${encodeURIComponent(title)}`);
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     const data = await res.json();
 
