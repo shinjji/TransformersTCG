@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>AUTOBOT ARCHIVE — Transformers TCG Collection</title>
-<link rel="icon" type="image/png" href="https://wsrv.nl/?url=https://drive.google.com/uc?export=view%26id=1SAmrBj-tkGvHD3Yteh_Jnk8b9jmK0Mzw">
+<link rel="icon" type="image/png" href="https://wsrv.nl/?url=https://drive.google.com/uc?export=view%26id=1fzWFPem8tnny1MTXyDgVMYxo1KbbxOVK">
 <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;400;600;700&display=swap" rel="stylesheet">
 <style>
   :root {
@@ -3006,6 +3006,10 @@
                 <label class="form-label">Cost</label>
                 <input type="number" class="form-input" id="col-cost" value="13" min="1">
               </div>
+              <div class="form-group">
+                <label class="form-label">MPC</label>
+                <input type="number" class="form-input" id="col-mpc" value="14" min="1">
+              </div>
             </div>
           </div>
 
@@ -3113,6 +3117,7 @@
     <div class="modal-header">
       <span class="modal-title" id="modal-title">CARD DETAILS</span>
       <div style="display:flex;align-items:center;gap:0.5rem;">
+        <span class="btn-tfwiki" id="modal-mpc-badge" style="display:none;cursor:default;width:36px;" title="3rd Party Print">MPC</span>
         <button class="btn-tfwiki" id="modal-wiki-btn" style="display:none;" title="CyberSearch" onclick="openCyberSearch()"></button>
         <button class="modal-close" onclick="closeModal()">✕</button>
       </div>
@@ -3211,7 +3216,7 @@ const activeKeywords = { keywords: new Set(), charKeywords: new Set(), faction: 
 
 const COLS = {
   front: 'col-front', back: 'col-back', set: 'col-set', type: 'col-type',
-  number: 'col-number', name: 'col-name', qty: 'col-qty', combiner: 'col-combiner'
+  number: 'col-number', name: 'col-name', qty: 'col-qty', combiner: 'col-combiner', mpc: 'col-mpc'
 };
 
 // ===== INIT =====
@@ -3273,6 +3278,7 @@ function saveConfig() {
       number: parseInt(document.getElementById('col-number').value) || 5,
       name: parseInt(document.getElementById('col-name').value) || 6,
       qty: parseInt(document.getElementById('col-qty').value) || 7,
+      mpc: parseInt(document.getElementById('col-mpc').value) || 14,
       combiner: parseInt(document.getElementById('col-combiner').value) || 8,
       updatedAt: parseInt(document.getElementById('col-updated-at').value) || 9,
       keywords: parseInt(document.getElementById('col-keywords').value) || 10,
@@ -3620,7 +3626,7 @@ function showPage(name) {
 function getColIndex(key) {
   return (config.cols && config.cols[key]) ? config.cols[key] - 1 : {
     front:0, back:1, set:2, type:3, number:4, name:5, qty:6, combiner:7, updatedAt:8,
-    keywords:9, charKeywords:10, faction:11, cost:12
+    keywords:9, charKeywords:10, faction:11, cost:12, mpc:13
   }[key];
 }
 
@@ -3665,6 +3671,7 @@ function rowToCard(row, rowIndex) {
     charKeywords: (row[getColIndex('charKeywords')] || '').split(',').map(s => s.trim()).filter(Boolean),
     faction: (row[getColIndex('faction')] || '').split(',').map(s => s.trim()).filter(Boolean),
     cost: row[getColIndex('cost')] || '',
+    mpc: row[getColIndex('mpc')] || '',
   };
 }
 
@@ -4543,6 +4550,11 @@ function openCardModal(idx) {
   } else {
     kwRow.style.display = 'none';
   }
+
+  // MPC
+
+  const mpcBadge = document.getElementById('modal-mpc-badge');
+  if (mpcBadge) mpcBadge.style.display = card.mpc ? 'flex' : 'none';
 
   document.getElementById('modal-qty').textContent = modalQty;
 
