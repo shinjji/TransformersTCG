@@ -773,6 +773,7 @@
     object-fit: cover;
     display: block;
     transition: opacity 0.2s;
+    border-radius: 24px;
   }
 
   .card-tile-img-front { position: relative; z-index: 1; }
@@ -1565,6 +1566,7 @@
     height: 294px;
     object-fit: cover;
     border: 2px solid var(--steel-mid);
+    border-radius: 18px;
     transition: border-color 0.2s, width 0.2s, height 0.2s;
     cursor: zoom-in;
     position: relative;
@@ -3467,7 +3469,12 @@ function renderStats() {
   }
 
   // Per-set breakdown
-  const sets = [...new Set(cards.map(c => c.set).filter(Boolean))].sort();
+  const sets = [...new Set(cards.map(c => c.set).filter(Boolean))].sort((a, b) => {
+    const aFM = a.startsWith('FM ') ? 1 : 0;
+    const bFM = b.startsWith('FM ') ? 1 : 0;
+    if (aFM !== bFM) return aFM - bFM;
+    return a.localeCompare(b);
+  });
   const container = document.getElementById('stats-by-set');
 
   if (!sets.length) {
@@ -4162,6 +4169,12 @@ function multiSort(a, b, primaryKey, primaryAsc) {
   // Primary sort (user-selected), then always fall back to set → type → number
   const cmp = (x, y) => (x || '').toString().localeCompare((y || '').toString(), undefined, { numeric: true });
   const numCmp = (x, y) => (x || 0) - (y || 0);
+  const setCmp = (x, y) => {
+    const xFM = (x || '').startsWith('FM ') ? 1 : 0;
+    const yFM = (y || '').startsWith('FM ') ? 1 : 0;
+    if (xFM !== yFM) return xFM - yFM;
+    return cmp(x, y);
+  };
 
   if (primaryKey && primaryKey !== 'set') {
     let result;
@@ -4171,8 +4184,8 @@ function multiSort(a, b, primaryKey, primaryAsc) {
     if (result !== 0) return result;
   }
 
-  // set → type → number
-  return cmp(a.set, b.set) || cmp(a.type, b.type) || cmp(a.number, b.number);
+  // set → type → number (FM sets always last)
+  return setCmp(a.set, b.set) || cmp(a.type, b.type) || cmp(a.number, b.number);
 }
 
 function renderCollection() {
@@ -4689,7 +4702,12 @@ async function addCard() {
 
 // ===== FILTERS =====
 function populateFilters() {
-  const sets = [...new Set(cards.map(c => c.set).filter(Boolean))].sort();
+  const sets = [...new Set(cards.map(c => c.set).filter(Boolean))].sort((a, b) => {
+    const aFM = a.startsWith('FM ') ? 1 : 0;
+    const bFM = b.startsWith('FM ') ? 1 : 0;
+    if (aFM !== bFM) return aFM - bFM;
+    return a.localeCompare(b);
+  });
   const types = [...new Set(cards.map(c => c.type).filter(Boolean))].sort();
 
   ['filter-set', 'coll-filter-set'].forEach(id => {
