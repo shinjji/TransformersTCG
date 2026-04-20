@@ -4556,7 +4556,7 @@ function openCardModal(idx) {
   }
 
   modalQty = card.qty;
-  document.getElementById('modal-title').textContent = card.name.toUpperCase();
+  document.getElementById('modal-title').textContent = card.name.split('/')[0].trim().toUpperCase();
   document.getElementById('modal-name').textContent = card.name;
 
   // Modal icon strip — faction icons then keyword icons
