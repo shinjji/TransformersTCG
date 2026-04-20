@@ -3123,7 +3123,10 @@
 <div class="modal-overlay" id="card-modal">
   <div class="modal">
     <div class="modal-header">
-      <span class="modal-title" id="modal-title">CARD DETAILS</span>
+      <div style="display:flex;align-items:center;gap:0.75rem;flex:1;min-width:0;">
+        <span class="modal-title" id="modal-title">CARD DETAILS</span>
+        <div id="modal-icon-strip" style="display:flex;align-items:center;gap:4px;flex-shrink:0;"></div>
+      </div>
       <div style="display:flex;align-items:center;gap:0.5rem;">
         <span class="btn-tfwiki" id="modal-mpc-badge" style="display:none;cursor:default;width:36px;" title="3rd Party Print">MPC</span>
         <button class="btn-tfwiki" id="modal-wiki-btn" style="display:none;" title="CyberSearch" onclick="openCyberSearch()"></button>
@@ -3214,6 +3217,7 @@
 // ===== STATE =====
 let cards = [];
 let combinerArt = {};
+let iconMap = {};
 let config = {};
 let currentCardIndex = null;
 let modalQty = 0;
@@ -3236,6 +3240,8 @@ document.addEventListener('DOMContentLoaded', () => {
   updateStats();
   populateFilters();
   showRandomCard();
+  // Fetch icons fresh on every load
+  fetchIconMap().then(m => { iconMap = m; });
 });
 
 function loadConfig() {
@@ -3757,6 +3763,31 @@ async function fetchCombinerArt() {
   return map;
 }
 
+async function fetchIconMap() {
+  const key = config.apiKey;
+  const id = config.sheetId;
+  if (!key || !id) return {};
+  const sheet = encodeURIComponent('TransformersIcons');
+  const url = `https://sheets.googleapis.com/v4/spreadsheets/${id}/values/${sheet}?key=${key}`;
+  const resp = await fetch(url);
+  if (!resp.ok) return {};
+  const data = await resp.json();
+  const rows = data.values || [];
+  const map = {};
+  // Col A = type, Col B = keyword, Col C = Google Drive URL
+  const typeToGroup = { 'Trait': 'keywords', 'Faction': 'faction', 'Character': 'charKeywords' };
+  rows.slice(1).forEach(row => {
+    const type = (row[0] || '').trim();
+    const keyword = (row[1] || '').trim();
+    const imgUrl = (row[2] || '').trim();
+    if (!keyword || !imgUrl || type === 'NOT USED') return;
+    const group = typeToGroup[type];
+    if (!group) return;
+    map[keyword] = { url: proxyImg(imgUrl), group };
+  });
+  return map;
+}
+
 async function syncFromSheet() {
   if (!config.sheetId || !config.apiKey) {
     showToast('Configure API key and Sheet ID in Settings first', 'error');
@@ -3766,9 +3797,10 @@ async function syncFromSheet() {
   const btns = ['coll-sync-btn', 'cfg-sync-btn', 'stats-sync-btn'].map(id => document.getElementById(id)).filter(Boolean);
   btns.forEach(b => { b.disabled = true; b.textContent = '⟳ SYNCING...'; });
   try {
-    const [fetched, artMap] = await Promise.all([fetchSheetData(), fetchCombinerArt()]);
+    const [fetched, artMap, icons] = await Promise.all([fetchSheetData(), fetchCombinerArt(), fetchIconMap()]);
     cards = fetched.filter(c => c.name);
     combinerArt = artMap;
+    iconMap = icons;
     saveLocalCards();
     localStorage.removeItem('tcg_combiner_art');
     localStorage.setItem('tcg_combiner_art', JSON.stringify(combinerArt));
@@ -4523,6 +4555,22 @@ function openCardModal(idx) {
   modalQty = card.qty;
   document.getElementById('modal-title').textContent = card.name.toUpperCase();
   document.getElementById('modal-name').textContent = card.name;
+
+  // Modal icon strip — faction icons then keyword icons
+  const iconStrip = document.getElementById('modal-icon-strip');
+  if (iconStrip) {
+    const factions = card.faction || [];
+    const keywords = card.keywords || [];
+    const stripIcons = [
+      ...factions.map(f => ({ value: f, group: 'faction' })),
+      ...keywords.map(k => ({ value: k, group: 'keywords' })),
+    ].map(({ value, group }) => {
+      const key = Object.keys(iconMap).find(k => k.toLowerCase() === value.toLowerCase() && iconMap[k].group === group);
+      return key ? `<img src="${iconMap[key].url}" alt="${value}" title="${value}" style="width:30px;height:30px;object-fit:contain;" onerror="this.style.display='none'">` : '';
+    }).join('');
+    iconStrip.innerHTML = stripIcons;
+    iconStrip.style.display = stripIcons.trim() ? 'flex' : 'none';
+  }
   document.getElementById('modal-set').textContent = card.set || '—';
   document.getElementById('modal-number').textContent = card.number || '—';
   document.getElementById('modal-type').textContent = card.type || '—';
@@ -4796,12 +4844,13 @@ function toggleKeywordPanel() {
 function updateKeywordActiveCount() {
   const total = activeKeywords.keywords.size + activeKeywords.charKeywords.size + activeKeywords.faction.size;
   const badge = document.getElementById('kw-active-count');
-  if (!badge) return;
-  if (total > 0) {
-    badge.textContent = `${total} active`;
-    badge.style.display = 'inline';
-  } else {
-    badge.style.display = 'none';
+  if (badge) {
+    if (total > 0) {
+      badge.textContent = `${total} active`;
+      badge.style.display = 'inline';
+    } else {
+      badge.style.display = 'none';
+    }
   }
 }
 
