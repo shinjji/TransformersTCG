@@ -4279,12 +4279,11 @@ function getStratagemGroupCards(stratagemCard) {
 }
 
 function findStratagemForCharacter(characterCard) {
-  for (const c of cards) {
-    if ((c.type || '').toLowerCase() !== 'stratagem') continue;
+  return cards.filter(c => {
+    if ((c.type || '').toLowerCase() !== 'stratagem') return false;
     const entries = parseStratagemEntries(c.stratagemCharacter);
-    if (entries.some(entry => characterMatchesEntry(characterCard, entry))) return c;
-  }
-  return null;
+    return entries.some(entry => characterMatchesEntry(characterCard, entry));
+  });
 }
 
 function applyStratagemGroupFilter() {
@@ -4711,12 +4710,29 @@ function openCardModal(idx) {
     const isStratagem = (card.type || '').toLowerCase() === 'stratagem';
     let group = null;
     if (isStratagem) {
-      group = getStratagemGroupCards(card);
-      console.log('[STRAT] Stratagem card opened:', card.name, '| stratagemCharacter:', card.stratagemCharacter, '| entries:', parseStratagemEntries(card.stratagemCharacter), '| group found:', group ? group.map(c => c.name) : null);
+      const entries = parseStratagemEntries(card.stratagemCharacter);
+      const matchedChars = cards.filter(c => entries.some(entry => characterMatchesEntry(c, entry)));
+      const allStratagems = new Set([card]);
+      matchedChars.forEach(char => findStratagemForCharacter(char).forEach(s => allStratagems.add(s)));
+      const seen = new Set();
+      const groupArr = [];
+      allStratagems.forEach(sc => {
+        const g = getStratagemGroupCards(sc);
+        if (g) g.forEach(c => { const k = cardKey(c); if (!seen.has(k)) { seen.add(k); groupArr.push(c); } });
+      });
+      group = groupArr.length > 1 ? groupArr : null;
     } else {
-      const stratagemCard = findStratagemForCharacter(card);
-      console.log('[STRAT] Character card opened:', card.name, '| charSubName:', card.charSubName, '| matching stratagem:', stratagemCard ? stratagemCard.name : null);
-      if (stratagemCard) group = getStratagemGroupCards(stratagemCard);
+      const stratagemCards = findStratagemForCharacter(card);
+      console.log('[STRAT] Character card opened:', card.name, '| charSubName:', card.charSubName, '| matching stratagems:', stratagemCards.map(c => c.name));
+      if (stratagemCards.length) {
+        const seen = new Set();
+        group = [];
+        stratagemCards.forEach(sc => {
+          const g = getStratagemGroupCards(sc);
+          if (g) g.forEach(c => { const k = cardKey(c); if (!seen.has(k)) { seen.add(k); group.push(c); } });
+        });
+        if (!group.length) group = null;
+      }
     }
     pendingStratagemGroup = group;
     stratagemBtn.style.display = group ? 'inline-flex' : 'none';
