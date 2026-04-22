@@ -326,12 +326,14 @@
     width: 154px;
     height: 215px;
     object-fit: cover;
+    object-position: center;
     border: 2px solid var(--steel-mid);
     display: block;
     cursor: pointer;
     transition: all 0.3s;
     position: relative;
     z-index: 1;
+    border-radius: 18px;
   }
 
   .cotd-img:hover {
@@ -749,6 +751,7 @@
     cursor: pointer;
     transition: all 0.2s;
     position: relative;
+    border-radius: 18px;
   }
 
   .card-tile.unowned {
@@ -773,7 +776,7 @@
     object-fit: cover;
     display: block;
     transition: opacity 0.2s;
-    border-radius: 24px;
+    border-radius: 18px;
   }
 
   .card-tile-img-front { position: relative; z-index: 1; }
@@ -793,7 +796,7 @@
   .card-tile:hover .card-tile-img-back { opacity: 1; }
 
   /* COTD character card flip */
-  .cotd-flip-wrap { border: 2px solid var(--steel-mid); transition: border-color 0.2s, box-shadow 0.2s; }
+  .cotd-flip-wrap { border: 2px solid var(--steel-mid); border-radius: 18px; transition: border-color 0.2s, box-shadow 0.2s; }
   .cotd-flip-wrap:hover { border-color: var(--energon-blue); box-shadow: 0 0 20px var(--glow-blue); }
   .cotd-flip-wrap:hover .card-tile-img-back { opacity: 1; }
   .cotd-flip-wrap:hover .card-tile-img-front { opacity: 0; }
@@ -4070,10 +4073,10 @@ function rollCharacterCard(forceRandom = false) {
     <div class="cotd-inner">
       <div class="card-tile-img-wrap cotd-flip-wrap" style="width:154px;height:215px;flex-shrink:0;cursor:pointer;" onclick="openCardModal(${idx})">
         ${card.front
-          ? `<img class="card-tile-img card-tile-img-front${card.qty === 0 ? ' card-img-unowned' : ''}" src="${card.front}" alt="${card.name}" style="width:154px;height:215px;" onerror="this.style.display='none';">`
+          ? `<img class="card-tile-img card-tile-img-front${card.qty === 0 ? ' card-img-unowned' : ''}" src="${card.front}" alt="${card.name}" style="width:100%;height:100%;object-fit:cover;object-position:center;" onerror="this.style.display='none';">`
           : `<div class="cotd-img-placeholder">NO IMAGE</div>`}
         ${card.back
-          ? `<img class="card-tile-img-back${card.qty === 0 ? ' card-img-unowned-back' : ''}" src="${card.back}" alt="${card.name} back" style="width:154px;height:215px;">`
+          ? `<img class="card-tile-img-back${card.qty === 0 ? ' card-img-unowned-back' : ''}" src="${card.back}" alt="${card.name} back" style="width:100%;height:100%;object-fit:cover;object-position:center;">`
           : ''}
       </div>
       <div class="cotd-info">
