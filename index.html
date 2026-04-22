@@ -2550,8 +2550,8 @@
       <button onclick="showPage('collection')" id="nav-collection">◈ COLLECTION</button>
       <button onclick="showPage('combiners')" id="nav-combiners">⟁ COMBINERS</button>
       <button onclick="showPage('stats')" id="nav-stats">◎ STATS</button>
-      <button onclick="showPage('settings')" id="nav-settings">⚙ CONFIGURE</button>
       <button onclick="showPage('cybersearch')" id="nav-cybersearch">⌖ CYBERSEARCH</button>
+      <button onclick="showPage('settings')" id="nav-settings">⚙ CONFIGURE</button>
     </nav>
 
     <!-- Burger menu (small screens) -->
@@ -2563,8 +2563,8 @@
         <button onclick="showPage('collection');closeBurger()" id="nav-collection-m">◈ COLLECTION</button>
         <button onclick="showPage('combiners');closeBurger()" id="nav-combiners-m">⟁ COMBINERS</button>
         <button onclick="showPage('stats');closeBurger()" id="nav-stats-m">◎ STATS</button>
-        <button onclick="showPage('settings');closeBurger()" id="nav-settings-m">⚙ CONFIGURE</button>
         <button onclick="showPage('cybersearch');closeBurger()" id="nav-cybersearch-m">⌖ CYBERSEARCH</button>
+        <button onclick="showPage('settings');closeBurger()" id="nav-settings-m">⚙ CONFIGURE</button>
       </div>
     </div>
 
@@ -3021,6 +3021,14 @@
                 <label class="form-label">MPC</label>
                 <input type="number" class="form-input" id="col-mpc" value="14" min="1">
               </div>
+              <div class="form-group">
+                <label class="form-label">Character Sub Name</label>
+                <input type="number" class="form-input" id="col-char-sub-name" value="15" min="1">
+              </div>
+              <div class="form-group">
+                <label class="form-label">Stratagem Character</label>
+                <input type="number" class="form-input" id="col-stratagem-character" value="16" min="1">
+              </div>
             </div>
           </div>
 
@@ -3298,6 +3306,8 @@ function saveConfig() {
       name: parseInt(document.getElementById('col-name').value) || 6,
       qty: parseInt(document.getElementById('col-qty').value) || 7,
       mpc: parseInt(document.getElementById('col-mpc').value) || 14,
+      charSubName: parseInt(document.getElementById('col-char-sub-name').value) || 15,
+      stratagemCharacter: parseInt(document.getElementById('col-stratagem-character').value) || 16,
       combiner: parseInt(document.getElementById('col-combiner').value) || 8,
       updatedAt: parseInt(document.getElementById('col-updated-at').value) || 9,
       keywords: parseInt(document.getElementById('col-keywords').value) || 10,
@@ -3656,7 +3666,7 @@ function showPage(name) {
 function getColIndex(key) {
   return (config.cols && config.cols[key]) ? config.cols[key] - 1 : {
     front:0, back:1, set:2, type:3, number:4, name:5, qty:6, combiner:7, updatedAt:8,
-    keywords:9, charKeywords:10, faction:11, cost:12, mpc:13
+    keywords:9, charKeywords:10, faction:11, cost:12, mpc:13, charSubName:14, stratagemCharacter:15
   }[key];
 }
 
@@ -3702,6 +3712,8 @@ function rowToCard(row, rowIndex) {
     faction: (row[getColIndex('faction')] || '').split(',').map(s => s.trim()).filter(Boolean),
     cost: row[getColIndex('cost')] || '',
     mpc: row[getColIndex('mpc')] || '',
+    charSubName: row[getColIndex('charSubName')] || '',
+    stratagemCharacter: row[getColIndex('stratagemCharacter')] || '',
   };
 }
 
@@ -4557,7 +4569,13 @@ function openCardModal(idx) {
 
   modalQty = card.qty;
   document.getElementById('modal-title').textContent = card.name.split('/')[0].trim().toUpperCase();
-  document.getElementById('modal-name').textContent = card.name;
+  const modalNameEl = document.getElementById('modal-name');
+  modalNameEl.textContent = card.name;
+  if (card.charSubName) {
+    modalNameEl.setAttribute('title', card.charSubName);
+  } else {
+    modalNameEl.removeAttribute('title');
+  }
 
   // Modal icon strip — faction icons then keyword icons
   const iconStrip = document.getElementById('modal-icon-strip');
