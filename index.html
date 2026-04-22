@@ -3139,6 +3139,7 @@
         <div id="modal-icon-strip" style="display:flex;align-items:center;gap:4px;flex-shrink:0;"></div>
       </div>
       <div style="display:flex;align-items:center;gap:0.5rem;">
+        <button class="btn-tfwiki" id="modal-stratagem-btn" style="display:none;" title="Stratagem" onclick="applyStratagemGroupFilter()">#</button>
         <span class="btn-tfwiki" id="modal-mpc-badge" style="display:none;cursor:default;width:36px;" title="3rd Party Print">MPC</span>
         <button class="btn-tfwiki" id="modal-wiki-btn" style="display:none;" title="CyberSearch" onclick="openCyberSearch()"></button>
         <button class="modal-close" onclick="closeModal()">✕</button>
@@ -4180,6 +4181,7 @@ function resetCollectionFilters() {
   activeKeywords.faction.clear();
   document.querySelectorAll('.keyword-chip.active').forEach(el => el.classList.remove('active'));
   updateKeywordActiveCount();
+  activeStratagemGroup = null;
   renderCollection();
 }
 
@@ -4243,6 +4245,57 @@ function multiSort(a, b, primaryKey, primaryAsc) {
   return setCmp(a.set, b.set) || cmp(a.type, b.type) || cmp(a.number, b.number);
 }
 
+// ===== STRATAGEM GROUP =====
+let activeStratagemGroup = null;
+let pendingStratagemGroup = null;
+
+function cardKey(c) {
+  return (c.name || '') + '||' + (c.set || '') + '||' + (c.number || '');
+}
+
+function parseStratagemEntries(str) {
+  return (str || '').split(',').map(s => s.trim()).filter(Boolean).map(entry => {
+    const parts = entry.split('|');
+    return { partialName: (parts[0] || '').trim().toLowerCase(), partialSubName: (parts[1] || '').trim().toLowerCase() };
+  });
+}
+
+function characterMatchesEntry(card, entry) {
+  const name = (card.name || '').toLowerCase();
+  const subName = (card.charSubName || '').toLowerCase();
+  return (!entry.partialName || name.includes(entry.partialName)) &&
+         (!entry.partialSubName || subName.includes(entry.partialSubName));
+}
+
+function getStratagemGroupCards(stratagemCard) {
+  const entries = parseStratagemEntries(stratagemCard.stratagemCharacter);
+  if (!entries.length) return null;
+  const group = [stratagemCard];
+  cards.forEach(c => {
+    if (c === stratagemCard) return;
+    if (entries.some(entry => characterMatchesEntry(c, entry))) group.push(c);
+  });
+  return group.length > 1 ? group : null;
+}
+
+function findStratagemForCharacter(characterCard) {
+  for (const c of cards) {
+    if ((c.type || '').toLowerCase() !== 'stratagem') continue;
+    const entries = parseStratagemEntries(c.stratagemCharacter);
+    if (entries.some(entry => characterMatchesEntry(characterCard, entry))) return c;
+  }
+  return null;
+}
+
+function applyStratagemGroupFilter() {
+  if (!pendingStratagemGroup) return;
+  const group = pendingStratagemGroup;
+  resetCollectionFilters();
+  activeStratagemGroup = new Set(group.map(cardKey));
+  closeModal();
+  renderCollection();
+}
+
 function renderCollection() {
   const q = (document.getElementById('coll-search')?.value || '').toLowerCase();
   const setF = document.getElementById('coll-filter-set')?.value || '';
@@ -4273,7 +4326,8 @@ function renderCollection() {
     const matchKeywords = activeKeywords.keywords.size === 0 || [...activeKeywords.keywords].every(kw => (c.keywords || []).includes(kw));
     const matchCharKeywords = activeKeywords.charKeywords.size === 0 || [...activeKeywords.charKeywords].every(kw => (c.charKeywords || []).includes(kw));
     const matchFaction = activeKeywords.faction.size === 0 || [...activeKeywords.faction].some(f => (c.faction || []).includes(f));
-    return matchQ && matchSet && matchType && matchOwned && matchCost && matchKeywords && matchCharKeywords && matchFaction;
+    const matchStratagemGroup = !activeStratagemGroup || activeStratagemGroup.has(cardKey(c));
+    return matchQ && matchSet && matchType && matchOwned && matchCost && matchKeywords && matchCharKeywords && matchFaction && matchStratagemGroup;
   });
 
   filtered.sort((a, b) => multiSort(a, b, sort, sortAsc));
@@ -4648,9 +4702,26 @@ function openCardModal(idx) {
   }
 
   // MPC
-
   const mpcBadge = document.getElementById('modal-mpc-badge');
   if (mpcBadge) mpcBadge.style.display = card.mpc ? 'flex' : 'none';
+
+  // Stratagem group button
+  const stratagemBtn = document.getElementById('modal-stratagem-btn');
+  if (stratagemBtn) {
+    const isStratagem = (card.type || '').toLowerCase() === 'stratagem';
+    let group = null;
+    if (isStratagem) {
+      group = getStratagemGroupCards(card);
+      console.log('[STRAT] Stratagem card opened:', card.name, '| stratagemCharacter:', card.stratagemCharacter, '| entries:', parseStratagemEntries(card.stratagemCharacter), '| group found:', group ? group.map(c => c.name) : null);
+    } else {
+      const stratagemCard = findStratagemForCharacter(card);
+      console.log('[STRAT] Character card opened:', card.name, '| charSubName:', card.charSubName, '| matching stratagem:', stratagemCard ? stratagemCard.name : null);
+      if (stratagemCard) group = getStratagemGroupCards(stratagemCard);
+    }
+    pendingStratagemGroup = group;
+    stratagemBtn.style.display = group ? 'inline-flex' : 'none';
+    console.log('[STRAT] Button display:', stratagemBtn.style.display);
+  }
 
   document.getElementById('modal-qty').textContent = modalQty;
 
