@@ -5081,13 +5081,14 @@ function renderCombinerPage() {
     artSub.textContent = 'Combined form artwork coming soon';
   }
 
-  const owned = members.filter(c => c.qty > 0).length;
-  const isComplete = owned === members.length;
-  const pct = members.length ? Math.round((owned / members.length) * 100) : 0;
+  const characterMembers = members.filter(c => (c.type || '').toLowerCase() === 'character');
+  const owned = characterMembers.filter(c => c.qty > 0).length;
+  const isComplete = owned === characterMembers.length;
+  const pct = characterMembers.length ? Math.round((owned / characterMembers.length) * 100) : 0;
 
   const partsLeft = document.getElementById('combiner-parts-left');
   if (partsLeft) {
-    partsLeft.textContent = `${owned} / ${members.length} PARTS OWNED`;
+    partsLeft.textContent = `${owned} / ${characterMembers.length} PARTS OWNED`;
     partsLeft.style.display = 'inline-block';
   }
 
@@ -5114,6 +5115,31 @@ function renderCombinerPage() {
     return;
   }
 
+  const nonStratagems = members.filter(c => (c.type || '').toLowerCase() !== 'stratagem');
+  const stratagems = members.filter(c => (c.type || '').toLowerCase() === 'stratagem');
+
+  const renderRow = c => {
+    const idx = cards.indexOf(c);
+    const missing = !c.qty || c.qty < 1;
+    const qClass = qtyClass(c);
+    return `<tr class="${missing ? 'missing-row' : ''}" onclick="openCardModal(${idx})">
+      <td class="list-thumb-cell">
+        ${c.front
+          ? `<img class="list-thumb ${missing ? 'card-img-unowned' : ''}" src="${c.front}" alt="${c.name}" loading="lazy" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+             <div class="list-thumb-ph" style="display:none;">?</div>`
+          : `<div class="list-thumb-ph">?</div>`}
+      </td>
+      <td class="list-name">${c.name}</td>
+      <td>${c.set || '—'}</td>
+      <td style="color:var(--chrome);font-size:0.8rem;">${c.number || '—'}</td>
+      <td class="list-qty ${missing ? 'list-qty-zero' : qClass}" style="text-align:center;">${c.qty}</td>
+    </tr>`;
+  };
+
+  const stratagemDivider = stratagems.length ? `
+    <tr><td colspan="5" style="padding:0.4rem 0.5rem;background:var(--steel);color:var(--energon-blue);font-family:'Orbitron',monospace;font-size:0.6rem;font-weight:700;letter-spacing:0.18em;text-shadow:0 0 8px var(--energon-blue);">⚡ STRATAGEM</td></tr>
+    ${stratagems.map(renderRow).join('')}` : '';
+
   const tableHtml = `<table class="collection-list" style="width:100%;">
     <thead><tr>
       <th class="list-thumb-cell"></th>
@@ -5123,23 +5149,8 @@ function renderCombinerPage() {
       <th style="text-align:center;">QTY</th>
     </tr></thead>
     <tbody>
-      ${members.map(c => {
-        const idx = cards.indexOf(c);
-        const missing = !c.qty || c.qty < 1;
-        const qClass = qtyClass(c);
-        return `<tr class="${missing ? 'missing-row' : ''}" onclick="openCardModal(${idx})">
-          <td class="list-thumb-cell">
-            ${c.front
-              ? `<img class="list-thumb ${missing ? 'card-img-unowned' : ''}" src="${c.front}" alt="${c.name}" loading="lazy" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
-                 <div class="list-thumb-ph" style="display:none;">?</div>`
-              : `<div class="list-thumb-ph">?</div>`}
-          </td>
-          <td class="list-name">${c.name}</td>
-          <td>${c.set || '—'}</td>
-          <td style="color:var(--chrome);font-size:0.8rem;">${c.number || '—'}</td>
-          <td class="list-qty ${missing ? 'list-qty-zero' : qClass}" style="text-align:center;">${c.qty}</td>
-        </tr>`;
-      }).join('')}
+      ${nonStratagems.map(renderRow).join('')}
+      ${stratagemDivider}
     </tbody>
   </table>`;
   grid.innerHTML = tableHtml;
