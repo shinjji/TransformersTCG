@@ -2993,44 +2993,44 @@
                 <input type="number" class="form-input" id="col-name" value="6" min="1">
               </div>
               <div class="form-group">
+                <label class="form-label">Character Sub Name</label>
+                <input type="number" class="form-input" id="col-char-sub-name" value="7" min="1">
+              </div>
+              <div class="form-group">
                 <label class="form-label">Quantity</label>
-                <input type="number" class="form-input" id="col-qty" value="7" min="1">
-              </div>
-              <div class="form-group">
-                <label class="form-label">Combiner</label>
-                <input type="number" class="form-input" id="col-combiner" value="8" min="1">
-              </div>
-              <div class="form-group">
-                <label class="form-label">Updated At</label>
-                <input type="number" class="form-input" id="col-updated-at" value="9" min="1">
-              </div>
-              <div class="form-group">
-                <label class="form-label">Keywords</label>
-                <input type="number" class="form-input" id="col-keywords" value="10" min="1">
-              </div>
-              <div class="form-group">
-                <label class="form-label">Character Keywords</label>
-                <input type="number" class="form-input" id="col-char-keywords" value="11" min="1">
+                <input type="number" class="form-input" id="col-qty" value="8" min="1">
               </div>
               <div class="form-group">
                 <label class="form-label">Faction</label>
-                <input type="number" class="form-input" id="col-faction" value="12" min="1">
+                <input type="number" class="form-input" id="col-faction" value="9" min="1">
               </div>
               <div class="form-group">
                 <label class="form-label">Cost</label>
-                <input type="number" class="form-input" id="col-cost" value="13" min="1">
+                <input type="number" class="form-input" id="col-cost" value="10" min="1">
+              </div>
+              <div class="form-group">
+                <label class="form-label">Keywords</label>
+                <input type="number" class="form-input" id="col-keywords" value="11" min="1">
+              </div>
+              <div class="form-group">
+                <label class="form-label">Character Keywords</label>
+                <input type="number" class="form-input" id="col-char-keywords" value="12" min="1">
+              </div>
+              <div class="form-group">
+                <label class="form-label">Combiner</label>
+                <input type="number" class="form-input" id="col-combiner" value="13" min="1">
               </div>
               <div class="form-group">
                 <label class="form-label">MPC</label>
                 <input type="number" class="form-input" id="col-mpc" value="14" min="1">
               </div>
               <div class="form-group">
-                <label class="form-label">Character Sub Name</label>
-                <input type="number" class="form-input" id="col-char-sub-name" value="15" min="1">
+                <label class="form-label">Stratagem Character Links</label>
+                <input type="number" class="form-input" id="col-stratagem-character-links" value="15" min="1">
               </div>
               <div class="form-group">
-                <label class="form-label">Stratagem Character</label>
-                <input type="number" class="form-input" id="col-stratagem-character" value="16" min="1">
+                <label class="form-label">Updated At</label>
+                <input type="number" class="form-input" id="col-updated-at" value="16" min="1">
               </div>
             </div>
           </div>
@@ -3308,16 +3308,17 @@ function saveConfig() {
       type: parseInt(document.getElementById('col-type').value) || 4,
       number: parseInt(document.getElementById('col-number').value) || 5,
       name: parseInt(document.getElementById('col-name').value) || 6,
-      qty: parseInt(document.getElementById('col-qty').value) || 7,
+      charSubName: parseInt(document.getElementById('col-char-sub-name').value) || 7,
+      qty: parseInt(document.getElementById('col-qty').value) || 8,
+      faction: parseInt(document.getElementById('col-faction').value) || 9,
+      cost: parseInt(document.getElementById('col-cost').value) || 10,
+      keywords: parseInt(document.getElementById('col-keywords').value) || 11,
+      charKeywords: parseInt(document.getElementById('col-char-keywords').value) || 12,
+      combiner: parseInt(document.getElementById('col-combiner').value) || 13,
       mpc: parseInt(document.getElementById('col-mpc').value) || 14,
-      charSubName: parseInt(document.getElementById('col-char-sub-name').value) || 15,
-      stratagemCharacter: parseInt(document.getElementById('col-stratagem-character').value) || 16,
-      combiner: parseInt(document.getElementById('col-combiner').value) || 8,
-      updatedAt: parseInt(document.getElementById('col-updated-at').value) || 9,
-      keywords: parseInt(document.getElementById('col-keywords').value) || 10,
-      charKeywords: parseInt(document.getElementById('col-char-keywords').value) || 11,
-      faction: parseInt(document.getElementById('col-faction').value) || 12,
-      cost: parseInt(document.getElementById('col-cost').value) || 13,
+      stratagemCharacterLinks: parseInt(document.getElementById('col-stratagem-character-links').value) || 15,
+      updatedAt: parseInt(document.getElementById('col-updated-at').value) || 16,
+     
     }
   };
   localStorage.setItem('tcg_config', JSON.stringify(config));
@@ -3669,8 +3670,8 @@ function showPage(name) {
 // ===== GOOGLE SHEETS API =====
 function getColIndex(key) {
   return (config.cols && config.cols[key]) ? config.cols[key] - 1 : {
-    front:0, back:1, set:2, type:3, number:4, name:5, qty:6, combiner:7, updatedAt:8,
-    keywords:9, charKeywords:10, faction:11, cost:12, mpc:13, charSubName:14, stratagemCharacter:15
+    front:0, back:1, set:2, type:3, number:4, name:5, charSubName:6, qty:7, faction:8, cost:9,
+    keywords:10, charKeywords:11, combiner:12, mpc:13, stratagemCharacterLinks:14, updatedAt:15
   }[key];
 }
 
@@ -3717,7 +3718,7 @@ function rowToCard(row, rowIndex) {
     cost: row[getColIndex('cost')] || '',
     mpc: row[getColIndex('mpc')] || '',
     charSubName: row[getColIndex('charSubName')] || '',
-    stratagemCharacter: row[getColIndex('stratagemCharacter')] || '',
+    stratagemCharacter: row[getColIndex('stratagemCharacterLinks')] || '',
   };
 }
 
