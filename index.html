@@ -3150,7 +3150,7 @@
         <div id="modal-icon-strip" style="display:flex;align-items:center;gap:4px;flex-shrink:0;"></div>
       </div>
       <div style="display:flex;align-items:center;gap:0.5rem;">
-        <button class="btn-tfwiki" id="modal-stratagem-btn" style="display:none;" title="Stratagem" onclick="applyStratagemGroupFilter()">#</button>
+        <button class="btn-tfwiki" id="modal-stratagem-btn" style="display:none;" title="Linked Cards" onclick="applyStratagemGroupFilter()">#</button>
         <span class="btn-tfwiki" id="modal-mpc-badge" style="display:none;cursor:default;width:36px;" title="3rd Party Print">MPC</span>
         <button class="btn-tfwiki" id="modal-wiki-btn" style="display:none;" title="CyberSearch" onclick="openCyberSearch()"></button>
         <button class="modal-close" onclick="closeModal()">✕</button>
@@ -4287,6 +4287,9 @@ function parseStratagemBattleEntries(str) {
   return (str || '').split(',').map(s => s.trim().toLowerCase()).filter(Boolean);
 }
 
+function isCharacterCard(c) { return (c.type || '').toLowerCase() === 'character'; }
+function isBattleCard(c) { const t = (c.type || '').toLowerCase(); return t !== 'character' && t !== 'stratagem'; }
+
 function getStratagemGroupCards(stratagemCard) {
   const entries = parseStratagemEntries(stratagemCard.stratagemCharacter);
   const battleNames = parseStratagemBattleEntries(stratagemCard.stratagemBattle);
@@ -4294,8 +4297,8 @@ function getStratagemGroupCards(stratagemCard) {
   const group = [stratagemCard];
   cards.forEach(c => {
     if (c === stratagemCard) return;
-    if (entries.some(entry => characterMatchesEntry(c, entry))) group.push(c);
-    else if (battleNames.includes((c.name || '').toLowerCase())) group.push(c);
+    if (isCharacterCard(c) && entries.some(entry => characterMatchesEntry(c, entry))) group.push(c);
+    else if (isBattleCard(c) && battleNames.includes((c.name || '').toLowerCase())) group.push(c);
   });
   return group.length > 1 ? group : null;
 }
@@ -4314,6 +4317,54 @@ function findStratagemForBattle(battleCard) {
     if ((c.type || '').toLowerCase() !== 'stratagem') return false;
     return parseStratagemBattleEntries(c.stratagemBattle).includes(name);
   });
+}
+
+function findCharacterForBattle(battleCard) {
+  const name = (battleCard.name || '').toLowerCase();
+  return cards.filter(c => parseStratagemBattleEntries(c.charBattle).includes(name));
+}
+
+function buildGroupForCard(startCard) {
+  const seen = new Set();
+  const group = [];
+  const queue = [startCard];
+
+  function visit(c) {
+    const k = cardKey(c);
+    if (seen.has(k)) return;
+    seen.add(k);
+    group.push(c);
+    queue.push(c);
+  }
+
+  visit(startCard);
+
+  while (queue.length) {
+    const c = queue.shift();
+    if ((c.type || '').toLowerCase() === 'stratagem') {
+      // stratagemCharacterLinks → character cards only
+      const entries = parseStratagemEntries(c.stratagemCharacter);
+      cards.filter(x => isCharacterCard(x) && entries.some(e => characterMatchesEntry(x, e))).forEach(visit);
+      // stratagemBattleLinks → battle cards only
+      const battleNames = parseStratagemBattleEntries(c.stratagemBattle);
+      cards.filter(x => isBattleCard(x) && battleNames.includes((x.name || '').toLowerCase())).forEach(visit);
+    } else if (isCharacterCard(c)) {
+      // Find stratagems that link to this character
+      findStratagemForCharacter(c).forEach(visit);
+      // charBattle → battle cards only
+      if (c.charBattle) {
+        const battleNames = parseStratagemBattleEntries(c.charBattle);
+        cards.filter(x => isBattleCard(x) && battleNames.includes((x.name || '').toLowerCase())).forEach(visit);
+      }
+    } else if (isBattleCard(c)) {
+      // Find stratagems that link to this battle card
+      findStratagemForBattle(c).forEach(visit);
+      // Find characters that link to this battle card via charBattle
+      findCharacterForBattle(c).forEach(visit);
+    }
+  }
+
+  return group.length > 1 ? group : null;
 }
 
 function applyStratagemGroupFilter() {
@@ -4425,7 +4476,7 @@ function renderList(filtered) {
 let currentWikiUrl = null;
 let cyberSearchReturnState = null; // { page, scrollY, cardIndex }
 
-const TFWIKI_FACTION_PREFIXES = /^(autobot|decepticon|dinobot|insecticon|sergeant|predacon|captain|general|major|private|raider|specialist|lord|ghost of|allicon)\s+/i;
+const TFWIKI_FACTION_PREFIXES = /^(autobot|decepticon|dinobot|insecticon|sergeant|predacon|captain|general|major|private|raider|specialist|lord|ghost of|allicon|savage)\s+/i;
 
 async function tfwikiSearch(query) {
   const res = await fetch(`${config.workerUrl || ''}?search=${encodeURIComponent(query)}`);
@@ -4737,39 +4788,9 @@ function openCardModal(idx) {
   // Stratagem group button
   const stratagemBtn = document.getElementById('modal-stratagem-btn');
   if (stratagemBtn) {
-    const isStratagem = (card.type || '').toLowerCase() === 'stratagem';
-    let group = null;
-    if (isStratagem) {
-      const entries = parseStratagemEntries(card.stratagemCharacter);
-      const battleNames = parseStratagemBattleEntries(card.stratagemBattle);
-      const matchedChars = cards.filter(c => entries.some(entry => characterMatchesEntry(c, entry)));
-      const matchedBattle = cards.filter(c => battleNames.includes((c.name || '').toLowerCase()));
-      const allStratagems = new Set([card]);
-      matchedChars.forEach(c => findStratagemForCharacter(c).forEach(s => allStratagems.add(s)));
-      matchedBattle.forEach(c => findStratagemForBattle(c).forEach(s => allStratagems.add(s)));
-      const seen = new Set();
-      const groupArr = [];
-      allStratagems.forEach(sc => {
-        const g = getStratagemGroupCards(sc);
-        if (g) g.forEach(c => { const k = cardKey(c); if (!seen.has(k)) { seen.add(k); groupArr.push(c); } });
-      });
-      group = groupArr.length > 1 ? groupArr : null;
-    } else {
-      const stratagemCards = [...findStratagemForCharacter(card), ...findStratagemForBattle(card)]
-        .filter((s, i, arr) => arr.findIndex(x => cardKey(x) === cardKey(s)) === i);
-      if (stratagemCards.length) {
-        const seen = new Set();
-        group = [];
-        stratagemCards.forEach(sc => {
-          const g = getStratagemGroupCards(sc);
-          if (g) g.forEach(c => { const k = cardKey(c); if (!seen.has(k)) { seen.add(k); group.push(c); } });
-        });
-        if (!group.length) group = null;
-      }
-    }
+    const group = buildGroupForCard(card);
     pendingStratagemGroup = group;
     stratagemBtn.style.display = group ? 'inline-flex' : 'none';
-    console.log('[STRAT] Button display:', stratagemBtn.style.display);
   }
 
   document.getElementById('modal-qty').textContent = modalQty;
