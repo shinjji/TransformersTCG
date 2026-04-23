@@ -3033,8 +3033,12 @@
                 <input type="number" class="form-input" id="col-stratagem-battle-links" value="16" min="1">
               </div>
               <div class="form-group">
+                <label class="form-label">Character Battle Card Links</label>
+                <input type="number" class="form-input" id="col-char-battle-links" value="17" min="1">
+              </div>
+              <div class="form-group">
                 <label class="form-label">Updated At</label>
-                <input type="number" class="form-input" id="col-updated-at" value="17" min="1">
+                <input type="number" class="form-input" id="col-updated-at" value="18" min="1">
               </div>
             </div>
           </div>
@@ -3322,7 +3326,8 @@ function saveConfig() {
       mpc: parseInt(document.getElementById('col-mpc').value) || 14,
       stratagemCharacterLinks: parseInt(document.getElementById('col-stratagem-character-links').value) || 15,
       stratagemBattleLinks: parseInt(document.getElementById('col-stratagem-battle-links').value) || 16,
-      updatedAt: parseInt(document.getElementById('col-updated-at').value) || 17,
+      charBattleLinks: parseInt(document.getElementById('col-char-battle-links').value) || 17,
+      updatedAt: parseInt(document.getElementById('col-updated-at').value) || 18,
      
     }
   };
@@ -3676,7 +3681,7 @@ function showPage(name) {
 function getColIndex(key) {
   return (config.cols && config.cols[key]) ? config.cols[key] - 1 : {
     front:0, back:1, set:2, type:3, number:4, name:5, charSubName:6, qty:7, faction:8, cost:9,
-    keywords:10, charKeywords:11, combiner:12, mpc:13, stratagemCharacterLinks:14, stratagemBattleLinks:15, updatedAt:16
+    keywords:10, charKeywords:11, combiner:12, mpc:13, stratagemCharacterLinks:14, stratagemBattleLinks:15, charBattleLinks:16, updatedAt:17
   }[key];
 }
 
@@ -3725,6 +3730,7 @@ function rowToCard(row, rowIndex) {
     charSubName: row[getColIndex('charSubName')] || '',
     stratagemCharacter: row[getColIndex('stratagemCharacterLinks')] || '',
     stratagemBattle: row[getColIndex('stratagemBattleLinks')] || '',
+    charBattle: row[getColIndex('charBattleLinks')] || '',
   };
 }
 
