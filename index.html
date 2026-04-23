@@ -3029,8 +3029,12 @@
                 <input type="number" class="form-input" id="col-stratagem-character-links" value="15" min="1">
               </div>
               <div class="form-group">
+                <label class="form-label">Stratagem Battle Links</label>
+                <input type="number" class="form-input" id="col-stratagem-battle-links" value="16" min="1">
+              </div>
+              <div class="form-group">
                 <label class="form-label">Updated At</label>
-                <input type="number" class="form-input" id="col-updated-at" value="16" min="1">
+                <input type="number" class="form-input" id="col-updated-at" value="17" min="1">
               </div>
             </div>
           </div>
@@ -3317,7 +3321,8 @@ function saveConfig() {
       combiner: parseInt(document.getElementById('col-combiner').value) || 13,
       mpc: parseInt(document.getElementById('col-mpc').value) || 14,
       stratagemCharacterLinks: parseInt(document.getElementById('col-stratagem-character-links').value) || 15,
-      updatedAt: parseInt(document.getElementById('col-updated-at').value) || 16,
+      stratagemBattleLinks: parseInt(document.getElementById('col-stratagem-battle-links').value) || 16,
+      updatedAt: parseInt(document.getElementById('col-updated-at').value) || 17,
      
     }
   };
@@ -3671,7 +3676,7 @@ function showPage(name) {
 function getColIndex(key) {
   return (config.cols && config.cols[key]) ? config.cols[key] - 1 : {
     front:0, back:1, set:2, type:3, number:4, name:5, charSubName:6, qty:7, faction:8, cost:9,
-    keywords:10, charKeywords:11, combiner:12, mpc:13, stratagemCharacterLinks:14, updatedAt:15
+    keywords:10, charKeywords:11, combiner:12, mpc:13, stratagemCharacterLinks:14, stratagemBattleLinks:15, updatedAt:16
   }[key];
 }
 
@@ -3719,6 +3724,7 @@ function rowToCard(row, rowIndex) {
     mpc: row[getColIndex('mpc')] || '',
     charSubName: row[getColIndex('charSubName')] || '',
     stratagemCharacter: row[getColIndex('stratagemCharacterLinks')] || '',
+    stratagemBattle: row[getColIndex('stratagemBattleLinks')] || '',
   };
 }
 
@@ -4271,13 +4277,19 @@ function characterMatchesEntry(card, entry) {
          (!entry.partialSubName || subName.includes(entry.partialSubName));
 }
 
+function parseStratagemBattleEntries(str) {
+  return (str || '').split(',').map(s => s.trim().toLowerCase()).filter(Boolean);
+}
+
 function getStratagemGroupCards(stratagemCard) {
   const entries = parseStratagemEntries(stratagemCard.stratagemCharacter);
-  if (!entries.length) return null;
+  const battleNames = parseStratagemBattleEntries(stratagemCard.stratagemBattle);
+  if (!entries.length && !battleNames.length) return null;
   const group = [stratagemCard];
   cards.forEach(c => {
     if (c === stratagemCard) return;
     if (entries.some(entry => characterMatchesEntry(c, entry))) group.push(c);
+    else if (battleNames.includes((c.name || '').toLowerCase())) group.push(c);
   });
   return group.length > 1 ? group : null;
 }
@@ -4287,6 +4299,14 @@ function findStratagemForCharacter(characterCard) {
     if ((c.type || '').toLowerCase() !== 'stratagem') return false;
     const entries = parseStratagemEntries(c.stratagemCharacter);
     return entries.some(entry => characterMatchesEntry(characterCard, entry));
+  });
+}
+
+function findStratagemForBattle(battleCard) {
+  const name = (battleCard.name || '').toLowerCase();
+  return cards.filter(c => {
+    if ((c.type || '').toLowerCase() !== 'stratagem') return false;
+    return parseStratagemBattleEntries(c.stratagemBattle).includes(name);
   });
 }
 
@@ -4715,9 +4735,12 @@ function openCardModal(idx) {
     let group = null;
     if (isStratagem) {
       const entries = parseStratagemEntries(card.stratagemCharacter);
+      const battleNames = parseStratagemBattleEntries(card.stratagemBattle);
       const matchedChars = cards.filter(c => entries.some(entry => characterMatchesEntry(c, entry)));
+      const matchedBattle = cards.filter(c => battleNames.includes((c.name || '').toLowerCase()));
       const allStratagems = new Set([card]);
-      matchedChars.forEach(char => findStratagemForCharacter(char).forEach(s => allStratagems.add(s)));
+      matchedChars.forEach(c => findStratagemForCharacter(c).forEach(s => allStratagems.add(s)));
+      matchedBattle.forEach(c => findStratagemForBattle(c).forEach(s => allStratagems.add(s)));
       const seen = new Set();
       const groupArr = [];
       allStratagems.forEach(sc => {
@@ -4726,8 +4749,8 @@ function openCardModal(idx) {
       });
       group = groupArr.length > 1 ? groupArr : null;
     } else {
-      const stratagemCards = findStratagemForCharacter(card);
-      console.log('[STRAT] Character card opened:', card.name, '| charSubName:', card.charSubName, '| matching stratagems:', stratagemCards.map(c => c.name));
+      const stratagemCards = [...findStratagemForCharacter(card), ...findStratagemForBattle(card)]
+        .filter((s, i, arr) => arr.findIndex(x => cardKey(x) === cardKey(s)) === i);
       if (stratagemCards.length) {
         const seen = new Set();
         group = [];
