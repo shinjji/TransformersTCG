@@ -2969,76 +2969,80 @@
             <div class="settings-section-title" style="font-size:0.65rem; margin-bottom:0.75rem;">COLUMN MAPPING</div>
             <div class="form-grid" style="max-width:700px;">
               <div class="form-group">
+                <label class="form-label">Active</label>
+                <input type="number" class="form-input" id="col-active" value="1" min="1">
+              </div>
+              <div class="form-group">
                 <label class="form-label">Card Front</label>
-                <input type="number" class="form-input" id="col-front" value="1" min="1">
+                <input type="number" class="form-input" id="col-front" value="2" min="1">
               </div>
               <div class="form-group">
                 <label class="form-label">Card Back</label>
-                <input type="number" class="form-input" id="col-back" value="2" min="1">
+                <input type="number" class="form-input" id="col-back" value="3" min="1">
               </div>
               <div class="form-group">
                 <label class="form-label">Set</label>
-                <input type="number" class="form-input" id="col-set" value="3" min="1">
+                <input type="number" class="form-input" id="col-set" value="4" min="1">
               </div>
               <div class="form-group">
                 <label class="form-label">Type</label>
-                <input type="number" class="form-input" id="col-type" value="4" min="1">
+                <input type="number" class="form-input" id="col-type" value="5" min="1">
               </div>
               <div class="form-group">
                 <label class="form-label">No.</label>
-                <input type="number" class="form-input" id="col-number" value="5" min="1">
+                <input type="number" class="form-input" id="col-number" value="6" min="1">
               </div>
               <div class="form-group">
                 <label class="form-label">Name</label>
-                <input type="number" class="form-input" id="col-name" value="6" min="1">
+                <input type="number" class="form-input" id="col-name" value="7" min="1">
               </div>
               <div class="form-group">
                 <label class="form-label">Character Sub Name</label>
-                <input type="number" class="form-input" id="col-char-sub-name" value="7" min="1">
+                <input type="number" class="form-input" id="col-char-sub-name" value="8" min="1">
               </div>
               <div class="form-group">
                 <label class="form-label">Quantity</label>
-                <input type="number" class="form-input" id="col-qty" value="8" min="1">
+                <input type="number" class="form-input" id="col-qty" value="9" min="1">
               </div>
               <div class="form-group">
                 <label class="form-label">Faction</label>
-                <input type="number" class="form-input" id="col-faction" value="9" min="1">
+                <input type="number" class="form-input" id="col-faction" value="10" min="1">
               </div>
               <div class="form-group">
                 <label class="form-label">Cost</label>
-                <input type="number" class="form-input" id="col-cost" value="10" min="1">
+                <input type="number" class="form-input" id="col-cost" value="11" min="1">
               </div>
               <div class="form-group">
                 <label class="form-label">Keywords</label>
-                <input type="number" class="form-input" id="col-keywords" value="11" min="1">
+                <input type="number" class="form-input" id="col-keywords" value="12" min="1">
               </div>
               <div class="form-group">
                 <label class="form-label">Character Keywords</label>
-                <input type="number" class="form-input" id="col-char-keywords" value="12" min="1">
+                <input type="number" class="form-input" id="col-char-keywords" value="13" min="1">
               </div>
               <div class="form-group">
                 <label class="form-label">Combiner</label>
-                <input type="number" class="form-input" id="col-combiner" value="13" min="1">
+                <input type="number" class="form-input" id="col-combiner" value="14" min="1">
               </div>
               <div class="form-group">
                 <label class="form-label">MPC</label>
-                <input type="number" class="form-input" id="col-mpc" value="14" min="1">
+                <input type="number" class="form-input" id="col-mpc" value="15" min="1">
               </div>
               <div class="form-group">
                 <label class="form-label">Stratagem Character Links</label>
-                <input type="number" class="form-input" id="col-stratagem-character-links" value="15" min="1">
+                <input type="number" class="form-input" id="col-stratagem-character-links" value="16" min="1">
               </div>
               <div class="form-group">
                 <label class="form-label">Stratagem Battle Links</label>
-                <input type="number" class="form-input" id="col-stratagem-battle-links" value="16" min="1">
+                <input type="number" class="form-input" id="col-stratagem-battle-links" value="17" min="1">
               </div>
               <div class="form-group">
                 <label class="form-label">Character Battle Card Links</label>
-                <input type="number" class="form-input" id="col-char-battle-links" value="17" min="1">
+                <input type="number" class="form-input" id="col-char-battle-links" value="18" min="1">
               </div>
               <div class="form-group">
                 <label class="form-label">Updated At</label>
-                <input type="number" class="form-input" id="col-updated-at" value="18" min="1">
+                <input type="number" class="form-input" id="col-updated-at" value="19" min="1">
               </div>
             </div>
           </div>
@@ -3310,24 +3314,25 @@ function saveConfig() {
     headerRow: parseInt(document.getElementById('cfg-headerrow').value) || 1,
     serviceKey: document.getElementById('cfg-servicekey').value.trim(),
     cols: {
-      front: parseInt(document.getElementById('col-front').value) || 1,
-      back: parseInt(document.getElementById('col-back').value) || 2,
-      set: parseInt(document.getElementById('col-set').value) || 3,
-      type: parseInt(document.getElementById('col-type').value) || 4,
-      number: parseInt(document.getElementById('col-number').value) || 5,
-      name: parseInt(document.getElementById('col-name').value) || 6,
-      charSubName: parseInt(document.getElementById('col-char-sub-name').value) || 7,
-      qty: parseInt(document.getElementById('col-qty').value) || 8,
-      faction: parseInt(document.getElementById('col-faction').value) || 9,
-      cost: parseInt(document.getElementById('col-cost').value) || 10,
-      keywords: parseInt(document.getElementById('col-keywords').value) || 11,
-      charKeywords: parseInt(document.getElementById('col-char-keywords').value) || 12,
-      combiner: parseInt(document.getElementById('col-combiner').value) || 13,
-      mpc: parseInt(document.getElementById('col-mpc').value) || 14,
-      stratagemCharacterLinks: parseInt(document.getElementById('col-stratagem-character-links').value) || 15,
-      stratagemBattleLinks: parseInt(document.getElementById('col-stratagem-battle-links').value) || 16,
-      charBattleLinks: parseInt(document.getElementById('col-char-battle-links').value) || 17,
-      updatedAt: parseInt(document.getElementById('col-updated-at').value) || 18,
+      active: parseInt(document.getElementById('col-active').value) || 1,
+      front: parseInt(document.getElementById('col-front').value) || 2,
+      back: parseInt(document.getElementById('col-back').value) || 3,
+      set: parseInt(document.getElementById('col-set').value) || 4,
+      type: parseInt(document.getElementById('col-type').value) || 5,
+      number: parseInt(document.getElementById('col-number').value) || 6,
+      name: parseInt(document.getElementById('col-name').value) || 7,
+      charSubName: parseInt(document.getElementById('col-char-sub-name').value) || 8,
+      qty: parseInt(document.getElementById('col-qty').value) || 9,
+      faction: parseInt(document.getElementById('col-faction').value) || 10,
+      cost: parseInt(document.getElementById('col-cost').value) || 11,
+      keywords: parseInt(document.getElementById('col-keywords').value) || 12,
+      charKeywords: parseInt(document.getElementById('col-char-keywords').value) || 13,
+      combiner: parseInt(document.getElementById('col-combiner').value) || 14,
+      mpc: parseInt(document.getElementById('col-mpc').value) || 15,
+      stratagemCharacterLinks: parseInt(document.getElementById('col-stratagem-character-links').value) || 16,
+      stratagemBattleLinks: parseInt(document.getElementById('col-stratagem-battle-links').value) || 17,
+      charBattleLinks: parseInt(document.getElementById('col-char-battle-links').value) || 18,
+      updatedAt: parseInt(document.getElementById('col-updated-at').value) || 19,
      
     }
   };
@@ -3680,8 +3685,8 @@ function showPage(name) {
 // ===== GOOGLE SHEETS API =====
 function getColIndex(key) {
   return (config.cols && config.cols[key]) ? config.cols[key] - 1 : {
-    front:0, back:1, set:2, type:3, number:4, name:5, charSubName:6, qty:7, faction:8, cost:9,
-    keywords:10, charKeywords:11, combiner:12, mpc:13, stratagemCharacterLinks:14, stratagemBattleLinks:15, charBattleLinks:16, updatedAt:17
+    active:0, front:1, back:2, set:3, type:4, number:5, name:6, charSubName:7, qty:8, faction:9, cost:10,
+    keywords:11, charKeywords:12, combiner:13, mpc:14, stratagemCharacterLinks:15, stratagemBattleLinks:16, charBattleLinks:17, updatedAt:18
   }[key];
 }
 
@@ -3731,6 +3736,7 @@ function rowToCard(row, rowIndex) {
     stratagemCharacter: row[getColIndex('stratagemCharacterLinks')] || '',
     stratagemBattle: row[getColIndex('stratagemBattleLinks')] || '',
     charBattle: row[getColIndex('charBattleLinks')] || '',
+    active: row[getColIndex('active')] || '',
   };
 }
 
@@ -3772,7 +3778,9 @@ async function fetchSheetData(testOnly = false) {
 
   // Skip header row(s)
   const dataRows = rows.slice(headerRow);
-  return dataRows.map((row, i) => rowToCard(row, i + headerRow + 1)); // +1 for 1-indexed, +headerRow for offset
+  return dataRows
+    .filter(row => (row[getColIndex('active')] || '').toString().trim() === '1')
+    .map((row, i) => rowToCard(row, i + headerRow + 1)); // +1 for 1-indexed, +headerRow for offset
 }
 
 async function fetchCombinerArt() {
