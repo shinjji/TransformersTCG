@@ -2779,6 +2779,7 @@
       <button class="combiner-nav-btn" id="combiner-wiki-btn" onclick="openCombinerCyberSearch()" title="CyberSearch" style="display:none;font-family:'Orbitron',monospace;font-size:0.7rem;font-weight:900;">?</button>
       <button class="combiner-nav-btn" id="combiner-next" onclick="navigateCombiner(1)" title="Next">›</button>
       <span class="combiners-parts-count" id="combiner-parts-left" style="display:none;"></span>
+      <div id="combiner-icon-strip" style="display:none;align-items:center;gap:4px;flex-shrink:0;"></div>
     </div>
 
     <div class="home-grid" id="combiners-layout">
@@ -3804,11 +3805,19 @@ async function fetchCombinerArt() {
   const data = await resp.json();
   const rows = data.values || [];
   const map = {};
-  // Skip header row, col A = name, col B = URL
+  // Skip header row: A=name, B=url, C=tooltip, D=faction, E=cost (unused), F=keywords
   rows.slice(1).forEach(row => {
     const name = (row[0] || '').trim();
     const imgUrl = (row[1] || '').trim();
-    if (name && imgUrl) map[name] = proxyImgFresh(imgUrl);
+    const tooltip = (row[2] || '').trim();
+    const factionRaw = (row[3] || '').trim();
+    const keywordsRaw = (row[5] || '').trim();
+    if (name) map[name] = {
+      url: imgUrl ? proxyImgFresh(imgUrl) : '',
+      tooltip,
+      faction: factionRaw ? factionRaw.split(',').map(s => s.trim()).filter(Boolean) : [],
+      keywords: keywordsRaw ? keywordsRaw.split(',').map(s => s.trim()).filter(Boolean) : [],
+    };
   });
   return map;
 }
@@ -5143,6 +5152,9 @@ function renderCombinerPage() {
     if (artImg) { artImg.style.display = 'none'; artImg.src = ''; }
     const artInner = document.getElementById('combiner-artwork-inner');
     if (artInner) artInner.style.display = 'flex';
+    const combinerIconStrip = document.getElementById('combiner-icon-strip');
+    if (combinerIconStrip) { combinerIconStrip.innerHTML = ''; combinerIconStrip.style.display = 'none'; }
+    if (artLabel) artLabel.removeAttribute('title');
     grid.innerHTML = `<div class="combiner-empty" style="grid-column:1/-1;"><p>Select a combiner team above</p></div>`;
     return;
   }
@@ -5158,7 +5170,31 @@ function renderCombinerPage() {
   // Show artwork if available, otherwise show placeholder
   const artImg = document.getElementById('combiner-art-img');
   const artInner = document.getElementById('combiner-artwork-inner');
-  const artUrl = combinerArt[selected];
+  const artData = combinerArt[selected] || {};
+  const artUrl = artData.url || '';
+
+  // Tooltip on the artwork heading
+  if (artLabel) {
+    if (artData.tooltip) artLabel.setAttribute('title', artData.tooltip);
+    else artLabel.removeAttribute('title');
+  }
+
+  // Icon strip in controls — faction icons then keyword icons
+  const combinerIconStrip = document.getElementById('combiner-icon-strip');
+  if (combinerIconStrip) {
+    const factions = artData.faction || [];
+    const keywords = artData.keywords || [];
+    const stripIcons = [
+      ...factions.map(f => ({ value: f, group: 'faction' })),
+      ...keywords.map(k => ({ value: k, group: 'keywords' })),
+    ].map(({ value, group }) => {
+      const key = Object.keys(iconMap).find(k => k.toLowerCase() === value.toLowerCase() && iconMap[k].group === group);
+      return key ? `<img src="${iconMap[key].url}" alt="${value}" title="${value}" style="width:34px;height:34px;object-fit:contain;" onerror="this.style.display='none'">` : '';
+    }).join('');
+    combinerIconStrip.innerHTML = stripIcons;
+    combinerIconStrip.style.display = stripIcons.trim() ? 'flex' : 'none';
+  }
+
   if (artUrl) {
     artImg.src = artUrl;
     artImg.style.display = 'block';
@@ -5179,8 +5215,6 @@ function renderCombinerPage() {
     partsLeft.textContent = `${owned} / ${characterMembers.length} PARTS OWNED`;
     partsLeft.style.display = 'inline-block';
   }
-
-
 
   // Greyscale artwork if set is incomplete
   if (artUrl) {
