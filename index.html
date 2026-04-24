@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>AUTOBOT ARCHIVE — Transformers TCG Collection</title>
-<link rel="icon" type="image/png" href="https://wsrv.nl/?url=https://drive.google.com/uc?export=view%26id=1fzWFPem8tnny1MTXyDgVMYxo1KbbxOVK&output=png">
+<link rel="icon" type="image/png" href="https://wsrv.nl/?url=https://drive.google.com/uc?export=view%26id=1fzWFPem8tnny1MTXyDgVMYxo1KbbxOVK&output=webp&q=90">
 <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;400;600;700&display=swap" rel="stylesheet">
 <style>
   :root {
@@ -328,6 +328,7 @@
     object-fit: cover;
     object-position: center;
     image-rendering: auto;
+    image-rendering: high-quality;
     border: 2px solid var(--steel-mid);
     display: block;
     cursor: pointer;
@@ -781,6 +782,7 @@
     transition: opacity 0.2s;
     border-radius: 18px;
     image-rendering: auto;
+    image-rendering: high-quality;
   }
 
   .card-tile-img-front { position: relative; z-index: 1; }
@@ -1578,6 +1580,7 @@
     height: 294px;
     object-fit: cover;
     image-rendering: auto;
+    image-rendering: high-quality;
     border: 2px solid var(--steel-mid);
     border-radius: 18px;
     transition: border-color 0.2s, width 0.2s, height 0.2s;
@@ -2453,6 +2456,7 @@
     height: 38px;
     object-fit: cover;
     image-rendering: auto;
+    image-rendering: high-quality;
     border: 1px solid var(--steel-mid);
     display: block;
   }
@@ -2659,7 +2663,7 @@
 
           <div class="search-results" id="search-results">
             <div id="search-placeholder" style="display:flex;align-items:center;justify-content:center;height:100%;padding:1rem 0;">
-              <img src="https://wsrv.nl/?url=https://drive.google.com/uc?export=view%26id=1cxShgSlCeWcTq0k1goNRzeeXPG2Xgndp&output=png" alt="" style="max-width:100%;max-height:300px;object-fit:contain;opacity:0.85;" onerror="this.style.display='none'">
+              <img src="https://wsrv.nl/?url=https://drive.google.com/uc?export=view%26id=1cxShgSlCeWcTq0k1goNRzeeXPG2Xgndp&output=webp&q=90" alt="" style="max-width:100%;max-height:300px;object-fit:contain;opacity:0.85;" onerror="this.style.display='none'">
             </div>
           </div>
         </div>
@@ -3702,7 +3706,7 @@ function proxyImg(url) {
   if (!url) return '';
   url = url.trim();
   if (url.includes('wsrv.nl')) return url;
-  return 'https://wsrv.nl/?url=' + encodeURIComponent(url) + '&output=png';
+  return 'https://wsrv.nl/?url=' + encodeURIComponent(url) + '&output=webp&q=90';
 }
 
 // Cache-busting version for combiner art
@@ -3714,7 +3718,7 @@ function proxyImgFresh(url) {
     const inner = url.split('?url=')[1];
     url = inner ? decodeURIComponent(inner) : url;
   }
-  return 'https://wsrv.nl/?url=' + encodeURIComponent(url) + '&output=png&t=' + Date.now();
+  return 'https://wsrv.nl/?url=' + encodeURIComponent(url) + '&output=webp&q=90&t=' + Date.now();
 }
 
 const DEFAULT_BACK = 'https://drive.google.com/uc?export=view&id=13gf4UvUgxPp-5ewCdxBjY_FGcOhT4jF6';
