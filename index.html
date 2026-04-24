@@ -4494,7 +4494,7 @@ function renderList(filtered) {
 let currentWikiUrl = null;
 let cyberSearchReturnState = null; // { page, scrollY, cardIndex }
 
-const TFWIKI_FACTION_PREFIXES = /^(autobot|decepticon|dinobot|insecticon|sergeant|predacon|captain|general|major|private|raider|specialist|lord|ghost of|allicon|savage)\s+/i;
+const TFWIKI_FACTION_PREFIXES = /^(autobot|decepticon|dinobot|insecticon|sergeant|predacon|captain|general|major|private|raider|specialist|lord|ghost of|allicon|savage|junkion)\s+/i;
 
 async function tfwikiSearch(query) {
   const res = await fetch(`${config.workerUrl || ''}?search=${encodeURIComponent(query)}`);
