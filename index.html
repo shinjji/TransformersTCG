@@ -1062,6 +1062,24 @@
     .home-grid#combiners-layout { grid-template-columns: 1fr; }
   }
 
+  .combiner-controls-break { display: none; }
+
+  @media (max-width: 600px) {
+    .combiners-label {
+      flex: 0 0 100%;
+    }
+    .combiners-select {
+      flex: 1;
+      min-width: 0;
+      max-width: 100%;
+    }
+    .combiner-controls-break {
+      display: block;
+      flex: 0 0 100%;
+      height: 0;
+    }
+  }
+
   #combiner-card-grid {
     width: 100% !important;
     background: var(--card-bg);
@@ -2778,6 +2796,7 @@
       </select>
       <button class="combiner-nav-btn" id="combiner-wiki-btn" onclick="openCombinerCyberSearch()" title="CyberSearch" style="display:none;font-family:'Orbitron',monospace;font-size:0.7rem;font-weight:900;">?</button>
       <button class="combiner-nav-btn" id="combiner-next" onclick="navigateCombiner(1)" title="Next">›</button>
+      <div class="combiner-controls-break"></div>
       <span class="combiners-parts-count" id="combiner-parts-left" style="display:none;"></span>
       <div id="combiner-icon-strip" style="display:none;align-items:center;gap:4px;flex-shrink:0;"></div>
     </div>
