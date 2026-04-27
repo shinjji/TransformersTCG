@@ -1425,6 +1425,7 @@
   .newest-card-border-inner {
     position: absolute;
     inset: 6px;
+    border-radius: 18px;
     background: var(--card-bg);
     z-index: 0;
   }
@@ -3815,11 +3816,12 @@ async function fetchSheetData(testOnly = false) {
   const rows = data.values || [];
   if (testOnly) return rows;
 
-  // Skip header row(s)
+  // Skip header row(s) — preserve original index before filtering so rowIndex matches the actual sheet row
   const dataRows = rows.slice(headerRow);
   return dataRows
-    .filter(row => (row[getColIndex('active')] || '').toString().trim() === '1')
-    .map((row, i) => rowToCard(row, i + headerRow + 1)); // +1 for 1-indexed, +headerRow for offset
+    .map((row, i) => ({ row, sheetRow: i + headerRow + 1 })) // +1 for 1-indexed sheets
+    .filter(({ row }) => (row[getColIndex('active')] || '').toString().trim() === '1')
+    .map(({ row, sheetRow }) => rowToCard(row, sheetRow));
 }
 
 async function fetchCombinerArt() {
