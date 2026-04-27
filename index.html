@@ -3284,6 +3284,16 @@ let listSortKey = 'set';
 let listSortAsc = true;
 const activeKeywords = { keywords: new Set(), charKeywords: new Set(), faction: new Set() };
 
+const CHAR_NAME_GROUPS = [
+  'BUMBLEBEE',
+  'MEGATRON',
+  'OPTIMUS PRIME',
+  'STARSCREAM',
+  'SHOCKWAVE',
+  'WINDBLADE',
+  'SOUNDBLASTER',
+];
+
 const COLS = {
   front: 'col-front', back: 'col-back', set: 'col-set', type: 'col-type',
   number: 'col-number', name: 'col-name', qty: 'col-qty', combiner: 'col-combiner', mpc: 'col-mpc'
@@ -4451,7 +4461,10 @@ function renderCollection() {
     const matchOwned = !ownedF || (ownedF === 'owned' ? c.qty > 0 : c.qty === 0);
     const matchCost = !costF || c.cost === costF;
     const matchKeywords = activeKeywords.keywords.size === 0 || [...activeKeywords.keywords].every(kw => (c.keywords || []).includes(kw));
-    const matchCharKeywords = activeKeywords.charKeywords.size === 0 || [...activeKeywords.charKeywords].every(kw => (c.charKeywords || []).includes(kw));
+    const matchCharKeywords = activeKeywords.charKeywords.size === 0 || [...activeKeywords.charKeywords].every(kw =>
+      (c.charKeywords || []).includes(kw) ||
+      (CHAR_NAME_GROUPS.includes(kw) && isCharacterCard(c) && (c.name || '').toLowerCase().includes(kw.toLowerCase()))
+    );
     const matchFaction = activeKeywords.faction.size === 0 || [...activeKeywords.faction].some(f => (c.faction || []).includes(f));
     const matchStratagemGroup = !activeStratagemGroup || activeStratagemGroup.has(cardKey(c));
     return matchQ && matchSet && matchType && matchOwned && matchCost && matchKeywords && matchCharKeywords && matchFaction && matchStratagemGroup;
@@ -5014,7 +5027,9 @@ function populateKeywordFilters() {
   let anyValues = false;
 
   Object.entries(groups).forEach(([key, { field, containerId }]) => {
-    const values = [...new Set(cards.flatMap(c => c[field] || []).filter(Boolean))].sort();
+    const dataValues = cards.flatMap(c => c[field] || []).filter(Boolean);
+    const extra = key === 'charKeywords' ? CHAR_NAME_GROUPS : [];
+    const values = [...new Set([...dataValues, ...extra])].sort();
     const container = document.getElementById(containerId);
     if (!container) return;
     if (values.length) anyValues = true;
@@ -5257,7 +5272,8 @@ function renderCombinerPage() {
     return;
   }
 
-  const nonStratagems = members.filter(c => (c.type || '').toLowerCase() !== 'stratagem');
+  const characterMembers2 = members.filter(c => isCharacterCard(c));
+  const battleMembers = members.filter(c => isBattleCard(c));
   const stratagems = members.filter(c => (c.type || '').toLowerCase() === 'stratagem');
 
   const renderRow = c => {
@@ -5278,9 +5294,10 @@ function renderCombinerPage() {
     </tr>`;
   };
 
-  const stratagemDivider = stratagems.length ? `
-    <tr><td colspan="5" style="padding:0.4rem 0.5rem;background:var(--steel);color:var(--energon-blue);font-family:'Orbitron',monospace;font-size:0.6rem;font-weight:700;letter-spacing:0.18em;text-shadow:0 0 8px var(--energon-blue);">⚡ STRATAGEM</td></tr>
-    ${stratagems.map(renderRow).join('')}` : '';
+  const dividerRow = label => `<tr><td colspan="5" style="padding:0.4rem 0.5rem;background:var(--steel);color:var(--energon-blue);font-family:'Orbitron',monospace;font-size:0.6rem;font-weight:700;letter-spacing:0.18em;text-shadow:0 0 8px var(--energon-blue);">⚡ ${label}</td></tr>`;
+
+  const extras = [...battleMembers, ...stratagems];
+  const extrasSection = extras.length ? `${dividerRow('STRATAGEMS & BATTLE CARDS')}${extras.map(renderRow).join('')}` : '';
 
   const tableHtml = `<table class="collection-list" style="width:100%;">
     <thead><tr>
@@ -5291,8 +5308,8 @@ function renderCombinerPage() {
       <th style="text-align:center;">QTY</th>
     </tr></thead>
     <tbody>
-      ${nonStratagems.map(renderRow).join('')}
-      ${stratagemDivider}
+      ${characterMembers2.map(renderRow).join('')}
+      ${extrasSection}
     </tbody>
   </table>`;
   grid.innerHTML = tableHtml;
