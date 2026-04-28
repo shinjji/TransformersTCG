@@ -3345,7 +3345,7 @@ function saveLocalCards() {
 }
 
 // ===== CONFIG =====
-function saveConfig() {
+function saveConfig(showFeedback = true) {
   config = {
     apiKey: document.getElementById('cfg-apikey').value.trim(),
     workerUrl: document.getElementById('cfg-workerurl').value.trim().replace(/\/$/, ''),
@@ -3378,6 +3378,16 @@ function saveConfig() {
   };
   localStorage.setItem('tcg_config', JSON.stringify(config));
   showToast('Configuration saved!', 'success');
+
+  if (showFeedback) {
+    const btn = document.querySelector('button[onclick="saveConfig()"]');
+    if (btn) {
+      const original = btn.textContent;
+      btn.textContent = '✓ SAVED';
+      btn.disabled = true;
+      setTimeout(() => { btn.textContent = original; btn.disabled = false; }, 1500);
+    }
+  }
 }
 
 // ===== OFFLINE INDICATOR =====
@@ -3784,7 +3794,7 @@ async function testConnection() {
   if (!config.sheetId && !document.getElementById('cfg-sheetid').value.trim()) {
     showToast('Enter a Spreadsheet ID first', 'error'); return;
   }
-  saveConfig();
+  saveConfig(false);
   setStatus('loading', 'Testing connection...');
   showLoading('CONNECTING TO CYBERTRON...');
   try {
@@ -3897,6 +3907,7 @@ async function syncFromSheet() {
     populateFilters();
     showRandomCard();
     renderCollection();
+    if (document.getElementById('page-stats')?.classList.contains('active')) renderStats();
     setStatus('connected', 'Synced — ' + cards.length + ' cards loaded');
     showToast('Synced ' + cards.length + ' cards!', 'success');
     setOfflineIndicator(false);
