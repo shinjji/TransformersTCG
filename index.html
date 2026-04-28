@@ -3564,7 +3564,7 @@ function renderStats() {
     const aFM = a.startsWith('FM ') ? 1 : 0;
     const bFM = b.startsWith('FM ') ? 1 : 0;
     if (aFM !== bFM) return aFM - bFM;
-    return a.localeCompare(b);
+    return a.localeCompare(b, undefined, { numeric: true });
   });
   const container = document.getElementById('stats-by-set');
 
@@ -4995,7 +4995,7 @@ function populateFilters() {
     const aFM = a.startsWith('FM ') ? 1 : 0;
     const bFM = b.startsWith('FM ') ? 1 : 0;
     if (aFM !== bFM) return aFM - bFM;
-    return a.localeCompare(b);
+    return a.localeCompare(b, undefined, { numeric: true });
   });
   const types = [...new Set(cards.map(c => c.type).filter(Boolean))].sort();
 
