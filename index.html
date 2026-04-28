@@ -3551,7 +3551,7 @@ function renderStats() {
             <div class="newest-card-border"></div>
             <div class="newest-card-border-inner"></div>
             ${newest.front
-              ? `<img class="newest-card-img" src="${newest.front}" alt="${newest.name}" loading="lazy" decoding="async" onerror="this.style.display='none'">`
+              ? `<img class="newest-card-img" src="${newest.front}" srcset="${makeSrcset(newest.front, [340, 680])}" sizes="(max-width:700px) 90vw, 340px" alt="${newest.name}" loading="lazy" decoding="async" onerror="this.style.display='none'">`
               : `<div class="newest-card-img" style="background:var(--steel);display:flex;align-items:center;justify-content:center;color:var(--chrome);font-size:0.7rem;letter-spacing:0.1em;width:357px;">NO IMAGE</div>`}
           </div>
           <div class="newest-blueprint right">${rightBlueprint}</div>
@@ -3671,7 +3671,7 @@ function renderStats() {
               return `<tr onclick="openCardModal(${idx})">
                 <td class="list-thumb-cell">
                   ${c.front
-                    ? `<img class="list-thumb ${missing ? 'card-img-unowned' : ''}" src="${c.front}" alt="${c.name}" loading="lazy" decoding="async" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                    ? `<img class="list-thumb ${missing ? 'card-img-unowned' : ''}" src="${c.front}" srcset="${makeSrcset(c.front, [56, 112])}" sizes="56px" alt="${c.name}" loading="lazy" decoding="async" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
                        <div class="list-thumb-ph" style="display:none;">?</div>`
                     : `<div class="list-thumb-ph">?</div>`}
                 </td>
@@ -3759,6 +3759,18 @@ function proxyImgFresh(url) {
     url = inner ? decodeURIComponent(inner) : url;
   }
   return 'https://wsrv.nl/?url=' + encodeURIComponent(url) + '&output=webp&q=90&t=' + Date.now();
+}
+
+// Append a width hint to a wsrv.nl URL for srcset variants
+function addWidth(url, w) {
+  if (!url || !url.includes('wsrv.nl')) return url;
+  return url + '&w=' + w;
+}
+
+// Build a srcset string from a url and array of widths
+function makeSrcset(url, widths) {
+  if (!url) return '';
+  return widths.map(w => `${addWidth(url, w)} ${w}w`).join(', ');
 }
 
 const DEFAULT_BACK = 'https://drive.google.com/uc?export=view&id=13gf4UvUgxPp-5ewCdxBjY_FGcOhT4jF6';
@@ -4101,7 +4113,7 @@ function rollBattleCard(forceRandom = false) {
     <div class="cotd-inner">
       <div class="cotd-card-wrap">
         ${card.front
-          ? `<img class="cotd-img${card.qty === 0 ? ' card-img-unowned' : ''}" src="${card.front}" alt="${card.name}" loading="lazy" decoding="async" onclick="openCardModal(${idx})" onerror="this.style.display='none'">`
+          ? `<img class="cotd-img${card.qty === 0 ? ' card-img-unowned' : ''}" src="${card.front}" srcset="${makeSrcset(card.front, [154, 308])}" sizes="154px" alt="${card.name}" loading="lazy" decoding="async" onclick="openCardModal(${idx})" onerror="this.style.display='none'">`
           : `<div class="cotd-img-placeholder">NO IMAGE</div>`}
       </div>
       <div class="cotd-info">
@@ -4154,10 +4166,10 @@ function rollCharacterCard(forceRandom = false) {
     <div class="cotd-inner">
       <div class="card-tile-img-wrap cotd-flip-wrap" style="width:154px;height:215px;flex-shrink:0;cursor:pointer;" onclick="openCardModal(${idx})">
         ${card.front
-          ? `<img class="card-tile-img card-tile-img-front${card.qty === 0 ? ' card-img-unowned' : ''}" src="${card.front}" alt="${card.name}" loading="lazy" decoding="async" style="width:100%;height:100%;object-fit:cover;object-position:center;" onerror="this.style.display='none';">`
+          ? `<img class="card-tile-img card-tile-img-front${card.qty === 0 ? ' card-img-unowned' : ''}" src="${card.front}" srcset="${makeSrcset(card.front, [154, 308])}" sizes="154px" alt="${card.name}" loading="lazy" decoding="async" style="width:100%;height:100%;object-fit:cover;object-position:center;" onerror="this.style.display='none';">`
           : `<div class="cotd-img-placeholder">NO IMAGE</div>`}
         ${card.back
-          ? `<img class="card-tile-img-back${card.qty === 0 ? ' card-img-unowned-back' : ''}" src="${card.back}" alt="${card.name} back" loading="lazy" decoding="async" style="width:100%;height:100%;object-fit:cover;object-position:center;">`
+          ? `<img class="card-tile-img-back${card.qty === 0 ? ' card-img-unowned-back' : ''}" src="${card.back}" srcset="${makeSrcset(card.back, [154, 308])}" sizes="154px" alt="${card.name} back" loading="lazy" decoding="async" style="width:100%;height:100%;object-fit:cover;object-position:center;">`
           : ''}
       </div>
       <div class="cotd-info">
@@ -4231,7 +4243,7 @@ function handleSearch(query) {
     const qc = qtyClass(c);
     const qColour = qc === 'card-tile-qty-zero' ? 'var(--autobot-red)' : qc === 'card-tile-qty-single' ? '#00e676' : 'var(--warning-yellow)';
     return `<div class="result-card" onclick="openCardModal(${idx})">
-      ${c.front ? `<img class="result-thumb" src="${c.front}" alt="${c.name}" loading="lazy" decoding="async" onerror="this.style.display='none'">` : `<div class="result-thumb-placeholder">?</div>`}
+      ${c.front ? `<img class="result-thumb" src="${c.front}" srcset="${makeSrcset(c.front, [72, 144])}" sizes="72px" alt="${c.name}" loading="lazy" decoding="async" onerror="this.style.display='none'">` : `<div class="result-thumb-placeholder">?</div>`}
       <div class="result-info">
         <div class="result-name">${c.name}</div>
         <div class="result-sub">${[c.set, c.type, c.number].filter(Boolean).join(' · ')}</div>
@@ -4501,10 +4513,10 @@ function renderGrid(filtered) {
     return `<div class="card-tile ${unownedClass}" onclick="openCardModal(${idx})">
       <div class="card-tile-img-wrap">
         ${c.front
-          ? `<img class="card-tile-img card-tile-img-front ${greyClass}" src="${c.front}" alt="${displayName}" loading="lazy" decoding="async" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+          ? `<img class="card-tile-img card-tile-img-front ${greyClass}" src="${c.front}" srcset="${makeSrcset(c.front, [210, 420])}" sizes="(max-width:700px) calc(50vw - 1.5rem), 210px" alt="${displayName}" loading="lazy" decoding="async" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
              <div class="card-tile-img-placeholder" style="display:none;">${displayName}</div>`
           : `<div class="card-tile-img-placeholder">${displayName}</div>`}
-        ${!((c.type || '').toLowerCase().includes('battle')) && c.back && c.qty > 0 ? `<img class="card-tile-img-back" src="${c.back}" alt="${displayName} back" loading="lazy" decoding="async">` : ''}
+        ${!((c.type || '').toLowerCase().includes('battle')) && c.back && c.qty > 0 ? `<img class="card-tile-img-back" src="${c.back}" srcset="${makeSrcset(c.back, [210, 420])}" sizes="(max-width:700px) calc(50vw - 1.5rem), 210px" alt="${displayName} back" loading="lazy" decoding="async">` : ''}
       </div>
       <div class="card-tile-info">
         <div class="card-tile-name" data-tooltip="${displayName}" title="${displayName}">${displayName}</div>
@@ -4529,7 +4541,7 @@ function renderList(filtered) {
     return `<tr class="${missing ? 'missing-row' : ''}" onclick="openCardModal(${idx})">
       <td class="list-thumb-cell">
         ${c.front
-          ? `<img class="list-thumb ${missing ? 'card-img-unowned' : ''}" src="${c.front}" alt="${c.name}" loading="lazy" decoding="async" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+          ? `<img class="list-thumb ${missing ? 'card-img-unowned' : ''}" src="${c.front}" srcset="${makeSrcset(c.front, [56, 112])}" sizes="56px" alt="${c.name}" loading="lazy" decoding="async" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
              <div class="list-thumb-ph" style="display:none;">?</div>`
           : `<div class="list-thumb-ph">?</div>`}
       </td>
@@ -4726,7 +4738,7 @@ async function runCyberSearchWithUrl(query, wikiUrl, pageTitle) {
 
     const imgHtml = [data.image, data.image2]
       .filter(Boolean)
-      .map(src => `<div class="cybersearch-img-wrap"><img class="cybersearch-img" src="${src}" alt="${title}" loading="lazy" decoding="async" onerror="this.parentElement.style.display='none'"></div>`)
+      .map(src => `<div class="cybersearch-img-wrap"><img class="cybersearch-img" src="${src}" srcset="${makeSrcset(src, [240, 480])}" sizes="(max-width:600px) 195px, 240px" alt="${title}" loading="lazy" decoding="async" onerror="this.parentElement.style.display='none'"></div>`)
       .join('');
 
 
@@ -4792,7 +4804,7 @@ function openCardModal(idx) {
       ...keywords.map(k => ({ value: k, group: 'keywords' })),
     ].map(({ value, group }) => {
       const key = Object.keys(iconMap).find(k => k.toLowerCase() === value.toLowerCase() && iconMap[k].group === group);
-      return key ? `<img src="${iconMap[key].url}" alt="${value}" title="${value}" loading="lazy" decoding="async" style="width:30px;height:30px;object-fit:contain;" onerror="this.style.display='none'">` : '';
+      return key ? `<img src="${iconMap[key].url}" srcset="${makeSrcset(iconMap[key].url, [60, 120])}" sizes="60px" alt="${value}" title="${value}" loading="lazy" decoding="async" style="width:30px;height:30px;object-fit:contain;" onerror="this.style.display='none'">` : '';
     }).join('');
     iconStrip.innerHTML = stripIcons;
     iconStrip.style.display = stripIcons.trim() ? 'flex' : 'none';
@@ -4870,7 +4882,10 @@ function openCardModal(idx) {
   const frontImg = document.getElementById('modal-img-front');
   const frontPh = document.getElementById('modal-front-ph');
   if (card.front) {
-    frontImg.src = card.front; frontImg.style.display = 'block'; frontPh.style.display = 'none';
+    frontImg.src = card.front;
+    frontImg.srcset = makeSrcset(card.front, [210, 420]);
+    frontImg.sizes = '210px';
+    frontImg.style.display = 'block'; frontPh.style.display = 'none';
   } else {
     frontImg.style.display = 'none'; frontPh.style.display = 'flex';
   }
@@ -4878,7 +4893,10 @@ function openCardModal(idx) {
   const backImg = document.getElementById('modal-img-back');
   const backPh = document.getElementById('modal-back-ph');
   if (card.back) {
-    backImg.src = card.back; backImg.style.display = 'block'; backPh.style.display = 'none';
+    backImg.src = card.back;
+    backImg.srcset = makeSrcset(card.back, [210, 420]);
+    backImg.sizes = '210px';
+    backImg.style.display = 'block'; backPh.style.display = 'none';
   } else {
     backImg.style.display = 'none'; backPh.style.display = 'flex';
   }
@@ -5195,7 +5213,7 @@ function renderCombinerPage() {
     if (partsLeft) partsLeft.style.display = 'none';
     if (progressWrap) progressWrap.style.display = 'none';
     const artImg = document.getElementById('combiner-art-img');
-    if (artImg) { artImg.style.display = 'none'; artImg.src = ''; }
+    if (artImg) { artImg.style.display = 'none'; artImg.src = ''; artImg.srcset = ''; }
     const artInner = document.getElementById('combiner-artwork-inner');
     if (artInner) artInner.style.display = 'flex';
     const combinerIconStrip = document.getElementById('combiner-icon-strip');
@@ -5235,7 +5253,7 @@ function renderCombinerPage() {
       ...keywords.map(k => ({ value: k, group: 'keywords' })),
     ].map(({ value, group }) => {
       const key = Object.keys(iconMap).find(k => k.toLowerCase() === value.toLowerCase() && iconMap[k].group === group);
-      return key ? `<img src="${iconMap[key].url}" alt="${value}" title="${value}" loading="lazy" decoding="async" style="width:34px;height:34px;object-fit:contain;" onerror="this.style.display='none'">` : '';
+      return key ? `<img src="${iconMap[key].url}" srcset="${makeSrcset(iconMap[key].url, [68, 136])}" sizes="68px" alt="${value}" title="${value}" loading="lazy" decoding="async" style="width:34px;height:34px;object-fit:contain;" onerror="this.style.display='none'">` : '';
     }).join('');
     combinerIconStrip.innerHTML = stripIcons;
     combinerIconStrip.style.display = stripIcons.trim() ? 'flex' : 'none';
@@ -5243,6 +5261,8 @@ function renderCombinerPage() {
 
   if (artUrl) {
     artImg.src = artUrl;
+    artImg.srcset = makeSrcset(artUrl, [500, 1000]);
+    artImg.sizes = '(max-width:700px) 90vw, 500px';
     artImg.style.display = 'block';
     artInner.style.display = 'none';
   } else {
@@ -5294,7 +5314,7 @@ function renderCombinerPage() {
     return `<tr class="${missing ? 'missing-row' : ''}" onclick="openCardModal(${idx})">
       <td class="list-thumb-cell">
         ${c.front
-          ? `<img class="list-thumb ${missing ? 'card-img-unowned' : ''}" src="${c.front}" alt="${c.name}" loading="lazy" decoding="async" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+          ? `<img class="list-thumb ${missing ? 'card-img-unowned' : ''}" src="${c.front}" srcset="${makeSrcset(c.front, [56, 112])}" sizes="56px" alt="${c.name}" loading="lazy" decoding="async" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
              <div class="list-thumb-ph" style="display:none;">?</div>`
           : `<div class="list-thumb-ph">?</div>`}
       </td>
