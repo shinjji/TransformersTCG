@@ -1,11 +1,19 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+
+<!-- ===== META ===== -->
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>AUTOBOT ARCHIVE — Transformers TCG Collection</title>
+
+<!-- ===== FAVICON ===== -->
 <link rel="icon" type="image/png" href="https://wsrv.nl/?url=https://drive.google.com/uc?export=view%26id=1fzWFPem8tnny1MTXyDgVMYxo1KbbxOVK&output=webp&q=90">
+
+<!-- ===== FONTS ===== -->
 <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;400;600;700&display=swap" rel="stylesheet">
+
+<!-- ===== STYLES ===== -->
 <link rel="stylesheet" href="css/app.css">
 </head>
 <body>
@@ -720,7 +728,9 @@
 <div class="toast-container" id="toast-container"></div>
 
 <script>
+
 // ===== STATE =====
+// Runtime variables — populated from localStorage on load, then kept in sync with the sheet
 let cards = [];
 let combinerArt = {};
 let iconMap = {};
@@ -732,6 +742,8 @@ let listSortKey = 'set';
 let listSortAsc = true;
 const activeKeywords = { keywords: new Set(), charKeywords: new Set(), faction: new Set() };
 
+// ===== CONSTANTS =====
+// Character names that support partial-name matching in keyword filters
 const CHAR_NAME_GROUPS = [
   'BUMBLEBEE',
   'MEGATRON',
@@ -1181,7 +1193,8 @@ function showPage(name) {
   }
 }
 
-// ===== GOOGLE SHEETS API =====
+// ===== SHEET READ =====
+// Reads card data, combiner art, and icon map from Google Sheets via the API key (read-only)
 function getColIndex(key) {
   return (config.cols && config.cols[key]) ? config.cols[key] - 1 : {
     active:0, front:1, back:2, set:3, type:4, number:5, name:6, charSubName:7, qty:8, faction:9, cost:10,
@@ -1269,6 +1282,8 @@ async function testConnection() {
   hideLoading();
 }
 
+// Fetch main card data from the configured sheet tab.
+// Preserves original row numbers before filtering so rowIndex always matches the real sheet row.
 async function fetchSheetData(testOnly = false) {
   const key = config.apiKey;
   const id = config.sheetId;
@@ -1380,10 +1395,10 @@ async function syncFromSheet() {
   btns.forEach(b => { b.disabled = false; b.textContent = '↻ SYNC SHEET'; });
 }
 
-// ===== WRITE BACK TO SHEET (using fetch + service account) =====
-// NOTE: Direct OAuth from a static HTML file requires an OAuth flow or a proxy.
-// We implement two modes: (a) API key = read-only, (b) service account JSON = full access via direct REST.
-// For simplicity in a local HTML file, we use the Sheets REST API with a service account JWT.
+// ===== SHEET WRITE =====
+// Writes qty/timestamp back to the sheet using a service account JWT (full access).
+// Two modes: (a) API key = read-only sync only, (b) service account JSON = write access via REST.
+// writeRowToSheet() appends a new row; updateRowInSheet() patches qty + updatedAt on an existing row.
 
 async function getAccessToken() {
   const keyJson = config.serviceKey;
@@ -1434,7 +1449,7 @@ async function getAccessToken() {
   return tokenData.access_token;
 }
 
-// Strip wsrv.nl proxy to recover the raw URL before writing back to sheet
+// Strip wsrv.nl wrapper to recover the raw Drive URL before writing back to the sheet
 function unproxyImg(url) {
   if (!url) return '';
   if (url.startsWith('https://wsrv.nl/?url=')) {
@@ -2901,6 +2916,9 @@ document.addEventListener('mousemove', e => {
     showTooltipFor(el, e.clientX, e.clientY);
   }, 600);
 });
+
 </script>
+
+<!-- ===== END OF APP ===== -->
 </body>
 </html>
