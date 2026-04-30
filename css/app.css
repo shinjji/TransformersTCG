@@ -698,10 +698,10 @@
     border: none;
     color: white;
     font-family: 'Orbitron', monospace;
-    font-size: 0.75rem;
+    font-size: 0.6rem;
     font-weight: 900;
     letter-spacing: 0.2em;
-    padding: 0.85rem;
+    padding: 0.5rem 1rem;
     cursor: pointer;
     text-transform: uppercase;
     clip-path: polygon(10px 0%, 100% 0%, calc(100% - 10px) 100%, 0% 100%);

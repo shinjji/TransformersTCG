@@ -188,7 +188,7 @@
           ☰ LIST
         </button>
       </div>
-      <button class="sync-btn" id="coll-sync-btn" onclick="syncFromSheet()">↻ SYNC SHEET</button>
+      <button class="sync-btn" id="coll-sync-btn" onclick="syncFromSheet()">↻ SYNC</button>
     </div>
 
     <!-- Keyword filter row -->
@@ -219,7 +219,7 @@
       <div class="empty-state" style="grid-column:1/-1;">
         <div class="empty-state-icon">📦</div>
         <h3>NO CARDS LOADED</h3>
-        <p>Configure your Google Sheet in the Settings page, then sync your collection.</p>
+        <p>Update your Google Sheet on the Configure tab, then sync your collection.</p>
       </div>
     </div>
 
@@ -392,7 +392,7 @@
         <div class="section-header" style="margin-bottom:1rem;">
           <span class="section-title">⟳ Recently Updated</span>
           <div class="section-line"></div>
-          <button class="sync-btn" id="stats-sync-btn" style="flex-shrink:0;" onclick="syncFromSheet()">↻ SYNC SHEET</button>
+          <button class="sync-btn" id="stats-sync-btn" style="flex-shrink:0;" onclick="syncFromSheet()">↻ SYNC</button>
         </div>
         <div id="stats-recent"></div>
       </div>
@@ -410,7 +410,7 @@
         <div class="panel-corner bl"></div>
         <div class="panel-corner br"></div>
         <div class="panel-body">
-          <div class="settings-section-title">⚡ Google Sheets Connection</div>
+          <div class="settings-section-title">⚡ Connections</div>
 
           <div class="api-status">
             <div class="status-dot disconnected" id="status-dot"></div>
@@ -432,7 +432,7 @@
             </div>
             <div class="form-group">
               <label class="form-label">Sheet / Tab Name</label>
-              <input type="text" class="form-input" id="cfg-sheetname" placeholder="e.g. Sheet1" value="Sheet1">
+              <input type="text" class="form-input" id="cfg-sheetname" placeholder="e.g. Transformers" value="Transformers">
             </div>
             <div class="form-group">
               <label class="form-label">Header Row</label>
@@ -441,9 +441,9 @@
           </div>
 
           <div style="margin-top:1rem; display:flex; gap:0.75rem; flex-wrap:wrap; align-items:center;">
-            <button class="submit-btn" onclick="saveConfig()" style="width:auto; padding:0.75rem 2rem;">💾 SAVE CONFIG</button>
+            <button class="submit-btn" onclick="saveConfig()" style="width:auto;">💾 SAVE CONFIG</button>
             <button class="cotd-refresh" onclick="testConnection()">TEST CONNECTION</button>
-            <button class="sync-btn" id="cfg-sync-btn" onclick="syncFromSheet()" style="margin-top:16px;">↻ SYNC SHEET</button>
+            <button class="sync-btn" id="cfg-sync-btn" onclick="syncFromSheet()" style="margin-top:16px;">↻ SYNC</button>
           </div>
 
           <div class="info-box" style="margin-top:1rem;">
@@ -707,7 +707,7 @@
           </div>
 
           <div class="modal-actions">
-            <button class="btn-save" onclick="saveCardQty()" id="modal-save-btn">💾 SAVE TO SHEET</button>
+            <button class="btn-save" onclick="saveCardQty()" id="modal-save-btn">💾 SAVE</button>
           </div>
         </div>
       </div>
@@ -811,7 +811,7 @@ function saveConfig(showFeedback = true) {
     apiKey: document.getElementById('cfg-apikey').value.trim(),
     workerUrl: document.getElementById('cfg-workerurl').value.trim().replace(/\/$/, ''),
     sheetId: document.getElementById('cfg-sheetid').value.trim(),
-    sheetName: document.getElementById('cfg-sheetname').value.trim() || 'Sheet1',
+    sheetName: document.getElementById('cfg-sheetname').value.trim() || 'Transformers',
     headerRow: parseInt(document.getElementById('cfg-headerrow').value) || 1,
     serviceKey: document.getElementById('cfg-servicekey').value.trim(),
     cols: {
@@ -1287,7 +1287,7 @@ async function testConnection() {
 async function fetchSheetData(testOnly = false) {
   const key = config.apiKey;
   const id = config.sheetId;
-  const sheet = encodeURIComponent(config.sheetName || 'Sheet1');
+  const sheet = encodeURIComponent(config.sheetName || 'Transformers');
   const headerRow = config.headerRow || 1;
 
   if (!key || !id) throw new Error('API Key and Sheet ID required');
@@ -1392,7 +1392,7 @@ async function syncFromSheet() {
     setStatus('disconnected', 'Sync failed: ' + e.message);
     setOfflineIndicator(true);
   }
-  btns.forEach(b => { b.disabled = false; b.textContent = '↻ SYNC SHEET'; });
+  btns.forEach(b => { b.disabled = false; b.textContent = '↻ SYNC'; });
 }
 
 // ===== SHEET WRITE =====
@@ -1461,7 +1461,7 @@ function unproxyImg(url) {
 async function writeRowToSheet(card) {
   const token = await getAccessToken();
   const id = config.sheetId;
-  const sheet = encodeURIComponent(config.sheetName || 'Sheet1');
+  const sheet = encodeURIComponent(config.sheetName || 'Transformers');
   const cols = config.cols || { front:1, back:2, set:3, type:4, number:5, name:6, qty:7, combiner:8, updatedAt:9 };
   const maxCol = Math.max(...Object.values(cols));
 
@@ -1496,7 +1496,7 @@ async function updateRowInSheet(card, stampTime = false) {
   if (!card.rowIndex) throw new Error('No row index for this card');
   const token = await getAccessToken();
   const id = config.sheetId;
-  const sheet = config.sheetName || 'Sheet1';
+  const sheet = config.sheetName || 'Transformers';
   const cols = config.cols || { qty:7, updatedAt:9 };
 
   const now = new Date().toLocaleString('en-GB', { day:'2-digit', month:'2-digit', year:'numeric', hour:'2-digit', minute:'2-digit', second:'2-digit' });
@@ -2418,7 +2418,7 @@ async function saveCardQty() {
   }
 
   btn.disabled = false;
-  btn.textContent = '💾 SAVE TO SHEET';
+  btn.textContent = '💾 SAVE';
 }
 
 // ===== ADD CARD =====
