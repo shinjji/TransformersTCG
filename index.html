@@ -166,6 +166,7 @@
       <select class="filter-select" id="coll-filter-owned" onchange="renderCollection()" style="width:auto;">
         <option value="">All Cards</option>
         <option value="owned">Owned</option>
+        <option value="owned-mpc">Owned (MPC)</option>
         <option value="missing">Not Owned</option>
       </select>
       <select class="filter-select" id="coll-filter-cost" onchange="renderCollection()" style="width:auto;">
@@ -1945,7 +1946,7 @@ function renderCollection() {
     const matchQ = !q || c.name.toLowerCase().includes(q) || c.set.toLowerCase().includes(q) || (c.type||'').toLowerCase().includes(q);
     const matchSet = !setF || c.set === setF;
     const matchType = !typeF || c.type === typeF;
-    const matchOwned = !ownedF || (ownedF === 'owned' ? c.qty > 0 : c.qty === 0);
+    const matchOwned = !ownedF || (ownedF === 'owned' ? c.qty > 0 : ownedF === 'owned-mpc' ? c.qty > 0 && !!c.mpc : c.qty === 0);
     const matchCost = !costF || c.cost === costF;
     const matchKeywords = activeKeywords.keywords.size === 0 || [...activeKeywords.keywords].every(kw => (c.keywords || []).includes(kw));
     const matchCharKeywords = activeKeywords.charKeywords.size === 0 || [...activeKeywords.charKeywords].every(kw =>
