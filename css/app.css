@@ -1661,11 +1661,19 @@
   .detail-label { font-size: 0.6rem; letter-spacing: 0.2em; color: var(--chrome); text-transform: uppercase; }
   .detail-value { font-size: 0.9rem; font-weight: 600; color: var(--chrome-bright); }
 
-  .qty-editor {
+  .qty-save-row {
+    grid-column: 1 / -1;
     display: flex;
     align-items: center;
     gap: 0.75rem;
     margin-bottom: 1.5rem;
+  }
+
+  .qty-editor {
+    display: flex;
+    align-items: center;
+    flex: 1;
+    gap: 0.75rem;
     background: var(--steel);
     padding: 0.75rem 1rem;
     border: 1px solid var(--steel-mid);
@@ -1703,11 +1711,12 @@
 
   .modal-actions {
     display: flex;
+    align-items: center;
     gap: 0.75rem;
   }
 
   .btn-save {
-    flex: 1;
+    flex: 0 0 auto;
     background: linear-gradient(135deg, var(--energon-blue), #0090b8);
     border: none;
     color: var(--dark-bg);
@@ -1715,7 +1724,7 @@
     font-size: 0.7rem;
     font-weight: 900;
     letter-spacing: 0.15em;
-    padding: 0.75rem;
+    padding: 0.75rem 2rem;
     cursor: pointer;
     text-transform: uppercase;
     clip-path: polygon(8px 0%, 100% 0%, calc(100% - 8px) 100%, 0% 100%);

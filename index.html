@@ -700,15 +700,16 @@
               <span class="detail-value" id="modal-keywords" style="white-space:normal;line-height:1.6;"></span>
             </div>
 
-          <div class="qty-editor">
-            <span class="qty-label">Your Quantity</span>
-            <button class="qty-btn" onclick="adjustQty(-1)">−</button>
-            <span class="qty-display" id="modal-qty">0</span>
-            <button class="qty-btn" onclick="adjustQty(1)">+</button>
-          </div>
-
-          <div class="modal-actions">
-            <button class="btn-save" onclick="saveCardQty()" id="modal-save-btn">💾 SAVE</button>
+          <div class="qty-save-row">
+            <div class="qty-editor">
+              <span class="qty-label">Your Quantity</span>
+              <button class="qty-btn" onclick="adjustQty(-1)">−</button>
+              <span class="qty-display" id="modal-qty">0</span>
+              <button class="qty-btn" onclick="adjustQty(1)">+</button>
+            </div>
+            <div class="modal-actions">
+              <button class="btn-save" onclick="saveCardQty()" id="modal-save-btn">💾 SAVE</button>
+            </div>
           </div>
         </div>
       </div>
@@ -1013,7 +1014,7 @@ function renderStats() {
             <div class="newest-card-border"></div>
             <div class="newest-card-border-inner"></div>
             ${newest.front
-              ? `<img class="newest-card-img" src="${newest.front}" srcset="${makeSrcset(newest.front, [340, 680])}" sizes="(max-width:700px) 90vw, 340px" alt="${newest.name}" loading="lazy" decoding="async" onerror="this.style.display='none'">`
+              ? `<img class="newest-card-img" src="${newest.front}" srcset="${makeSrcset(newest.front, [340, 680])}" sizes="(max-width:700px) 90vw, 340px" alt="${newest.name}" decoding="async" onerror="this.style.display='none'">`
               : `<div class="newest-card-img" style="background:var(--steel);display:flex;align-items:center;justify-content:center;color:var(--chrome);font-size:0.7rem;letter-spacing:0.1em;width:357px;">NO IMAGE</div>`}
           </div>
           <div class="newest-blueprint right">${rightBlueprint}</div>
