@@ -116,7 +116,7 @@
 
   nav {
     display: flex;
-    gap: 0.25rem;
+    gap: 0.15rem;
   }
 
   nav button {
@@ -127,7 +127,7 @@
     font-size: 0.65rem;
     font-weight: 700;
     letter-spacing: 0.12em;
-    padding: 0.6rem 1.2rem;
+    padding: 0.6rem 1rem;
     cursor: pointer;
     text-transform: uppercase;
     transition: all 0.2s;
@@ -2552,3 +2552,88 @@
   }
 
   .img-col { display: flex; flex-direction: column; align-items: center; gap: 0.25rem; }
+
+  /* ===== HEADER COG BUTTON ===== */
+  .header-cog-btn {
+    background: transparent;
+    border: none;
+    color: var(--chrome);
+    font-size: 2.6rem;
+    cursor: pointer;
+    opacity: 0.35;
+    padding: 0 0.25rem;
+    line-height: 1;
+    transition: opacity 0.2s, color 0.2s, text-shadow 0.2s;
+    flex-shrink: 0;
+  }
+
+  .header-cog-btn:hover,
+  .header-cog-btn.active {
+    opacity: 1;
+    color: var(--energon-blue);
+    text-shadow: 0 0 12px var(--energon-blue);
+  }
+
+  @media (max-width: 700px) {
+    .header-cog-btn { display: none; }
+  }
+
+  /* ===== RULES PAGE ===== */
+  .rules-list {
+    margin: 0 auto;
+    border-top: 1px solid var(--steel-mid);
+  }
+
+  .rule-entry {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    padding: 1rem 1.25rem 1rem 1.5rem;
+    border-left: 3px solid var(--warning-yellow);
+    border-bottom: 1px solid var(--steel-mid);
+    transition: background 0.15s;
+  }
+
+  .rule-entry:hover { background: var(--steel-light); }
+
+  .rule-term {
+    font-family: 'Orbitron', monospace;
+    font-size: 0.72rem;
+    font-weight: 900;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--warning-yellow);
+    min-width: 150px;
+    flex-shrink: 0;
+    line-height: 1.5;
+  }
+
+  .rule-suffix {
+    font-size: 0.65rem;
+    font-weight: 400;
+    opacity: 0.55;
+    margin-left: 0.3em;
+  }
+
+  .rule-def {
+    flex: 1;
+    font-size: 0.9rem;
+    color: var(--chrome-bright);
+    line-height: 1.5;
+  }
+
+  .rules-empty {
+    text-align: center;
+    padding: 4rem 1rem;
+    font-family: 'Orbitron', monospace;
+    font-size: 0.65rem;
+    letter-spacing: 0.3em;
+    color: var(--chrome);
+    text-transform: uppercase;
+  }
+
+  @media (max-width: 600px) {
+    .rules-title { font-size: 1.3rem; }
+    .rule-entry { flex-wrap: wrap; gap: 0.5rem; }
+    .rule-term { min-width: unset; width: 100%; }
+  }
