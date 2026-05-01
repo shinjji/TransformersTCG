@@ -15,6 +15,9 @@
 
 <!-- ===== STYLES ===== -->
 <link rel="stylesheet" href="css/app.css">
+
+<!-- ===== DATA ===== -->
+<script src="data/rules.js"></script>
 </head>
 <body>
 
@@ -41,7 +44,7 @@
       <button onclick="showPage('combiners')" id="nav-combiners">⟁ COMBINERS</button>
       <button onclick="showPage('stats')" id="nav-stats">◎ STATS</button>
       <button onclick="showPage('cybersearch')" id="nav-cybersearch">⌖ CYBERSEARCH</button>
-      <button onclick="showPage('settings')" id="nav-settings">⚙ CONFIGURE</button>
+      <button onclick="showPage('rules')" id="nav-rules">⊕ RULES</button>
     </nav>
 
     <!-- Burger menu (small screens) -->
@@ -54,6 +57,7 @@
         <button onclick="showPage('combiners');closeBurger()" id="nav-combiners-m">⟁ COMBINERS</button>
         <button onclick="showPage('stats');closeBurger()" id="nav-stats-m">◎ STATS</button>
         <button onclick="showPage('cybersearch');closeBurger()" id="nav-cybersearch-m">⌖ CYBERSEARCH</button>
+        <button onclick="showPage('rules');closeBurger()" id="nav-rules-m">⊕ RULES</button>
         <button onclick="showPage('settings');closeBurger()" id="nav-settings-m">⚙ CONFIGURE</button>
       </div>
     </div>
@@ -75,6 +79,8 @@
         <span class="stat-label">Missing</span>
       </div>
     </div>
+
+    <button class="header-cog-btn" id="nav-settings" onclick="showPage('settings')" title="Configure">⚙</button>
   </div>
 </header>
 
@@ -631,6 +637,11 @@
     <div id="cybersearch-results" class="cybersearch-results"></div>
   </div>
 
+  <!-- ===== RULES PAGE ===== -->
+  <div id="page-rules" class="page">
+    <div class="rules-list" id="rules-list"></div>
+  </div>
+
 </main>
 
 <!-- ===== CARD DETAIL MODAL ===== -->
@@ -770,6 +781,7 @@ document.addEventListener('DOMContentLoaded', () => {
   updateStats();
   populateFilters();
   showRandomCard();
+  renderRules();
   // Fetch icons fresh on every load
   fetchIconMap().then(m => { iconMap = m; });
 });
@@ -1180,7 +1192,7 @@ function showPage(name) {
     cyberSearchReturnState = null;
   }
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-  document.querySelectorAll('nav button, .nav-dropdown button').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('nav button, .nav-dropdown button, .header-cog-btn').forEach(b => b.classList.remove('active'));
   document.getElementById('page-' + name).classList.add('active');
   const desktopBtn = document.getElementById('nav-' + name);
   const mobileBtn = document.getElementById('nav-' + name + '-m');
@@ -1188,6 +1200,7 @@ function showPage(name) {
   if (mobileBtn) mobileBtn.classList.add('active');
   if (name === 'collection') renderCollection();
   if (name === 'stats') renderStats();
+  if (name === 'rules') renderRules();
   if (name === 'combiners') {
     populateCombinerSelect();
     if (!document.getElementById('combiner-select').value) pickRandomCombiner();
@@ -2612,6 +2625,23 @@ document.addEventListener('click', e => {
   updateKeywordActiveCount();
   renderCollection();
 });
+
+// ===== RULES =====
+function renderRules() {
+  const list = document.getElementById('rules-list');
+  if (!list) return;
+  const data = (typeof RULES_DATA !== 'undefined') ? RULES_DATA : [];
+  if (!data.length) {
+    list.innerHTML = '<div class="rules-empty">— NO ENTRIES FOUND —</div>';
+    return;
+  }
+  list.innerHTML = data.map(r => `
+    <div class="rule-entry">
+      <div class="rule-term">${r.term}${r.suffix ? `<span class="rule-suffix">${r.suffix}</span>` : ''}</div>
+      <div class="rule-def">${r.definition}</div>
+    </div>
+  `).join('');
+}
 
 // ===== STATS =====
 function updateStats() {
