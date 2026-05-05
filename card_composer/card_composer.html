@@ -29,16 +29,14 @@
           <label>Type</label>
           <select id="cardType" onchange="onTypeChange()">
             <optgroup label="Character">
-              <option value="Character - Standard">Character — Standard</option>
-              <option value="Character - Slim">Character — Slim</option>
-              <option value="Character - Small">Character — Small</option>
+              <option value="Character - Standard">Character - Standard</option>
+              <option value="Character - Slim" disabled>Character - Slim</option>
+              <option value="Character - Small" disabled>Character - Small</option>
             </optgroup>
-            <optgroup label="Battle">
-              <option value="Battle - Action">Battle — Action</option>
-              <option value="Battle - Upgrade">Battle — Upgrade</option>
-            </optgroup>
-            <optgroup label="Other">
-              <option value="Stratagem - Small">Stratagem — Small</option>
+            <optgroup label="Other - Small">
+              <option value="Battle - Action" disabled>Battle Action</option>
+              <option value="Battle - Upgrade" disabled>Battle Upgrade</option>
+              <option value="Stratagem - Small" disabled>Stratagem</option>
             </optgroup>
           </select>
         </div>
@@ -56,7 +54,7 @@
         <div class="field" id="faction2Field" style="display:none;">
           <label>Second Faction</label>
           <select id="faction2" onchange="render()">
-            <option value="">— None —</option>
+            <option value="">- None -</option>
             <option>Autobot</option>
             <option>Decepticon</option>
             <option>Junkion</option>
@@ -178,7 +176,7 @@
           <input type="file" id="artUpload" accept="image/*" onchange="loadArt(this)"
             style="font-size:11px;color:var(--muted);cursor:pointer;padding:4px 0;">
           <span id="artSizeWarning" style="display:none;font-size:10px;color:#e67e22;">
-            ⚠ Image over 5 MB — artwork won't be saved in local storage.
+            ⚠ Image over 5 MB - artwork won't be saved in local storage.
           </span>
         </div>
         <div class="field"><label>Vertical Position</label><input type="range" id="artPosY" min="-100" max="100" value="0" oninput="render()" style="padding:0;border:none;background:none;"></div>
@@ -252,7 +250,7 @@
           letter-spacing:1px;
           line-height:1; white-space:nowrap; overflow:hidden;"></div>
 
-        <!-- Subtitle — character cards: small text below name -->
+        <!-- Subtitle - character cards: small text below name -->
         <div id="tSubtitle" class="card-text" style="
           top:10.5%; left:4%; right:16%;
           font-family:'GothamNarrow','Segoe UI',sans-serif;
@@ -260,7 +258,7 @@
           letter-spacing:1px;
           white-space:nowrap; overflow:hidden;"></div>
 
-        <!-- Stratagem subtitle — rendered differently (italic, centered in faction banner) -->
+        <!-- Stratagem subtitle - rendered differently (italic, centered in faction banner) -->
         <div id="tStratagemSubtitle" class="card-text" style="
           top:9%; left:4%; right:4%;
           font-family:'GothamNarrowItalic','Georgia',serif;
@@ -270,7 +268,7 @@
           display:none;"></div>
 
 
-        <!-- Trait bar — single HORIZONTAL row across the card (position set by JS per card type) -->
+        <!-- Trait bar - single HORIZONTAL row across the card (position set by JS per card type) -->
         <div id="tTraitBar" class="card-text" style="
           left:3%; right:3%; height:20px;
           display:none; align-items:center; overflow:hidden;"></div>
@@ -290,7 +288,7 @@
             <span id="tDef" style="font-size:26px;font-weight:900;color:#fff;font-family:'ArmadaCondensed',sans-serif;line-height:1;"></span>
           </div>
         </div>
-        <!-- Mode label — independent of stats flex row -->
+        <!-- Mode label - independent of stats flex row -->
         <div id="tModeLabel" class="card-text" style="font-size:7px;font-weight:700;letter-spacing:1.5px;color:#fff;text-transform:uppercase;font-family:'OpenSansSCBold',sans-serif;text-align:center;bottom:26.6%;left:calc(50% - 43px);transform:translateX(-50%);height:32px;display:flex;align-items:center;"></div>
 
         <!-- Ability text box (left portion; right side reserved for mode box) -->
@@ -300,7 +298,7 @@
           <span id="tAbilityBody" style="font-family:'GothamNarrow','Arial',sans-serif;"></span>
         </div>
 
-        <!-- Battle / Stratagem ability text (wider, centred) — no mode box on right -->
+        <!-- Battle / Stratagem ability text (wider, centred) - no mode box on right -->
         <div id="abilityBoxWide" class="card-text" style="bottom:6%;left:4%;right:4%;font-size:8.5px;line-height:1.55;color:#1a1a1a;text-align:center;display:none;">
           <div id="tAbilityBodyWide" style="font-family:'GothamNarrow','Arial',sans-serif;"></div>
           <div id="tAbilityParenWide" style="font-style:italic;font-family:'GothamNarrowItalic','Georgia',serif;margin-top:4px;"></div>
@@ -317,12 +315,12 @@
           </div>
         </div>
 
-        <!-- Wave, ID, Credit — standalone for independent positioning -->
+        <!-- Wave, ID, Credit - standalone for independent positioning -->
         <span id="tWave" class="card-text" style="font-size:8px;color:#fff;font-weight:600;letter-spacing:0.8px;text-transform:uppercase;font-family:'OpenSansBold',sans-serif;bottom:4.6%;left:3%;"></span>
         <span id="tId" class="card-text" style="font-size:8px;font-weight:700;color:#fff;letter-spacing:0.5px;font-family:'OpenSansBold',sans-serif;bottom:4.6%;left:30%;white-space:pre;"></span>
         <div id="tCredit" class="card-text" style="font-size:8px;color:#fff;text-align:right;line-height:1.35;font-family:'OpenSansBold',sans-serif;bottom:4.6%;right:3%;"></div>
 
-        <!-- Stars — alt mode only, positioned independently -->
+        <!-- Stars - alt mode only, positioned independently -->
         <div id="tStarsFooter" class="card-text" style="display:none;bottom:5%;left:9.7%;align-items:center;gap:2px;"></div>
 
       </div><!-- .card -->
