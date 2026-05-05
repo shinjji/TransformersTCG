@@ -128,6 +128,7 @@ function abilityImgSrc(name) {
 function formatAbilityText(text) {
   return (text || '')
     .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+    .replace(/--&gt;/g, '<span style="font-family:\'GothamNarrowMedium\',sans-serif;font-size:1.4em;vertical-align:-0.15em;">→</span>')
     .replace(/\*\*(.+?)\*\*/g, '<span style="font-family:\'GothamNarrowMedium\',sans-serif;">$1</span>')
     .replace(/\*([^*]+?)\*/g, '<span style="font-family:\'GothamNarrowItalic\',sans-serif;">$1</span>')
     .replace(/\[([^\]]+)\]/g, (_, name) => {
