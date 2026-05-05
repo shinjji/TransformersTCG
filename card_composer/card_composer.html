@@ -1,0 +1,1594 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TF:TCG Card Composer</title>
+<style>
+@font-face {
+  font-family: 'BayformersName';
+  src: url('card_components/fonts/Font - Card Name - Bayformers TFTCGName Regular.ttf') format('truetype');
+}
+@font-face {
+  font-family: 'GothamNarrow';
+  src: url('card_components/fonts/Font - Ability Text - Gotham Narrow-Book.ttf') format('truetype');
+}
+@font-face {
+  font-family: 'GothamNarrowMedium';
+  src: url('card_components/fonts/Font - Keywords - Gotham Narrow-Medium.otf') format('opentype');
+}
+@font-face {
+  font-family: 'GothamNarrowItalic';
+  src: url('card_components/fonts/Font - Explanatio Text - Gotham Narrow-Book Italic.otf') format('opentype');
+}
+@font-face {
+  font-family: 'ArmadaCondensed';
+  src: url('card_components/fonts/Font - Stats - Armada Condensed Bold.otf') format('opentype');
+}
+@font-face {
+  font-family: 'OpenSansSCBold';
+  src: url('card_components/fonts/Font - Character Mode - OpenSans SemiCondensed Bold.ttf') format('truetype');
+}
+@font-face {
+  font-family: 'OpenSansSemiBold';
+  src: url('card_components/fonts/Font - Traits - OpenSans SemiBold.ttf') format('truetype');
+}
+@font-face {
+  font-family: 'OpenSansBold';
+  src: url('card_components/fonts/Font - Wave, Credits - OpenSans Bold.ttf') format('truetype');
+}
+@font-face {
+  font-family: 'OpenSansSCMedItal';
+  src: url('card_components/fonts/Font - Stratagem Target - OpenSans SemiCondensed MediumItalic.ttf') format('truetype');
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg: #0d0d0f;
+  --panel: #16161a;
+  --panel2: #1e1e24;
+  --border: #2a2a35;
+  --accent: #c0392b;
+  --text: #e8e6e0;
+  --muted: #7a7880;
+  --label: #555565;
+}
+
+html, body { height: 100%; }
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Segoe UI', 'Helvetica Neue', sans-serif;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+header {
+  padding: 11px 20px;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  background: var(--panel);
+  flex-shrink: 0;
+}
+header h1 {
+  font-family: 'BayformersName', 'Segoe UI', sans-serif;
+  font-size: 21px;
+  letter-spacing: 2px;
+  color: var(--accent);
+  font-weight: normal;
+}
+header .subtitle { font-size: 11px; color: var(--muted); letter-spacing: 1px; }
+.tag {
+  display: inline-block;
+  font-size: 9px;
+  padding: 2px 6px;
+  border-radius: 3px;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  background: rgba(192,57,43,0.2);
+  color: var(--accent);
+}
+
+.app {
+  display: flex;
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+}
+
+/* ── LEFT: Controls ── */
+.controls-panel {
+  width: 285px;
+  flex-shrink: 0;
+  min-height: 0;
+  background: var(--panel);
+  border-right: 1px solid var(--border);
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.section { flex-shrink: 0; border: 1px solid var(--border); border-radius: 5px; }
+.controls-panel > .btn-row,
+.controls-panel > .btn { flex-shrink: 0; }
+.section-header {
+  padding: 7px 10px;
+  background: var(--panel2);
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 1.2px;
+  text-transform: uppercase;
+  color: var(--muted);
+  cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  user-select: none;
+}
+.section-header:hover { color: var(--text); }
+.chevron { transition: transform 0.15s; font-size: 9px; }
+.section.collapsed .section-body { display: none; }
+.section.collapsed .chevron { transform: rotate(-90deg); }
+.section-body { padding: 10px; display: flex; flex-direction: column; gap: 7px; }
+
+.field { display: flex; flex-direction: column; gap: 3px; }
+.field label { font-size: 10px; color: var(--label); letter-spacing: 0.7px; text-transform: uppercase; }
+
+input[type="text"],
+input[type="number"],
+select,
+textarea {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  color: var(--text);
+  font-size: 12px;
+  padding: 5px 7px;
+  font-family: inherit;
+  outline: none;
+  transition: border-color 0.15s;
+  width: 100%;
+}
+input:focus, select:focus, textarea:focus { border-color: var(--accent); }
+textarea { resize: vertical; min-height: 60px; line-height: 1.45; font-size: 11px; }
+select option { background: var(--panel2); }
+
+.row-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 7px; }
+.row-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 7px; }
+
+.btn {
+  padding: 8px 12px;
+  border-radius: 4px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  cursor: pointer;
+  border: none;
+  transition: opacity 0.15s;
+}
+.btn:active { opacity: 0.75; }
+.btn-primary { background: var(--accent); color: #fff; width: 100%; margin-top: 2px; }
+.btn-primary:hover { opacity: 0.88; }
+.btn-secondary { background: var(--panel2); color: var(--text); border: 1px solid var(--border); flex: 1; }
+.btn-secondary:hover { border-color: var(--muted); }
+.btn-row { display: flex; gap: 6px; }
+
+.trait-row { display: flex; gap: 5px; align-items: center; }
+.trait-row .trait-num { font-size: 10px; color: var(--muted); min-width: 12px; }
+.trait-row select.main { flex: 1; min-width: 0; }
+.trait-row select.size { flex: 0 0 64px; }
+
+/* ── CENTER: Preview ── */
+.preview-area {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 28px;
+  background: var(--bg);
+  gap: 14px;
+  overflow: auto;
+}
+
+.cards-display {
+  display: flex;
+  flex-direction: row;
+  gap: 28px;
+  align-items: flex-start;
+}
+
+.card-col {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+
+.card-col-label {
+  font-size: 9px;
+  font-weight: 600;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.card-wrapper { transform-origin: top center; }
+
+.card {
+  position: relative;
+  width: 380px;
+  height: 530px;
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.85), 0 0 0 1px rgba(255,255,255,0.05);
+  background: #111;
+}
+
+.card-layer {
+  position: absolute;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  object-fit: cover;
+  pointer-events: none;
+}
+.screen { mix-blend-mode: screen; }
+
+.card-text { position: absolute; pointer-events: none; }
+
+.preview-controls { display: flex; gap: 8px; align-items: center; }
+.zoom-btn {
+  background: var(--panel2);
+  border: 1px solid var(--border);
+  color: var(--muted);
+  border-radius: 4px;
+  padding: 4px 10px;
+  font-size: 12px;
+  cursor: pointer;
+}
+.zoom-btn:hover { color: var(--text); }
+.zoom-display { font-size: 11px; color: var(--muted); min-width: 38px; text-align: center; }
+
+/* ── RIGHT: Layers ── */
+.layers-panel {
+  width: 188px;
+  flex-shrink: 0;
+  min-height: 0;
+  background: var(--panel);
+  border-left: 1px solid var(--border);
+  overflow-y: auto;
+  padding: 12px;
+}
+.layers-title {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 8px;
+}
+.layer-item {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 5px 7px;
+  border-radius: 4px;
+  margin-bottom: 2px;
+  font-size: 10px;
+  color: var(--muted);
+  border: 1px solid transparent;
+  transition: all 0.12s;
+}
+.layer-item.active { color: var(--text); border-color: var(--border); background: var(--panel2); }
+.layer-item.hidden { opacity: 0.4; }
+.layer-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--border); flex-shrink: 0; }
+.layer-item.active .layer-dot { background: #4caf50; }
+.layer-item.hidden .layer-dot { background: var(--border); }
+
+::-webkit-scrollbar { width: 5px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>TF:TCG COMPOSER</h1>
+  <span class="subtitle">Card Builder</span>
+  <span class="tag" style="margin-left:auto;">v0.3</span>
+</header>
+
+<div class="app">
+
+  <!-- ── LEFT: Controls ── -->
+  <div class="controls-panel">
+
+    <!-- Card Type -->
+    <div class="section" id="sec-type">
+      <div class="section-header" onclick="toggleSec('type')">Card Type <span class="chevron">▾</span></div>
+      <div class="section-body">
+        <div class="field">
+          <label>Type</label>
+          <select id="cardType" onchange="onTypeChange()">
+            <optgroup label="Character">
+              <option value="Character - Standard">Character — Standard</option>
+              <option value="Character - Slim">Character — Slim</option>
+              <option value="Character - Small">Character — Small</option>
+            </optgroup>
+            <optgroup label="Battle">
+              <option value="Battle - Action">Battle — Action</option>
+              <option value="Battle - Upgrade">Battle — Upgrade</option>
+            </optgroup>
+            <optgroup label="Other">
+              <option value="Stratagem - Small">Stratagem — Small</option>
+              <option value="PromoCharacter - Standard">Promo Character</option>
+            </optgroup>
+          </select>
+        </div>
+        <div class="field" id="factionField">
+          <label>Faction</label>
+          <select id="faction" onchange="render()">
+            <option>Autobot</option>
+            <option>Decepticon</option>
+            <option>Junkion</option>
+            <option selected>Mercenary</option>
+            <option>Quintesson</option>
+            <option>Unicronian</option>
+          </select>
+        </div>
+        <div class="field" id="faction2Field" style="display:none;">
+          <label>Second Faction</label>
+          <select id="faction2" onchange="render()">
+            <option value="">— None —</option>
+            <option>Autobot</option>
+            <option>Decepticon</option>
+            <option>Junkion</option>
+            <option>Mercenary</option>
+            <option>Quintesson</option>
+            <option>Unicronian</option>
+          </select>
+        </div>
+        <div class="field" id="upgradeTypeField" style="display:none;">
+          <label>Upgrade Type</label>
+          <select id="upgradeType" onchange="render()">
+            <option value="Attack">Attack</option>
+            <option value="Defense">Defense</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <!-- Identity -->
+    <div class="section" id="sec-identity">
+      <div class="section-header" onclick="toggleSec('identity')">Identity <span class="chevron">▾</span></div>
+      <div class="section-body">
+        <div class="field">
+          <label>Name</label>
+          <input type="text" id="cardName" value="OPTIMUS PRIME" oninput="render()">
+        </div>
+        <div class="field">
+          <label>Subtitle / Alt Mode</label>
+          <input type="text" id="cardSubtitle" value="LEGENDARY AUTOBOT COMMANDER" oninput="render()">
+        </div>
+      </div>
+    </div>
+
+    <!-- Traits -->
+    <div class="section" id="sec-traits">
+      <div class="section-header" onclick="toggleSec('traits')">Traits <span class="chevron">▾</span></div>
+      <div class="section-body">
+        <div style="font-size:9px;color:var(--label);letter-spacing:0.7px;text-transform:uppercase;margin-bottom:4px;">Bot Mode</div>
+        <div id="traitRows"></div>
+        <div style="font-size:9px;color:var(--label);letter-spacing:0.7px;text-transform:uppercase;margin-top:10px;margin-bottom:4px;">Alt Mode</div>
+        <div id="altTraitRows"></div>
+        <div style="margin-top:6px;display:flex;flex-direction:column;gap:4px;" id="traitXSliders">
+          <div style="font-size:9px;color:var(--label);letter-spacing:0.7px;text-transform:uppercase;margin-bottom:2px;">X Position</div>
+          <div id="traitXSliderRows"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Stats -->
+    <div class="section" id="sec-stats">
+      <div class="section-header" onclick="toggleSec('stats')">Stats <span class="chevron">▾</span></div>
+      <div class="section-body">
+        <div class="field" id="modeBoxRow">
+          <label>Mode Box</label>
+          <select id="modeBox" onchange="render()">
+            <option value="">None</option>
+            <option value="1 Mode">1 Mode</option>
+            <option value="One Mode">One Mode</option>
+            <option value="2 Modes" selected>2 Modes</option>
+            <option value="3 Modes">3 Modes</option>
+            <option value="Choose One">Choose One</option>
+          </select>
+        </div>
+        <div style="font-size:10px;font-weight:700;letter-spacing:1px;color:#888;text-transform:uppercase;margin:6px 0 4px;">Bot Mode</div>
+        <div class="row-2">
+          <div class="field"><label>ATK</label><input type="number" id="statAtk" value="5" min="0" max="99" oninput="render()"></div>
+          <div class="field"><label>DEF</label><input type="number" id="statDef" value="2" min="0" max="99" oninput="render()"></div>
+        </div>
+        <div class="field">
+          <label>HP</label><input type="number" id="statHp" value="13" min="0" max="99" oninput="render()" style="max-width:80px;">
+        </div>
+        <div id="altStatsRow">
+          <div style="font-size:10px;font-weight:700;letter-spacing:1px;color:#888;text-transform:uppercase;margin:10px 0 4px;">Alt Mode</div>
+          <div class="row-2">
+            <div class="field"><label>ATK</label><input type="number" id="altAtk" value="4" min="0" max="99" oninput="render()"></div>
+            <div class="field"><label>DEF</label><input type="number" id="altDef" value="3" min="0" max="99" oninput="render()"></div>
+          </div>
+        </div>
+        <div class="field">
+          <label>Stars</label>
+          <input type="number" id="starCount" value="0" min="0" max="30" oninput="render()">
+        </div>
+        <div style="display:flex;gap:14px;">
+          <label style="display:flex;align-items:center;gap:5px;font-size:10px;color:var(--label);cursor:pointer;">
+            <input type="checkbox" id="starsUse5" onchange="render()"> Use 5s
+          </label>
+          <label style="display:flex;align-items:center;gap:5px;font-size:10px;color:var(--label);cursor:pointer;">
+            <input type="checkbox" id="starsUse10" onchange="render()"> Use 10s
+          </label>
+        </div>
+      </div>
+    </div>
+
+    <!-- Ability -->
+    <div class="section" id="sec-ability">
+      <div class="section-header" onclick="toggleSec('ability')">Ability Text <span class="chevron">▾</span></div>
+      <div class="section-body">
+        <div class="row-2">
+          <div class="field"><label>Font Size</label><input type="number" id="abilityFontSize" value="7.5" min="4" max="20" step="0.5" oninput="render()"></div>
+        </div>
+        <div class="field"><label>Bot Mode Text</label><textarea id="abilityBody" oninput="render()" style="min-height:100px;">When you flip to this mode → You may draw 2 cards. Your opponents' characters get -1 Attack until end of turn.</textarea></div>
+        <div class="field"><label>Position</label><div style="display:flex;align-items:center;gap:6px;"><input type="range" id="posAbilityBox" min="0" max="50" step="0.1" value="14" oninput="g('posAbilityBoxVal').textContent=this.value+'%';render()" style="flex:1;"><span id="posAbilityBoxVal" style="font-size:10px;color:var(--muted);min-width:34px;">14%</span></div></div>
+        <div id="altAbilitySection" style="margin-top:6px;padding-top:6px;border-top:1px solid var(--border);">
+          <div class="row-2">
+            <div class="field"><label>Font Size</label><input type="number" id="altAbilityFontSize" value="7.5" min="4" max="20" step="0.5" oninput="render()"></div>
+          </div>
+          <div class="field" style="margin-top:6px;"><label>Alt Mode Text</label><textarea id="altAbilityBody" oninput="render()" style="min-height:100px;"></textarea></div>
+          <div class="field"><label>Position</label><div style="display:flex;align-items:center;gap:6px;"><input type="range" id="posAltAbilityBox" min="0" max="50" step="0.1" value="14" oninput="g('posAltAbilityBoxVal').textContent=this.value+'%';render()" style="flex:1;"><span id="posAltAbilityBoxVal" style="font-size:10px;color:var(--muted);min-width:34px;">14%</span></div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Artwork -->
+    <div class="section" id="sec-art">
+      <div class="section-header" onclick="toggleSec('art')">Artwork <span class="chevron">▾</span></div>
+      <div class="section-body">
+        <div class="field">
+          <label>Upload Image</label>
+          <input type="file" id="artUpload" accept="image/*" onchange="loadArt(this)"
+            style="font-size:11px;color:var(--muted);cursor:pointer;padding:4px 0;">
+          <span id="artSizeWarning" style="display:none;font-size:10px;color:#e67e22;">
+            ⚠ Image over 5 MB — artwork won't be saved in local storage.
+          </span>
+        </div>
+        <div class="field"><label>Vertical Position</label><input type="range" id="artPosY" min="-100" max="100" value="0" oninput="render()" style="padding:0;border:none;background:none;"></div>
+        <div class="field"><label>Scale</label><input type="range" id="artScale" min="50" max="220" value="100" oninput="render()" style="padding:0;border:none;background:none;"></div>
+      </div>
+    </div>
+
+    <!-- Card Info -->
+    <div class="section" id="sec-info">
+      <div class="section-header" onclick="toggleSec('info')">Card Info <span class="chevron">▾</span></div>
+      <div class="section-body">
+        <div class="row-2">
+          <div class="field"><label>Wave</label><input type="text" id="cardWave" value="WAVE 8" oninput="render()"></div>
+          <div class="field"><label>Card ID</label><input type="text" id="cardId" value="CT T01/T38" oninput="render()"></div>
+        </div>
+        <div class="field"><label>Credits</label><input type="text" id="cardCredit" value="Art by Artist Name" oninput="render()"></div>
+      </div>
+    </div>
+
+    <!-- Actions -->
+    <div class="btn-row">
+      <button class="btn btn-secondary" onclick="copyJSON()">Copy JSON</button>
+      <button class="btn btn-secondary" onclick="loadJSON()">Load JSON</button>
+    </div>
+    <button class="btn btn-primary" id="exportBtn" onclick="exportPNG()">Export PNG ↓</button>
+
+  </div>
+
+  <!-- ── CENTER: Card Preview ── -->
+  <div class="preview-area">
+    <div class="cards-display" id="cardsDisplay">
+
+      <!-- Front card -->
+      <div class="card-col">
+        <div class="card-col-label" id="frontLabel">FRONT</div>
+        <div class="card-wrapper" id="cardWrapper">
+      <div class="card" id="card">
+
+        <!-- Artwork (bottom, normal blend) -->
+        <img id="lArt" class="card-layer" style="display:none; object-fit:cover; object-position:center top; mix-blend-mode:normal;">
+
+        <!-- Structural layers (bottom → top) -->
+        <img id="lGradient"      class="card-layer" alt="">
+        <img id="lHeaderMask"    class="card-layer" alt="">
+        <img id="lTrait4"        class="card-layer" alt="">
+        <img id="lTrait3"        class="card-layer" alt="">
+        <img id="lTrait2"        class="card-layer" alt="">
+        <img id="lTrait1"        class="card-layer" alt="">
+        <img id="lTextbox"       class="card-layer" alt="">
+        <img id="lMainFrame"     class="card-layer" alt="">
+        <img id="lModeBox"       class="card-layer" alt="">
+        <img id="lSetSlash"      class="card-layer" alt="">
+        <img id="lStarSep"       class="card-layer" alt="">
+        <img id="lHeaderBg"      class="card-layer" alt="">
+        <img id="lHeaderOverlay" class="card-layer" alt="">
+        <img id="lHeaderLines"   class="card-layer" alt="">
+        <img id="lFactionFrame"  class="card-layer" alt="">
+        <img id="lFactionIcon"   class="card-layer" alt="">
+        <img id="lFactionIcon2"  class="card-layer" alt="">
+        <img id="lFactionDual"   class="card-layer" alt="">
+
+        <!-- ── Text overlays ── -->
+
+        <!-- Name (Bayformers font, top-left of header) -->
+        <div id="tName" class="card-text" style="
+          top:5%; left:4%; right:16%;
+          font-family:'BayformersName','Segoe UI',sans-serif;
+          font-size:32px; color:#fff; text-transform:uppercase;
+          letter-spacing:1px;
+          line-height:1; white-space:nowrap; overflow:hidden;"></div>
+
+        <!-- Subtitle — character cards: small text below name -->
+        <div id="tSubtitle" class="card-text" style="
+          top:10.5%; left:4%; right:16%;
+          font-family:'GothamNarrow','Segoe UI',sans-serif;
+          font-size:9px; font-weight:700; color:#fff; text-transform:uppercase;
+          letter-spacing:1px;
+          white-space:nowrap; overflow:hidden;"></div>
+
+        <!-- Stratagem subtitle — rendered differently (italic, centered in faction banner) -->
+        <div id="tStratagemSubtitle" class="card-text" style="
+          top:9%; left:4%; right:4%;
+          font-family:'GothamNarrowItalic','Georgia',serif;
+          font-size:8px; font-weight:700; color:#fff;
+          letter-spacing:1px; text-align:center;
+          text-shadow:1px 1px 2px rgba(0,0,0,0.9);
+          display:none;"></div>
+
+
+        <!-- Trait bar — single HORIZONTAL row across the card (position set by JS per card type) -->
+        <div id="tTraitBar" class="card-text" style="
+          left:3%; right:3%; height:20px;
+          display:none; align-items:center; overflow:hidden;"></div>
+
+        <!-- Stats bar (Character cards only; hidden for Battle/Stratagem) -->
+        <div id="statsBar" class="card-text" style="
+          bottom:27.7%; left:1%; right:1%; height:32px;
+          display:flex; align-items:center; justify-content:space-between;
+          padding:0 8px;">
+          <div style="display:flex;align-items:center;margin-left:36px;">
+            <span id="tAtk" style="font-size:26px;font-weight:900;color:#fff;font-family:'ArmadaCondensed',sans-serif;line-height:1;"></span>
+          </div>
+          <div style="display:flex;align-items:center;margin-left:66px;">
+            <span id="tHp" style="font-size:26px;font-weight:900;color:#fff;font-family:'ArmadaCondensed',sans-serif;line-height:1;"></span>
+          </div>
+          <div style="display:flex;align-items:center;margin-right:52px;">
+            <span id="tDef" style="font-size:26px;font-weight:900;color:#fff;font-family:'ArmadaCondensed',sans-serif;line-height:1;"></span>
+          </div>
+        </div>
+        <!-- Mode label — independent of stats flex row -->
+        <div id="tModeLabel" class="card-text" style="font-size:7px;font-weight:700;letter-spacing:1.5px;color:#fff;text-transform:uppercase;font-family:'OpenSansSCBold',sans-serif;text-align:center;bottom:26.6%;left:calc(50% - 43px);transform:translateX(-50%);height:32px;display:flex;align-items:center;"></div>
+
+        <!-- Ability text box (left portion; right side reserved for mode box) -->
+        <div id="abilityBox" class="card-text" style="bottom:14%;left:12%;right:23%;font-size:7.5px;line-height:1.45;color:#1a1a1a;text-align:center;">
+          <span id="tAbilityName" style="font-weight:700;font-style:italic;font-family:'GothamNarrowItalic','Georgia',serif;"></span>
+          <span id="tAbilityParen" style="font-style:italic;font-family:'GothamNarrowItalic','Georgia',serif;"></span>
+          <span id="tAbilityBody" style="font-family:'GothamNarrow','Arial',sans-serif;"></span>
+        </div>
+
+        <!-- Battle / Stratagem ability text (wider, centred) — no mode box on right -->
+        <div id="abilityBoxWide" class="card-text" style="bottom:6%;left:4%;right:4%;font-size:8.5px;line-height:1.55;color:#1a1a1a;text-align:center;display:none;">
+          <div id="tAbilityBodyWide" style="font-family:'GothamNarrow','Arial',sans-serif;"></div>
+          <div id="tAbilityParenWide" style="font-style:italic;font-family:'GothamNarrowItalic','Georgia',serif;margin-top:4px;"></div>
+        </div>
+
+        <!-- Mode box alt stats (bottom-right, inside mode box component area) -->
+        <div id="altModePanel" class="card-text" style="right:1.5%;bottom:7.5%;width:15%;text-align:center;line-height:1.6;">
+          <div id="tAltModeLabel" style="font-size:6px;letter-spacing:0.8px;color:#fff;font-weight:700;text-transform:uppercase;font-family:'OpenSansBold',sans-serif;margin-left:4px;"></div>
+          <div style="display:flex;align-items:center;justify-content:center;gap:1px;margin-top:1px;">
+            <img src="card_components/icons/Icon - Stat - ATK.png" style="width:9px;height:9px;object-fit:contain;" alt="">
+            <span id="tAltAtk" style="font-size:10px;font-weight:900;color:#e6a020;line-height:1;font-family:'ArmadaCondensed',sans-serif;"></span>
+          </div>
+          <div style="display:flex;align-items:center;justify-content:center;gap:1px;">
+            <img src="card_components/icons/Icon - Stat - DEF.png" style="width:9px;height:9px;object-fit:contain;" alt="">
+            <span id="tAltDef" style="font-size:10px;font-weight:900;color:#4a9fd4;line-height:1;font-family:'ArmadaCondensed',sans-serif;"></span>
+          </div>
+        </div>
+
+        <!-- Footer: [stars] [wave info + set slash] [card ID] [credits] -->
+        <div class="card-text" style="bottom:0;left:0;right:0;height:5.5%;display:flex;align-items:center;justify-content:space-between;padding:0 3%;">
+          <div style="display:flex;align-items:center;gap:5px;">
+            <span id="tWave" style="font-size:5.5px;color:#888;font-weight:600;letter-spacing:0.8px;text-transform:uppercase;font-family:'OpenSansBold',sans-serif;"></span>
+          </div>
+          <span id="tId" style="font-size:6.5px;font-weight:700;color:#999;letter-spacing:0.5px;font-family:'OpenSansBold',sans-serif;"></span>
+          <span id="tCredit" style="font-size:5px;color:#555;text-align:right;line-height:1.35;font-family:'OpenSansBold',sans-serif;"></span>
+        </div>
+
+        <!-- Stars — alt mode only, positioned independently -->
+        <div id="tStarsFooter" class="card-text" style="display:none;bottom:5%;left:9.7%;align-items:center;gap:2px;"></div>
+
+      </div><!-- .card -->
+        </div><!-- .card-wrapper front -->
+      </div><!-- .card-col front -->
+
+      <!-- Back card (cloned by JS; hidden for Battle types) -->
+      <div class="card-col" id="backCardCol">
+        <div class="card-col-label" id="backLabel">BACK</div>
+        <div class="card-wrapper" id="b_cardWrapper"></div>
+      </div><!-- .card-col back -->
+
+    </div><!-- .cards-display -->
+
+    <div class="preview-controls">
+      <button class="zoom-btn" onclick="zoom(-0.1)">−</button>
+      <span class="zoom-display" id="zoomDisplay">100%</span>
+      <button class="zoom-btn" onclick="zoom(0.1)">+</button>
+      <button class="zoom-btn" onclick="resetZoom()">Reset</button>
+    </div>
+  </div>
+
+  <!-- ── RIGHT: Layers panel ── -->
+  <div class="layers-panel">
+    <div class="layers-title">Layer Stack</div>
+    <div id="layerStack"></div>
+  </div>
+
+</div><!-- .app -->
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"
+        integrity="sha512-BNaRQnYJYiPSqHHDb58B0yaPfCu+Wgds8Gp/gU33kqBtgNS4tSPHuGibyoeqMV/TJlSKda6FXzoEyYGjTe+vXA=="
+        crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<script>
+
+/* ── Data ── */
+const FACTIONS = ['Autobot','Decepticon','Junkion','Mercenary','Quintesson','Unicronian'];
+
+const TRAIT_X_BASE     = { 1: -20, 2: -4, 3: 12, 4: 29 }; // baked-in per-slot offset
+const TRAIT_X_DEFAULTS = { 1: 0, 2: 0, 3: 0, 4: 0 };      // slider starts at zero
+
+const TRAIT_NAMES = [
+  'Aerialbot','Air Strike Patrol','Allicon','Battle Master','Battle Patrol',
+  'Beast','Boat','Car','Combaticon','Constructicon','Dinobot','Dreadwing',
+  'Firecon','Guardian','Helicopter','Insecticon','Judge','Leader','Me Grimlock',
+  'Melee','Mini-Cassette','Motorcycle','Off-Road Patrol','Omnibot','Plane',
+  'Predacon','Ranged','Rescue Patrol','Road Drone','Sentinel','Sharkticon',
+  'Spaceship','Specialist','Sports Car Patrol','Spy Patrol','Station','Stunticon',
+  'Tank','Tentacle','Terrorcon','Titan Master','Titan','Train','Truck',
+  'Vehicle','Weaponizer','Wrecker'
+];
+
+// Per card type: which folder, which components exist, layout hints
+const CARD_CONFIGS = {
+  'Character - Standard': {
+    folder: 'character',
+    layers: ['Gradient','Header Background','Header Lines','Header Overlay','Main Frame',
+             'Faction Icon Frame','Faction Icon','Traits','ModeBox','Set Slash',
+             'Star Separator','Textbox','Header Mask'],
+    hasFaction: true, hasModeBox: true, hasTraits: true, hasHeaderMask: true,
+    hasStats: true, isStratagem: false,
+    maxTraits: 4,
+    modeBoxOptions: ['1 Mode','One Mode','2 Modes','3 Modes','Choose One'],
+    traitBarTop: '12.5%',   // trait bar sits just below the header
+    artTop: '16%',
+  },
+  'Character - Slim': {
+    folder: 'character',
+    layers: ['Gradient','Header Background','Header Lines','Header Overlay','Main Frame',
+             'Faction Icon Frame','Faction Icon','Traits','ModeBox','Set Slash',
+             'Star Separator','Textbox'],
+    hasFaction: true, hasModeBox: true, hasTraits: true, hasHeaderMask: false,
+    hasStats: true, isStratagem: false,
+    maxTraits: 4,
+    modeBoxOptions: ['One Mode','2 Modes','3 Modes','Choose One'],
+    traitBarTop: '12.5%',
+    artTop: '16%',
+  },
+  'Character - Small': {
+    folder: 'character',
+    layers: ['Gradient','Header Background','Header Lines','Header Overlay','Main Frame',
+             'Faction Icon Frame','Faction Icon','Traits','ModeBox','Set Slash',
+             'Star Separator','Textbox','Header Mask'],
+    hasFaction: true, hasModeBox: true, hasTraits: true, hasHeaderMask: true,
+    hasStats: true, isStratagem: false,
+    maxTraits: 4,
+    modeBoxOptions: ['1 Mode','2 Modes','3 Modes','Choose One'],
+    traitBarTop: '12.5%',
+    artTop: '16%',
+  },
+  'Battle - Action': {
+    folder: 'battle',
+    // Battle Action has Header Overlay + Main Frame + Header Mask + Set Slash
+    // Trait bars live at Battle - Trait N (no Action/Upgrade prefix)
+    layers: ['Header Overlay','Main Frame','Header Mask','Set Slash','Traits'],
+    hasFaction: true, hasModeBox: false, hasTraits: true, hasHeaderMask: true,
+    hasStats: false, isStratagem: false,
+    maxTraits: 2,
+    modeBoxOptions: [],
+    traitBarTop: '64%',   // "ACTION" bar sits at bottom of art area
+    artTop: '13%',
+  },
+  'Battle - Upgrade': {
+    folder: 'battle',
+    layers: ['Header Overlay','Main Frame','Set Slash'],
+    hasFaction: true, hasModeBox: false, hasTraits: false, hasHeaderMask: false,
+    hasStats: false, isStratagem: false,
+    maxTraits: 0,
+    modeBoxOptions: [],
+    traitBarTop: null,
+    artTop: '13%',
+  },
+  'Stratagem - Small': {
+    folder: 'stratagem',
+    // Layer order: Black Background → Header → Header Grid → Header Overlay Bg →
+    //              Header Overlay (faction) → Border → Textbox → Textbox Overlay Bg →
+    //              Textbox Overlay (faction) → Set Slash
+    layers: ['Black Background','Header','Header Grid Black','Header Overlay Background',
+             'Header Overlay','Border Regular','Textbox','Textbox Overlay Background',
+             'Textbox Overlay','Set Slash'],
+    hasFaction: true, hasModeBox: false, hasTraits: false, hasHeaderMask: false,
+    hasStats: false, isStratagem: true,
+    maxTraits: 0,
+    modeBoxOptions: [],
+    traitBarTop: null,
+    artTop: '0%',   // art fills from top on stratagem
+  },
+  'PromoCharacter - Standard': {
+    folder: 'promo',
+    layers: ['Main Frame','Traits'],
+    hasFaction: false, hasModeBox: true, hasTraits: true, hasHeaderMask: false,
+    hasStats: true, isStratagem: false,
+    maxTraits: 4,
+    modeBoxOptions: ['Double-Sided','Triple-Sided'],
+    traitBarTop: '12.5%',
+    artTop: '16%',
+  },
+};
+
+/* ── Layer display list for the right panel ── */
+const LAYER_LABELS = [
+  { id: 'lArt',          label: 'Character Art' },
+  { id: 'lHeaderBg',     label: 'Header Background' },
+  { id: 'lGradient',     label: 'Gradient' },
+  { id: 'lHeaderMask',   label: 'Header Mask' },
+  { id: 'lMainFrame',    label: 'Main Frame' },
+  { id: 'lTrait1',       label: 'Trait 1' },
+  { id: 'lTrait2',       label: 'Trait 2' },
+  { id: 'lTrait3',       label: 'Trait 3' },
+  { id: 'lTrait4',       label: 'Trait 4' },
+  { id: 'lModeBox',      label: 'Mode Box' },
+  { id: 'lSetSlash',     label: 'Set Slash' },
+  { id: 'lStarSep',      label: 'Star Separator' },
+  { id: 'lTextbox',      label: 'Textbox' },
+  { id: 'lHeaderLines',  label: 'Header Lines' },
+  { id: 'lHeaderOverlay',label: 'Header Overlay' },
+  { id: 'lFactionFrame',  label: 'Faction Icon Frame' },
+  { id: 'lFactionIcon',   label: 'Faction Icon' },
+  { id: 'lFactionIcon2',  label: 'Faction Icon 2' },
+  { id: 'lFactionDual',   label: 'Dual-Faction Line' },
+];
+
+/* ── State ── */
+let artworkSrc = null;
+let zoomLevel = 1;
+
+/* ── Helpers ── */
+const g = id => document.getElementById(id);
+const cc = (folder, file) => `card_components/${folder}/${file}`;
+
+function abilityImgSrc(name) {
+  if (name.startsWith('Trait - ')) return `card_components/traits/${name}.png`;
+  if (name.startsWith('Icon - '))  return `card_components/icons/${name}.png`;
+  return null;
+}
+
+function formatAbilityText(text) {
+  return (text || '')
+    .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+    .replace(/\*\*(.+?)\*\*/g, '<span style="font-family:\'GothamNarrowMedium\',sans-serif;">$1</span>')
+    .replace(/\*([^*]+?)\*/g, '<span style="font-family:\'GothamNarrowItalic\',sans-serif;">$1</span>')
+    .replace(/\[([^\]]+)\]/g, (_, name) => {
+      const src = abilityImgSrc(name);
+      const filter = (name.startsWith('Trait - ') || name.startsWith('Icon - Stat - ')) ? 'filter:brightness(0);' : '';
+      const height = name.startsWith('Icon - Small ') ? '1.11em' : '1.3em';
+      return src ? `<img src="${src}" style="height:${height};width:auto;vertical-align:middle;${filter}">` : `[${name}]`;
+    })
+    .replace(/\n/g, '<span style="display:block;height:0.2em;"></span>');
+}
+
+function setLayer(id, src) {
+  const el = g(id);
+  if (!el) return;
+  if (src) { el.src = src; el.style.display = ''; }
+  else      { el.src = ''; el.style.display = 'none'; }
+  // Update layer panel indicator
+  const li = g('li-' + id);
+  if (li) {
+    li.classList.toggle('active', !!src);
+    li.classList.toggle('hidden', !src);
+  }
+}
+
+/* ── Build trait row controls ── */
+function buildTraitRows() {
+  // Bot Mode rows
+  const container = g('traitRows');
+  container.innerHTML = '';
+  for (let i = 1; i <= 4; i++) {
+    const div = document.createElement('div');
+    div.className = 'trait-row';
+    div.innerHTML = `
+      <span class="trait-num">${i}</span>
+      <select id="traitType${i}" class="main" onchange="render()">
+        <option value="">— none —</option>
+        ${TRAIT_NAMES.map(n => `<option value="${n}">${n}</option>`).join('')}
+      </select>
+      <select id="traitSize${i}" class="size" onchange="render()">
+        <option value="Short">Short</option>
+        <option value="Long">Long</option>
+      </select>`;
+    container.appendChild(div);
+  }
+  // Alt Mode rows
+  const altContainer = g('altTraitRows');
+  if (altContainer) {
+    altContainer.innerHTML = '';
+    for (let i = 1; i <= 4; i++) {
+      const div = document.createElement('div');
+      div.className = 'trait-row';
+      div.innerHTML = `
+        <span class="trait-num">${i}</span>
+        <select id="altTraitType${i}" class="main" onchange="render()">
+          <option value="">— none —</option>
+          ${TRAIT_NAMES.map(n => `<option value="${n}">${n}</option>`).join('')}
+        </select>
+        <select id="altTraitSize${i}" class="size" onchange="render()">
+          <option value="Short">Short</option>
+          <option value="Long">Long</option>
+        </select>`;
+      altContainer.appendChild(div);
+    }
+  }
+  // Build X-offset sliders (PNG position)
+  const sliderContainer = g('traitXSliderRows');
+  if (sliderContainer) {
+    sliderContainer.innerHTML = '';
+    for (let i = 1; i <= 4; i++) {
+      const def = TRAIT_X_DEFAULTS[i];
+      const row = document.createElement('div');
+      row.style.cssText = 'display:flex;align-items:center;gap:6px;';
+      row.innerHTML = `
+        <span style="font-size:10px;color:var(--muted);min-width:12px;">${i}</span>
+        <input type="range" id="traitOffX${i}" min="-100" max="100" value="${def}" step="1"
+          style="flex:1;" oninput="g('traitOffXVal${i}').textContent=this.value;render()">
+        <span id="traitOffXVal${i}" style="font-size:10px;color:var(--muted);min-width:28px;text-align:right;">${def}</span>`;
+      sliderContainer.appendChild(row);
+    }
+  }
+}
+
+/* ── Update UI when card type changes ── */
+function onTypeChange() {
+  const config = CARD_CONFIGS[g('cardType').value];
+
+  // Rebuild mode box dropdown for this type
+  const modeBoxSel = g('modeBox');
+  const current = modeBoxSel.value;
+  modeBoxSel.innerHTML = '<option value="">None</option>' +
+    config.modeBoxOptions.map(o =>
+      `<option value="${o}"${o===current?' selected':''}>${o}</option>`
+    ).join('');
+
+  // Show/hide control sections based on card type capabilities
+  g('sec-traits').style.display  = config.hasTraits  ? '' : 'none';
+  g('sec-stats').style.display   = config.hasStats   ? '' : 'none';
+  g('modeBoxRow').style.display  = config.hasModeBox ? '' : 'none';
+  g('altStatsRow').style.display = config.hasModeBox ? '' : 'none';
+  g('factionField').style.display = config.hasFaction ? '' : 'none';
+  g('faction2Field').style.display =
+    (config.hasFaction && config.folder === 'character') ? '' : 'none';
+  g('upgradeTypeField').style.display =
+    (g('cardType').value === 'Battle - Upgrade') ? '' : 'none';
+
+  // Show back card col + alt ability fields for non-Battle types
+  const hasTwoSides = config.folder !== 'battle';
+  g('backCardCol').style.display    = hasTwoSides ? '' : 'none';
+  g('altAbilitySection').style.display = hasTwoSides ? '' : 'none';
+
+  // Update labels
+  const lbl = config.isStratagem ? ['FRONT', 'BACK'] : ['BOT MODE', 'ALT MODE'];
+  g('frontLabel').textContent = lbl[0];
+  g('backLabel').textContent  = lbl[1];
+
+  // Stratagem subtitle label
+  const subLabel = config.isStratagem ? 'Stratagem Name / Target' : 'Subtitle / Alt Mode';
+  g('cardSubtitle').previousElementSibling.textContent = subLabel;
+
+  buildTraitRows();
+  render();
+}
+
+/* ── Main render ── */
+function render() {
+  const typeKey = g('cardType').value;
+  const config  = CARD_CONFIGS[typeKey];
+  const folder  = config.folder;
+  const faction = g('faction').value;
+  const cp = comp => cc(folder, `${typeKey} - ${comp}.png`);
+
+  // Clear all structural layers first, then set only what this type needs
+  const ALL_LAYERS = ['lGradient','lHeaderBg','lHeaderLines','lHeaderOverlay','lMainFrame',
+                      'lFactionFrame','lFactionIcon','lFactionIcon2','lFactionDual',
+                      'lTrait1','lTrait2','lTrait3','lTrait4',
+                      'lModeBox','lSetSlash','lStarSep','lTextbox','lHeaderMask'];
+  ALL_LAYERS.forEach(id => setLayer(id, null));
+
+  // ── Layers by card family ──
+  if (folder === 'character') {
+    setLayer('lGradient',      cp('Gradient'));
+    setLayer('lHeaderBg',      cp('Header Background'));
+    setLayer('lHeaderLines',   cp('Header Lines'));
+    setLayer('lHeaderOverlay', cp(`Header Overlay ${faction}`));
+    setLayer('lMainFrame',     cp('Main Frame'));
+    setLayer('lFactionFrame', cp('Faction Icon Frame'));
+    const faction2  = g('faction2')?.value || '';
+    const iconEl    = g('lFactionIcon');
+    const icon2El   = g('lFactionIcon2');
+    const SPLIT     = '85.6%';
+    if (faction2) {
+      iconEl.style.clipPath  = `polygon(0 0, ${SPLIT} 0, ${SPLIT} 100%, 0 100%)`;
+      icon2El.style.clipPath = `polygon(${SPLIT} 0, 100% 0, 100% 100%, ${SPLIT} 100%)`;
+      setLayer('lFactionIcon',  cp(`Faction Icon ${faction}`));
+      setLayer('lFactionIcon2', cp(`Faction Icon ${faction2}`));
+      setLayer('lFactionDual',  cp('Faction Icon Frame Dual-Faction'));
+    } else {
+      iconEl.style.clipPath  = '';
+      if (icon2El) icon2El.style.clipPath = '';
+      setLayer('lFactionIcon',  cp(`Faction Icon ${faction}`));
+      setLayer('lFactionIcon2', null);
+      setLayer('lFactionDual',  null);
+    }
+    setLayer('lTextbox',       cp('Textbox'));
+    setLayer('lSetSlash',      cp('Set Slash'));
+    if (config.hasHeaderMask) setLayer('lHeaderMask', cp('Header Mask'));
+
+    // lStarSep is alt mode only — set in renderBack(), not here
+
+    const modeBoxVal = g('modeBox').value;
+    if (modeBoxVal) setLayer('lModeBox', cp(`ModeBox ${modeBoxVal}`));
+
+  }
+
+  else if (folder === 'promo') {
+    setLayer('lMainFrame',    cp('Main Frame'));
+    setLayer('lHeaderOverlay', cp('Faction Overlay Background'));
+    const modeBoxVal = g('modeBox').value;
+    if (modeBoxVal) setLayer('lModeBox', cp(`Mode ${modeBoxVal}`));
+  }
+
+  else if (folder === 'battle') {
+    setLayer('lHeaderOverlay', cp(`Header Overlay ${faction}`));
+    setLayer('lMainFrame',     cp('Main Frame'));
+    setLayer('lSetSlash',      cp('Set Slash'));
+    if (config.hasHeaderMask) setLayer('lHeaderMask', cp('Header Mask'));
+    if (typeKey === 'Battle - Upgrade') {
+      const upgradeType = g('upgradeType')?.value || 'Attack';
+      setLayer('lGradient', cp(`${upgradeType} BG`));
+    }
+  }
+
+  else if (folder === 'stratagem') {
+    // Map stratagem components to available layer slots (DOM order = bottom→top)
+    setLayer('lGradient',      cp('Black Background'));            // darkens card
+    setLayer('lHeaderBg',      cp('Header'));                      // grey header bar
+    setLayer('lHeaderLines',   cp('Header Grid Black'));           // Cybertronix lines
+    setLayer('lHeaderOverlay', cp('Header Overlay Background'));   // subtitle band bg
+    setLayer('lMainFrame',     cp(`Header Overlay ${faction}`));  // faction subtitle band
+    setLayer('lFactionFrame',  cp('Border Regular'));              // card border
+    setLayer('lFactionIcon',   cp('Header Corner'));               // corner decoration
+    setLayer('lTrait1',        cp('Textbox'));                     // grey text area
+    setLayer('lTrait2',        cp('Textbox Overlay Background'));  // STRATAGEM badge bg
+    setLayer('lTrait3',        cp(`Textbox Overlay ${faction}`)); // STRATAGEM badge
+    setLayer('lTrait4',        cp('Art Border'));                  // art area border
+    setLayer('lStarSep',       cp('Header Line'));                 // header separator line
+    setLayer('lTextbox',       cp('Border Bottom'));               // bottom border trim
+    setLayer('lSetSlash',      cp('Set Slash'));
+  }
+
+  // ── Trait layers — horizontal row, left to right, scaled to card coordinate space ──
+  if (folder !== 'stratagem') {
+    const SCALE = 0.48; // ~29px tall
+    const BAR_H = Math.round(60 * SCALE); // ~29px
+    const maxT = folder === 'battle' ? 2 : 4;
+    for (let i = 1; i <= 4; i++) {
+      const el = g(`lTrait${i}`);
+      if (el) { el.style.cssText = ''; el.style.display = 'none'; }
+    }
+    if (config.hasTraits && config.traitBarTop) {
+      const traitTopPx = parseFloat(config.traitBarTop) / 100 * 530;
+      // Positions are always computed for ALL slots so disabling a trait
+      // never shifts the others. Slot 1 = rightmost, slot 4 = leftmost.
+      // GAP: negative = overlap/closer, positive = gap between traits.
+      let offsetRight = 380;
+      const GAP = -26;
+      for (let slot = 1; slot <= maxT; slot++) {
+        const size = g(`traitSize${slot}`)?.value || 'Short';
+        const nw = size === 'Long' ? 393 : 270;
+        const displayW = Math.round(nw * SCALE);
+        offsetRight -= displayW + GAP;
+        const el = g(`lTrait${slot}`);
+        if (!el) continue;
+        const hasValue = !!g(`traitType${slot}`)?.value;
+        if (hasValue) {
+          const src = folder === 'battle'
+            ? cc('battle', `Battle - Trait ${slot} ${size}.png`)
+            : cp(`Trait ${slot} ${size}`);
+          const xAdj = parseInt(g(`traitOffX${slot}`)?.value) || 0;
+          el.src = src;
+          el.style.cssText = `position:absolute; display:block; pointer-events:none; top:${traitTopPx}px; left:${offsetRight + (TRAIT_X_BASE[slot]||0) + xAdj}px; width:${displayW}px; height:${BAR_H}px; object-fit:fill;`;
+          const li = g('li-lTrait' + slot);
+          if (li) { li.classList.add('active'); li.classList.remove('hidden'); }
+        } else {
+          el.style.display = 'none';
+        }
+      }
+    }
+  }
+
+  // ── Artwork ──
+  const artEl = g('lArt');
+  if (artworkSrc) {
+    artEl.src = artworkSrc;
+    artEl.style.display = '';
+    const posY  = parseInt(g('artPosY').value)  || 0;
+    const scale = parseInt(g('artScale').value) || 100;
+    const baseTop = parseFloat(config.artTop) || 16;
+    artEl.style.top    = (baseTop + posY * 0.4) + '%';
+    artEl.style.height = scale + '%';
+    artEl.style.width  = '100%';
+    artEl.style.objectFit      = 'cover';
+    artEl.style.objectPosition = 'center top';
+  } else {
+    artEl.src = ''; artEl.style.display = 'none';
+  }
+
+  // ── Text overlays ──
+
+  // Name
+  g('tName').textContent = (g('cardName').value || 'CARD NAME').toUpperCase();
+
+  // Subtitle: normal for character/battle/promo; faction-banner centred for stratagem
+  const subtitle = (g('cardSubtitle').value || '').toUpperCase();
+  if (config.isStratagem) {
+    g('tSubtitle').style.display = 'none';
+    g('tStratagemSubtitle').style.display = '';
+    g('tStratagemSubtitle').textContent = g('cardSubtitle').value || '';
+  } else {
+    g('tSubtitle').style.display = '';
+    g('tSubtitle').textContent = subtitle;
+    g('tStratagemSubtitle').style.display = 'none';
+  }
+
+  // Positions from sliders
+  const posAbilityBox = parseFloat(g('posAbilityBox')?.value) ?? 14;
+  g('abilityBox').style.bottom     = posAbilityBox + '%';
+  g('abilityBoxWide').style.bottom = posAbilityBox + '%';
+  g('statsBar').style.bottom       = '27.7%';
+  g('tModeLabel').style.bottom     = '26.6%';
+  g('altModePanel').style.bottom   = '7.5%';
+
+  // Stats bar (Character / Promo only)
+  g('statsBar').style.display = config.hasStats ? 'flex' : 'none';
+  if (config.hasStats) {
+    g('tAtk').textContent = g('statAtk').value || '0';
+    g('tHp').textContent  = g('statHp').value  || '0';
+    g('tDef').textContent = g('statDef').value || '0';
+    g('tModeLabel').textContent = 'BOT MODE';
+  }
+
+  // Alt mode stats panel (inside mode box component)
+  const modeBoxVal = g('modeBox').value;
+  const showAltMode = config.hasModeBox && modeBoxVal &&
+                      modeBoxVal !== 'One Mode' && modeBoxVal !== '1 Mode';
+  g('altModePanel').style.display = showAltMode ? '' : 'none';
+  if (showAltMode) {
+    // Label shows the OTHER mode
+    g('tAltModeLabel').textContent = 'ALT MODE';
+    g('tAltAtk').textContent = g('altAtk').value || '0';
+    g('tAltDef').textContent = g('altDef').value || '0';
+  }
+
+  // Trait text overlay — each item absolutely positioned to match its PNG layer exactly
+  const traitBarEl = g('tTraitBar');
+  const T_SCALE = 0.48;
+  const T_BAR_H = Math.round(60 * T_SCALE);
+  const T_GAP   = -26;
+  const T_maxT  = folder === 'battle' ? 2 : 4;
+  if (config.hasTraits && config.traitBarTop) {
+    const traitTopPx = parseFloat(config.traitBarTop) / 100 * 530;
+    traitBarEl.style.cssText = 'position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;display:block;';
+    traitBarEl.innerHTML = '';
+    let offsetRight = 380;
+    for (let slot = 1; slot <= T_maxT; slot++) {
+      const size     = g(`traitSize${slot}`)?.value || 'Short';
+      const nw       = size === 'Long' ? 393 : 270;
+      const displayW = Math.round(nw * T_SCALE);
+      offsetRight   -= displayW + T_GAP;
+      const traitName = g(`traitType${slot}`)?.value || '';
+      if (!traitName) continue;
+      const xAdj = parseInt(g(`traitOffX${slot}`)?.value) || 0;
+      const leftPx = offsetRight + (TRAIT_X_BASE[slot]||0) + xAdj + 21;
+      const item = document.createElement('div');
+      item.style.cssText = `position:absolute;top:${traitTopPx}px;left:${leftPx}px;width:${displayW}px;height:${T_BAR_H}px;display:flex;align-items:center;gap:8px;padding:0 6px;overflow:hidden;`;
+      item.innerHTML =
+        `<img src="${cc('traits','Trait - '+traitName+'.png')}" style="width:17px;height:17px;object-fit:contain;flex-shrink:0;position:relative;top:3px;">` +
+        `<span style="font-size:8px;font-weight:700;color:#fff;text-transform:uppercase;letter-spacing:0.5px;font-family:'OpenSansSemiBold',sans-serif;white-space:nowrap;">${traitName.toUpperCase()}</span>`;
+      traitBarEl.appendChild(item);
+    }
+  } else {
+    traitBarEl.style.display = 'none';
+  }
+
+  // Ability text: narrow (with mode box) for Character; wide + centred for Battle/Stratagem
+  const useWide = !config.hasStats; // Battle + Stratagem get the wide centred layout
+  const aFontSize = parseFloat(g('abilityFontSize')?.value) || 7.5;
+  g('abilityBox').style.display     = useWide ? 'none' : '';
+  g('abilityBox').style.fontSize    = aFontSize + 'px';
+  g('abilityBoxWide').style.display = useWide ? '' : 'none';
+  g('abilityBoxWide').style.fontSize = aFontSize + 'px';
+
+  const aBody  = g('abilityBody').value;
+
+  if (useWide) {
+    g('tAbilityBodyWide').innerHTML  = formatAbilityText(aBody);
+    g('tAbilityParenWide').textContent = '';
+  } else {
+    g('tAbilityName').textContent  = '';
+    g('tAbilityParen').textContent = '';
+    g('tAbilityBody').innerHTML  = formatAbilityText(aBody);
+  }
+
+  // Stars — in the footer (bottom-left)
+  // Stars only appear on the alt mode (back) card — always hidden on front
+  g('tStarsFooter').style.display = 'none';
+  g('tStarsFooter').innerHTML = '';
+
+  // Footer text
+  g('tWave').textContent  = g('cardWave').value;
+  g('tId').textContent    = g('cardId').value;
+  g('tCredit').innerHTML  = (g('cardCredit').value || '') + '<br>Not endorsed by Hasbro/WotC';
+
+  saveToStorage();
+  renderBack();
+}
+
+/* ── Artwork loader ── */
+function loadArt(input) {
+  const file = input.files[0];
+  if (!file) return;
+  if (file.size > 5 * 1024 * 1024) {
+    g('artSizeWarning').style.display = '';
+  } else {
+    g('artSizeWarning').style.display = 'none';
+  }
+  const reader = new FileReader();
+  reader.onload = e => { artworkSrc = e.target.result; render(); };
+  reader.readAsDataURL(file);
+}
+
+/* ── Zoom ── */
+function applyZoom() {
+  const t = zoomLevel === 1 ? '' : `scale(${zoomLevel})`;
+  g('cardWrapper').style.transform = t;
+  const bw = g('b_cardWrapper');
+  if (bw) bw.style.transform = t;
+  g('zoomDisplay').textContent = Math.round(zoomLevel * 100) + '%';
+}
+function zoom(delta) {
+  zoomLevel = Math.max(0.3, Math.min(2.5, zoomLevel + delta));
+  applyZoom();
+}
+function resetZoom() {
+  zoomLevel = 1;
+  applyZoom();
+}
+
+/* ── Section toggle ── */
+function toggleSec(name) {
+  g('sec-' + name).classList.toggle('collapsed');
+  const collapsed = ['type','identity','traits','stats','ability','art','info']
+    .filter(n => g('sec-'+n)?.classList.contains('collapsed'));
+  try { localStorage.setItem('tfSectionState', JSON.stringify(collapsed)); } catch(e) {}
+}
+
+function restoreSections() {
+  try {
+    const collapsed = JSON.parse(localStorage.getItem('tfSectionState') || '[]');
+    collapsed.forEach(n => g('sec-'+n)?.classList.add('collapsed'));
+  } catch(e) {}
+}
+
+/* ── JSON save/load ── */
+function getState() {
+  const traits = [];
+  for (let i = 1; i <= 4; i++) {
+    traits.push({
+      type:       g(`traitType${i}`)?.value  || '',
+      size:       g(`traitSize${i}`)?.value  || 'Short',
+      xOffset: parseInt(g(`traitOffX${i}`)?.value) || 0,
+    });
+  }
+  return {
+    cardType: g('cardType').value,
+    faction: g('faction').value,
+    dualFaction: g('dualFaction')?.checked || false,
+    upgradeType: g('upgradeType')?.value || 'Attack',
+    faction2:    g('faction2')?.value    || '',
+    cardName: g('cardName').value,
+    cardSubtitle: g('cardSubtitle').value,
+    starCount: g('starCount').value,
+    starsUse5:  g('starsUse5')?.checked  || false,
+    starsUse10: g('starsUse10')?.checked || false,
+    modeBox: g('modeBox').value,
+    statAtk: g('statAtk').value,
+    statHp: g('statHp').value,
+    statDef: g('statDef').value,
+    altAtk: g('altAtk').value,
+    altDef: g('altDef').value,
+    traits,
+    altTraits: [1,2,3,4].map(i => ({ type: g(`altTraitType${i}`)?.value || '', size: g(`altTraitSize${i}`)?.value || 'Short' })),
+    abilityFontSize: g('abilityFontSize').value,
+    altAbilityFontSize: g('altAbilityFontSize').value,
+    posAbilityBox: g('posAbilityBox').value,
+    posAltAbilityBox: g('posAltAbilityBox').value,
+    abilityBody: g('abilityBody').value,
+    altAbilityBody: g('altAbilityBody').value,
+    artPosY: g('artPosY').value,
+    artScale: g('artScale').value,
+    cardWave: g('cardWave').value,
+    cardId: g('cardId').value,
+    cardCredit: g('cardCredit').value,
+  };
+}
+
+function applyState(s) {
+  const set = (id, val) => { if (val !== undefined && g(id)) g(id).value = val; };
+  set('cardType',    s.cardType);
+  set('faction',     s.faction);
+  set('cardName',    s.cardName);
+  set('cardSubtitle',s.cardSubtitle);
+  set('starCount',   s.starCount);
+  if (g('starsUse5'))  g('starsUse5').checked  = s.starsUse5  || false;
+  if (g('starsUse10')) g('starsUse10').checked = s.starsUse10 || false;
+  set('statAtk',     s.statAtk);
+  set('statHp',      s.statHp);
+  set('statDef',     s.statDef);
+  set('altAtk',      s.altAtk);
+  set('altDef',      s.altDef);
+  set('abilityFontSize',    s.abilityFontSize);
+  set('altAbilityFontSize', s.altAbilityFontSize);
+  set('posAbilityBox',    s.posAbilityBox);
+  set('posAltAbilityBox', s.posAltAbilityBox);
+  ['posAbilityBox','posAltAbilityBox'].forEach(id => {
+    const el = g(id); if (el) { const lbl = g(id+'Val'); if (lbl) lbl.textContent = el.value + '%'; }
+  });
+  set('abilityBody',        s.abilityBody);
+  set('altAbilityBody', s.altAbilityBody);
+  set('artPosY',        s.artPosY);
+  set('artScale',    s.artScale);
+  set('cardWave',    s.cardWave);
+  set('cardId',      s.cardId);
+  set('cardCredit',  s.cardCredit);
+  if (g('dualFaction') && s.dualFaction !== undefined) g('dualFaction').checked = s.dualFaction;
+  if (g('upgradeType') && s.upgradeType) g('upgradeType').value = s.upgradeType;
+  if (g('faction2')    && s.faction2    !== undefined) g('faction2').value = s.faction2;
+  onTypeChange(); // rebuilds mode box options + trait rows
+  set('modeBox', s.modeBox);
+  if (s.traits) {
+    s.traits.forEach((t, i) => {
+      const ti = g(`traitType${i+1}`);
+      const si = g(`traitSize${i+1}`);
+      const xi = g(`traitOffX${i+1}`);
+      const xv = g(`traitOffXVal${i+1}`);
+      if (ti) ti.value = t.type || '';
+      if (si) si.value = t.size || 'Long';
+      const xVal = t.xOffset !== undefined ? t.xOffset : (TRAIT_X_DEFAULTS[i+1] ?? 0);
+      if (xi) { xi.value = xVal; }
+      if (xv) { xv.textContent = xVal; }
+    });
+  }
+  if (s.altTraits) {
+    s.altTraits.forEach((t, i) => {
+      const ti = g(`altTraitType${i+1}`);
+      if (ti) ti.value = t.type || '';
+      const si = g(`altTraitSize${i+1}`);
+      if (si) si.value = t.size || 'Long';
+    });
+  }
+  render();
+}
+
+/* ── localStorage persistence ── */
+let _saveTimer = null;
+function saveToStorage() {
+  clearTimeout(_saveTimer);
+  _saveTimer = setTimeout(() => {
+    try {
+      localStorage.setItem('tfCardState', JSON.stringify(getState()));
+    } catch(e) {}
+    if (artworkSrc) {
+      try {
+        localStorage.setItem('tfCardArt', artworkSrc);
+      } catch(e) {
+        // artwork too large for storage quota — skip silently
+      }
+    } else {
+      localStorage.removeItem('tfCardArt');
+    }
+  }, 300);
+}
+
+function loadFromStorage() {
+  try {
+    const raw = localStorage.getItem('tfCardState');
+    if (raw) applyState(JSON.parse(raw));
+    const art = localStorage.getItem('tfCardArt');
+    if (art) { artworkSrc = art; render(); }
+  } catch(e) {}
+}
+
+function copyJSON() {
+  navigator.clipboard.writeText(JSON.stringify(getState(), null, 2))
+    .then(() => alert('Card JSON copied to clipboard!'))
+    .catch(() => { const t = document.createElement('textarea'); t.value = JSON.stringify(getState(),null,2); document.body.appendChild(t); t.select(); document.execCommand('copy'); document.body.removeChild(t); alert('Copied!'); });
+}
+
+function loadJSON() {
+  const json = prompt('Paste card JSON:');
+  if (!json) return;
+  try { applyState(JSON.parse(json)); }
+  catch(e) { alert('Invalid JSON: ' + e.message); }
+}
+
+/* ── PNG Export ── */
+async function exportPNG() {
+  const btn = g('exportBtn');
+  btn.textContent = 'Generating…';
+  btn.disabled = true;
+  try {
+    // Temporarily remove border-radius for clean export
+    const card = g('card');
+    card.style.borderRadius = '0';
+    const canvas = await html2canvas(card, {
+      scale: 3,
+      useCORS: true,
+      allowTaint: true,
+      backgroundColor: '#111111',
+      logging: false,
+    });
+    card.style.borderRadius = '';
+    const link = document.createElement('a');
+    const name = (g('cardName').value || 'card').toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g,'');
+    link.download = `tftcg-${name}.png`;
+    link.href = canvas.toDataURL('image/png');
+    link.click();
+  } catch(e) {
+    alert('Export failed: ' + e.message + '\n\nTip: serve via "python3 -m http.server 8080" and open localhost:8080 for best results with local images.');
+  } finally {
+    btn.textContent = 'Export PNG ↓';
+    btn.disabled = false;
+  }
+}
+
+/* ── Clone front card to create the back card DOM ── */
+function buildBackCard() {
+  const front = g('card');
+  const back  = front.cloneNode(true);
+  back.id = 'b_card';
+  back.querySelectorAll('[id]').forEach(el => { el.id = 'b_' + el.id; });
+  back.querySelectorAll('img').forEach(el => { el.src = ''; el.style.display = 'none'; });
+  g('b_cardWrapper').appendChild(back);
+}
+
+/* ── Render the back card by mirroring layers then overriding text ── */
+function renderBack() {
+  if (!g('b_card')) return;
+  const p = id => g('b_' + id);
+  const config = CARD_CONFIGS[g('cardType').value];
+
+  // Mirror every layer image from front → back (lStarSep excluded — alt mode only, set below)
+  const ALL_LAYERS = ['lArt','lGradient','lHeaderBg','lHeaderLines','lHeaderOverlay',
+    'lMainFrame','lFactionFrame','lFactionIcon','lFactionIcon2','lFactionDual',
+    'lTrait1','lTrait2','lTrait3','lTrait4',
+    'lModeBox','lSetSlash','lTextbox','lHeaderMask'];
+  ALL_LAYERS.forEach(id => {
+    const f = g(id), b = p(id);
+    if (!f || !b) return;
+    b.src              = f.src;
+    b.style.cssText    = f.style.cssText;
+  });
+
+  // Stars + star separator — alt mode card only
+  const bStarSep = p('lStarSep');
+  const bStarsFooter = p('tStarsFooter');
+  let starCount = parseInt(g('starCount').value) || 0;
+  if (starCount > 0 && bStarSep) {
+    bStarSep.src = cc(config.folder, `${g('cardType').value} - Star Separator.png`);
+    bStarSep.style.display = '';
+  } else if (bStarSep) {
+    bStarSep.src = ''; bStarSep.style.display = 'none';
+  }
+  if (bStarsFooter) {
+    bStarsFooter.style.bottom = '5%';
+    bStarsFooter.innerHTML = '';
+    if (starCount > 0) {
+      const use10 = g('starsUse10')?.checked;
+      const use5  = g('starsUse5')?.checked;
+      const imgs = [];
+      if (use10) { const n = Math.floor(starCount / 10); starCount %= 10; for (let i = 0; i < n; i++) imgs.push(10); }
+      if (use5)  { const n = Math.floor(starCount / 5);  starCount %= 5;  for (let i = 0; i < n; i++) imgs.push(5);  }
+      for (let i = 0; i < starCount; i++) imgs.push(1);
+      const useGroupGaps = !use5 && !use10;
+      let runningTotal = 0;
+      imgs.forEach(v => {
+        if (useGroupGaps && runningTotal > 0 && runningTotal % 5 === 0) {
+          const spacer = document.createElement('span');
+          spacer.style.cssText = 'width:4px;flex-shrink:0;'; // gap every 5 stars — adjust width here
+          bStarsFooter.appendChild(spacer);
+        }
+        const img = document.createElement('img');
+        img.src = cc('icons', `Icon - Stars ${v}.png`);
+        img.style.cssText = 'height:12px;width:auto;';
+        bStarsFooter.appendChild(img);
+        runningTotal += v;
+      });
+      bStarsFooter.style.display = 'flex';
+    } else {
+      bStarsFooter.style.display = 'none';
+    }
+  }
+
+  // Re-render alt traits on back card using alt mode trait selects
+  if (config.hasTraits && config.traitBarTop) {
+    const SCALE = 0.48, GAP = -26, T_BAR_H = Math.round(60 * 0.48);
+    const traitTopPx = parseFloat(config.traitBarTop) / 100 * 530;
+    const maxT = config.folder === 'battle' ? 2 : 4;
+    let offsetRight = 380;
+    for (let slot = 1; slot <= maxT; slot++) {
+      const size     = g(`altTraitSize${slot}`)?.value || g(`traitSize${slot}`)?.value || 'Short';
+      const nw       = size === 'Long' ? 393 : 270;
+      const displayW = Math.round(nw * SCALE);
+      offsetRight   -= displayW + GAP;
+      const traitEl  = p(`lTrait${slot}`);
+      if (!traitEl) continue;
+      const hasValue = !!g(`altTraitType${slot}`)?.value;
+      if (hasValue) {
+        const xAdj = parseInt(g(`traitOffX${slot}`)?.value) || 0;
+        const cardTypeVal = g('cardType').value;
+        const src = config.folder === 'battle'
+          ? cc('battle', `Battle - Trait ${slot} ${size}.png`)
+          : cc(config.folder, `${cardTypeVal} - Trait ${slot} ${size}.png`);
+        traitEl.src = src;
+        traitEl.style.cssText = `position:absolute;display:block;pointer-events:none;top:${traitTopPx}px;left:${offsetRight+(TRAIT_X_BASE[slot]||0)+xAdj}px;width:${displayW}px;height:${T_BAR_H}px;object-fit:fill;`;
+      } else {
+        traitEl.style.display = 'none';
+      }
+    }
+    // Re-render alt trait text overlay
+    const backTraitBar = p('tTraitBar');
+    if (backTraitBar) {
+      backTraitBar.style.cssText = 'position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;display:block;';
+      backTraitBar.innerHTML = '';
+      const cardTypeVal2 = g('cardType').value;
+      let oR = 380;
+      for (let slot = 1; slot <= maxT; slot++) {
+        const size = g(`altTraitSize${slot}`)?.value || g(`traitSize${slot}`)?.value || 'Short';
+        const nw = size === 'Long' ? 393 : 270;
+        const displayW = Math.round(nw * SCALE);
+        oR -= displayW + GAP;
+        const traitName = g(`altTraitType${slot}`)?.value || '';
+        if (!traitName) continue;
+        const xAdj = parseInt(g(`traitOffX${slot}`)?.value) || 0;
+        const leftPx = oR + (TRAIT_X_BASE[slot]||0) + xAdj + 21;
+        const item = document.createElement('div');
+        item.style.cssText = `position:absolute;top:${traitTopPx}px;left:${leftPx}px;width:${displayW}px;height:${T_BAR_H}px;display:flex;align-items:center;gap:8px;padding:0 6px;overflow:hidden;`;
+        item.innerHTML =
+          `<img src="card_components/traits/Trait - ${traitName}.png" style="width:17px;height:17px;object-fit:contain;flex-shrink:0;position:relative;top:3px;">` +
+          `<span style="font-size:8px;font-weight:700;color:#fff;text-transform:uppercase;letter-spacing:0.5px;font-family:'OpenSansSemiBold',sans-serif;white-space:nowrap;">${traitName.toUpperCase()}</span>`;
+        backTraitBar.appendChild(item);
+      }
+    }
+  }
+
+  // Mirror stats bar visibility + structure (tTraitBar handled above)
+  ['statsBar','abilityBox','abilityBoxWide','altModePanel',
+   'tStratagemSubtitle','tSubtitle'].forEach(id => {
+    const f = g(id), b = p(id);
+    if (f && b) { b.style.cssText = f.style.cssText; b.innerHTML = f.innerHTML; }
+  });
+
+  // Mirror simple text fields
+  ['tName','tWave','tId','tCredit'].forEach(id => {
+    const f = g(id), b = p(id);
+    if (f && b) b.textContent = f.textContent;
+  });
+
+  // tStarsFooter is built directly in renderBack() above — no mirror needed
+
+  // ── Back-specific overrides ──
+  // NOTE: p() lookups fail for elements inside mirrored innerHTML blocks above
+  // (statsBar, abilityBox, abilityBoxWide) because innerHTML copy strips b_ prefixes.
+  // Use bCard.querySelector() for all overrides on those elements.
+  if (!config.hasStats) return; // Stratagem / Battle: no stat swap needed
+
+  const bCard = g('b_card');
+  const bq = id => bCard?.querySelector('#' + id);
+
+  // Swap main stats — alt mode card shows alt ATK/DEF as primary
+  const bAtk = bq('tAtk'); if (bAtk) bAtk.textContent = g('altAtk').value || '0';
+  const bDef = bq('tDef'); if (bDef) bDef.textContent = g('altDef').value || '0';
+
+  // Mode labels
+  const bModeLabel = p('tModeLabel');     if (bModeLabel)    bModeLabel.textContent    = 'ALT MODE';
+  const bAltModeLabel = bq('tAltModeLabel'); if (bAltModeLabel) bAltModeLabel.textContent = 'BOT MODE';
+
+  // Corner panel shows bot ATK/DEF on the alt mode card
+  const bAltAtk = bq('tAltAtk'); if (bAltAtk) bAltAtk.textContent = g('statAtk').value || '0';
+  const bAltDef = bq('tAltDef'); if (bAltDef) bAltDef.textContent = g('statDef').value || '0';
+
+  // Alt ability text
+  const aBody     = g('altAbilityBody').value  || '';
+  const aFontSize = parseFloat(g('altAbilityFontSize')?.value) || 7.5;
+  const useWide   = !config.hasStats;
+
+  const bAbilityBox     = g('b_abilityBox');
+  const bAbilityBoxWide = g('b_abilityBoxWide');
+  const posAltAbilityBox = parseFloat(g('posAltAbilityBox')?.value) ?? 14;
+  if (bAbilityBox)     { bAbilityBox.style.fontSize = aFontSize + 'px'; bAbilityBox.style.bottom = posAltAbilityBox + '%'; }
+  if (bAbilityBoxWide) { bAbilityBoxWide.style.fontSize = aFontSize + 'px'; bAbilityBoxWide.style.bottom = posAltAbilityBox + '%'; }
+
+  if (useWide) {
+    const bAbWide = bq('tAbilityBodyWide'); if (bAbWide) bAbWide.innerHTML = formatAbilityText(aBody);
+    const bApWide = bq('tAbilityParenWide'); if (bApWide) bApWide.textContent = '';
+  } else {
+    const bAbName  = bq('tAbilityName');  if (bAbName)  bAbName.textContent  = '';
+    const bAbParen = bq('tAbilityParen'); if (bAbParen) bAbParen.textContent = '';
+    const bAbBody  = bq('tAbilityBody');  if (bAbBody)  bAbBody.innerHTML  = formatAbilityText(aBody);
+  }
+}
+
+/* ── Build layers panel ── */
+function buildLayersPanel() {
+  const stack = g('layerStack');
+  stack.innerHTML = '';
+  [...LAYER_LABELS].reverse().forEach(({ id, label }) => {
+    const div = document.createElement('div');
+    div.id = 'li-' + id;
+    div.className = 'layer-item active';
+    div.innerHTML = `<div class="layer-dot"></div><span style="flex:1">${label}</span>`;
+    stack.appendChild(div);
+  });
+}
+
+/* ── Init ── */
+buildLayersPanel();
+buildBackCard();
+buildTraitRows();
+onTypeChange(); // sets mode box options etc.
+loadFromStorage(); // restore saved state, falls back to render() if nothing saved
+restoreSections();
+</script>
+</body>
+</html>
