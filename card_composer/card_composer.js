@@ -436,7 +436,8 @@ function render() {
   // Alt mode stats panel (inside mode box component)
   const modeBoxVal = g('modeBox').value;
   const showAltMode = config.hasModeBox && modeBoxVal &&
-                      modeBoxVal !== 'One Mode' && modeBoxVal !== '1 Mode';
+                      modeBoxVal !== 'One Mode' && modeBoxVal !== '1 Mode' &&
+                      modeBoxVal !== 'Choose One';
   g('altModePanel').style.display = showAltMode ? '' : 'none';
   if (showAltMode) {
     g('tAltModeLabel').textContent = 'ALT';
