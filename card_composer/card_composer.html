@@ -528,7 +528,8 @@ select option { background: var(--panel2); }
         <img id="lStarSep"       class="card-layer" alt="">
         <img id="lStamp" src="card_components/stamp/wave11_tbc.svg" alt="" style="position:absolute;bottom:3.4%;left:2.4%;width:6.6%;height:auto;pointer-events:none;">
         <img id="lHeaderBg"      class="card-layer" alt="">
-        <img id="lHeaderOverlay" class="card-layer" alt="">
+        <img id="lHeaderOverlay"  class="card-layer" alt="">
+        <img id="lHeaderOverlay2" class="card-layer" alt="">
         <img id="lHeaderLines"   class="card-layer" alt="">
         <img id="lFactionFrame"  class="card-layer" alt="">
         <img id="lFactionIcon"   class="card-layer" alt="">
@@ -927,7 +928,7 @@ function render() {
   const cp = comp => cc(folder, `${typeKey} - ${comp}.png`);
 
   // Clear all structural layers first, then set only what this type needs
-  const ALL_LAYERS = ['lGradient','lHeaderBg','lHeaderLines','lHeaderOverlay','lMainFrame',
+  const ALL_LAYERS = ['lGradient','lHeaderBg','lHeaderLines','lHeaderOverlay','lHeaderOverlay2','lMainFrame',
                       'lFactionFrame','lFactionIcon','lFactionIcon2','lFactionDual',
                       'lTrait1','lTrait2','lTrait3','lTrait4',
                       'lModeBox','lSetSlash','lStarSep','lTextbox','lHeaderMask'];
@@ -944,6 +945,7 @@ function render() {
     const faction2  = g('faction2')?.value || '';
     const iconEl    = g('lFactionIcon');
     const icon2El   = g('lFactionIcon2');
+    const overlay2El = g('lHeaderOverlay2');
     const SPLIT     = '85.6%';
     if (faction2) {
       iconEl.style.clipPath  = `polygon(0 0, ${SPLIT} 0, ${SPLIT} 100%, 0 100%)`;
@@ -951,12 +953,24 @@ function render() {
       setLayer('lFactionIcon',  cp(`Faction Icon ${faction}`));
       setLayer('lFactionIcon2', cp(`Faction Icon ${faction2}`));
       setLayer('lFactionDual',  cp('Faction Icon Frame Dual-Faction'));
+      const cp2 = comp => cc(folder, `${typeKey} - ${comp}.png`);
+      setLayer('lHeaderOverlay2', cp2(`Header Overlay ${faction2}`));
+      if (overlay2El) {
+        const fade = 'linear-gradient(to right, transparent 20%, black 60%)';
+        overlay2El.style.webkitMaskImage = fade;
+        overlay2El.style.maskImage       = fade;
+      }
     } else {
       iconEl.style.clipPath  = '';
       if (icon2El) icon2El.style.clipPath = '';
       setLayer('lFactionIcon',  cp(`Faction Icon ${faction}`));
       setLayer('lFactionIcon2', null);
       setLayer('lFactionDual',  null);
+      setLayer('lHeaderOverlay2', null);
+      if (overlay2El) {
+        overlay2El.style.webkitMaskImage = '';
+        overlay2El.style.maskImage       = '';
+      }
     }
     setLayer('lTextbox',       cp('Textbox'));
     setLayer('lSetSlash',      cp('Set Slash'));
@@ -1410,7 +1424,7 @@ function renderBack() {
   const config = CARD_CONFIGS[g('cardType').value];
 
   // Mirror every layer image from front → back (lStarSep excluded — alt mode only, set below)
-  const ALL_LAYERS = ['lArt','lGradient','lHeaderBg','lHeaderLines','lHeaderOverlay',
+  const ALL_LAYERS = ['lArt','lGradient','lHeaderBg','lHeaderLines','lHeaderOverlay','lHeaderOverlay2',
     'lMainFrame','lFactionFrame','lFactionIcon','lFactionIcon2','lFactionDual',
     'lTrait1','lTrait2','lTrait3','lTrait4',
     'lModeBox','lTextbox','lHeaderMask'];
