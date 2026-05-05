@@ -597,14 +597,12 @@ select option { background: var(--panel2); }
 
         <!-- Mode box alt stats (bottom-right, inside mode box component area) -->
         <div id="altModePanel" class="card-text" style="right:1.5%;bottom:7.5%;width:15%;text-align:center;line-height:1.6;">
-          <div id="tAltModeLabel" style="font-size:6px;letter-spacing:0.8px;color:#fff;font-weight:700;text-transform:uppercase;font-family:'OpenSansBold',sans-serif;margin-left:4px;"></div>
-          <div style="display:flex;align-items:center;justify-content:center;gap:1px;margin-top:1px;">
-            <img src="card_components/icons/Icon - Stat - ATK.png" style="width:9px;height:9px;object-fit:contain;" alt="">
-            <span id="tAltAtk" style="font-size:10px;font-weight:900;color:#e6a020;line-height:1;font-family:'ArmadaCondensed',sans-serif;"></span>
+          <div id="tAltModeLabel" style="font-size:10px;letter-spacing:0.8px;color:#444;font-weight:700;text-transform:uppercase;font-family:'OpenSansBold',sans-serif;margin-left:10px;"></div>
+          <div style="display:flex;align-items:center;justify-content:center;gap:1px;margin-top:4px;">
+            <span id="tAltAtk" style="font-size:15px;font-weight:900;color:#444;line-height:1;font-family:'ArmadaCondensed',sans-serif;"></span>
           </div>
           <div style="display:flex;align-items:center;justify-content:center;gap:1px;">
-            <img src="card_components/icons/Icon - Stat - DEF.png" style="width:9px;height:9px;object-fit:contain;" alt="">
-            <span id="tAltDef" style="font-size:10px;font-weight:900;color:#4a9fd4;line-height:1;font-family:'ArmadaCondensed',sans-serif;"></span>
+            <span id="tAltDef" style="font-size:15px;font-weight:900;color:#444;line-height:1;font-family:'ArmadaCondensed',sans-serif;"></span>
           </div>
         </div>
 
@@ -614,8 +612,10 @@ select option { background: var(--panel2); }
             <span id="tWave" style="font-size:5.5px;color:#888;font-weight:600;letter-spacing:0.8px;text-transform:uppercase;font-family:'OpenSansBold',sans-serif;"></span>
           </div>
           <span id="tId" style="font-size:6.5px;font-weight:700;color:#999;letter-spacing:0.5px;font-family:'OpenSansBold',sans-serif;"></span>
-          <span id="tCredit" style="font-size:5px;color:#555;text-align:right;line-height:1.35;font-family:'OpenSansBold',sans-serif;"></span>
         </div>
+
+        <!-- Credit — standalone for independent positioning -->
+        <div id="tCredit" class="card-text" style="font-size:8px;color:#555;text-align:right;line-height:1.35;font-family:'OpenSansBold',sans-serif;bottom:1%;right:3%;"></div>
 
         <!-- Stars — alt mode only, positioned independently -->
         <div id="tStarsFooter" class="card-text" style="display:none;bottom:5%;left:9.7%;align-items:center;gap:2px;"></div>
@@ -1087,7 +1087,8 @@ function render() {
   g('abilityBoxWide').style.bottom = posAbilityBox + '%';
   g('statsBar').style.bottom       = '27.7%';
   g('tModeLabel').style.bottom     = '26.6%';
-  g('altModePanel').style.bottom   = '7.5%';
+  g('altModePanel').style.bottom   = '17%';
+  g('altModePanel').style.right    = '8.1%';
 
   // Stats bar (Character / Promo only)
   g('statsBar').style.display = config.hasStats ? 'flex' : 'none';
@@ -1105,7 +1106,7 @@ function render() {
   g('altModePanel').style.display = showAltMode ? '' : 'none';
   if (showAltMode) {
     // Label shows the OTHER mode
-    g('tAltModeLabel').textContent = 'ALT MODE';
+    g('tAltModeLabel').textContent = 'ALT';
     g('tAltAtk').textContent = g('altAtk').value || '0';
     g('tAltDef').textContent = g('altDef').value || '0';
   }
@@ -1168,7 +1169,9 @@ function render() {
   // Footer text
   g('tWave').textContent  = g('cardWave').value;
   g('tId').textContent    = g('cardId').value;
-  g('tCredit').innerHTML  = (g('cardCredit').value || '') + '<br>Not endorsed by Hasbro/WotC';
+  g('tCredit').innerHTML  = g('cardCredit').value || '';
+  g('tCredit').style.bottom = '4.6%';
+  g('tCredit').style.right  = '22.2%';
 
   saveToStorage();
   renderBack();
@@ -1524,6 +1527,8 @@ function renderBack() {
     const f = g(id), b = p(id);
     if (f && b) b.textContent = f.textContent;
   });
+  const bCredit = p('tCredit');
+  if (bCredit) { bCredit.style.bottom = '4.6%'; bCredit.style.right = '22.2%'; }
 
   // tStarsFooter is built directly in renderBack() above — no mirror needed
 
@@ -1542,7 +1547,7 @@ function renderBack() {
 
   // Mode labels
   const bModeLabel = p('tModeLabel');     if (bModeLabel)    bModeLabel.textContent    = 'ALT MODE';
-  const bAltModeLabel = bq('tAltModeLabel'); if (bAltModeLabel) bAltModeLabel.textContent = 'BOT MODE';
+  const bAltModeLabel = bq('tAltModeLabel'); if (bAltModeLabel) bAltModeLabel.textContent = 'BOT';
 
   // Corner panel shows bot ATK/DEF on the alt mode card
   const bAltAtk = bq('tAltAtk'); if (bAltAtk) bAltAtk.textContent = g('statAtk').value || '0';
