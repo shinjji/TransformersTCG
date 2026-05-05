@@ -39,7 +39,6 @@
             </optgroup>
             <optgroup label="Other">
               <option value="Stratagem - Small">Stratagem — Small</option>
-              <option value="PromoCharacter - Standard">Promo Character</option>
             </optgroup>
           </select>
         </div>
@@ -451,16 +450,6 @@ const CARD_CONFIGS = {
     traitBarTop: null,
     artTop: '0%',   // art fills from top on stratagem
   },
-  'PromoCharacter - Standard': {
-    folder: 'promo',
-    layers: ['Main Frame','Traits'],
-    hasFaction: false, hasModeBox: true, hasTraits: true, hasHeaderMask: false,
-    hasStats: true, isStratagem: false,
-    maxTraits: 4,
-    modeBoxOptions: ['Double-Sided','Triple-Sided'],
-    traitBarTop: '12.5%',
-    artTop: '16%',
-  },
 };
 
 /* ── Layer display list for the right panel ── */
@@ -688,13 +677,6 @@ function render() {
     const modeBoxVal = g('modeBox').value;
     if (modeBoxVal) setLayer('lModeBox', cp(`ModeBox ${modeBoxVal}`));
 
-  }
-
-  else if (folder === 'promo') {
-    setLayer('lMainFrame',    cp('Main Frame'));
-    setLayer('lHeaderOverlay', cp('Faction Overlay Background'));
-    const modeBoxVal = g('modeBox').value;
-    if (modeBoxVal) setLayer('lModeBox', cp(`Mode ${modeBoxVal}`));
   }
 
   else if (folder === 'battle') {
