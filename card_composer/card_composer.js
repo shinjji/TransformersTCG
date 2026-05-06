@@ -325,6 +325,7 @@ function render() {
       }
     }
     setLayer('lTextbox',       cp('Textbox'));
+    const lTextboxEl = g('lTextbox'); if (lTextboxEl) lTextboxEl.style.opacity = '0.85';
     setLayer('lSetSlash',      cp('Set Slash'));
     if (config.hasHeaderMask) setLayer('lHeaderMask', cp('Header Mask'));
 
