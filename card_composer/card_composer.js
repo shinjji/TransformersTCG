@@ -249,6 +249,7 @@ function onTypeChange() {
   g('cardSubtitle').previousElementSibling.textContent = subLabel;
 
   buildTraitRows();
+  updateExportBtn();
   render();
 }
 
@@ -699,31 +700,63 @@ function loadJSON() {
   catch(e) { alert('Invalid JSON: ' + e.message); }
 }
 
+/* ── Filename builder ── */
+function buildFilename(side) {
+  // Wave number: extract digits from wave field e.g. "WAVE 8" → "8"
+  const waveNum = (g('cardWave').value || '').match(/\d+/)?.[0] || '0';
+
+  // Type letter: C / B / S
+  const typeKey = g('cardType').value;
+  const typeLetter = typeKey.startsWith('Character') ? 'C'
+                   : typeKey.startsWith('Battle')    ? 'B'
+                   : typeKey.startsWith('Stratagem') ? 'S' : 'X';
+
+  // Card number: first T-number in the ID field e.g. "CT T02   T31" → "002"
+  const idMatch = (g('cardId').value || '').match(/T(\d+)/);
+  const cardNum = idMatch ? idMatch[1].padStart(3, '0') : '000';
+
+  return `FMW${waveNum}_${typeLetter}_${cardNum}_${side}`;
+}
+
 /* ── PNG Export ── */
+function updateExportBtn() {
+  const hasTwoSides = g('backCardCol')?.style.display !== 'none';
+  const btn = g('exportBtn');
+  if (btn) btn.textContent = hasTwoSides ? 'Export PNGs ↓' : 'Export PNG ↓';
+}
+
+async function exportCard(cardEl, filename) {
+  cardEl.style.borderRadius = '0';
+  const canvas = await html2canvas(cardEl, {
+    scale: 3,
+    useCORS: true,
+    allowTaint: true,
+    backgroundColor: '#111111',
+    logging: false,
+  });
+  cardEl.style.borderRadius = '';
+  const link = document.createElement('a');
+  link.download = filename;
+  link.href = canvas.toDataURL('image/png');
+  link.click();
+}
+
 async function exportPNG() {
   const btn = g('exportBtn');
   btn.textContent = 'Generating…';
   btn.disabled = true;
   try {
-    const card = g('card');
-    card.style.borderRadius = '0';
-    const canvas = await html2canvas(card, {
-      scale: 3,
-      useCORS: true,
-      allowTaint: true,
-      backgroundColor: '#111111',
-      logging: false,
-    });
-    card.style.borderRadius = '';
-    const link = document.createElement('a');
-    const name = (g('cardName').value || 'card').toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g,'');
-    link.download = `tftcg-${name}.png`;
-    link.href = canvas.toDataURL('image/png');
-    link.click();
+    const hasTwoSides = g('backCardCol')?.style.display !== 'none';
+    if (hasTwoSides) {
+      await exportCard(g('card'),   buildFilename('f') + '.png');
+      await exportCard(g('b_card'), buildFilename('b') + '.png');
+    } else {
+      await exportCard(g('card'), buildFilename('f') + '.png');
+    }
   } catch(e) {
     alert('Export failed: ' + e.message + '\n\nTip: serve via "python3 -m http.server 8080" and open localhost:8080 for best results with local images.');
   } finally {
-    btn.textContent = 'Export PNG ↓';
+    updateExportBtn();
     btn.disabled = false;
   }
 }
