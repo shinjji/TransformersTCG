@@ -239,6 +239,7 @@ function injectBundledFonts() {
     { family: 'OpenSansSemiBold',   file: 'fonts/Font - Traits - OpenSans SemiBold.ttf',                             fmt: 'truetype' },
     { family: 'OpenSansBold',       file: 'fonts/Font - Wave, Credits - OpenSans Bold.ttf',                          fmt: 'truetype' },
     { family: 'OpenSansSCMedItal',  file: 'fonts/Font - Stratagem Target - OpenSans SemiCondensed MediumItalic.ttf', fmt: 'truetype' },
+    { family: 'CybertonicFont',     file: 'fonts/Font - Cybertonian - Giedi Ancient Autobot.ttf',                     fmt: 'truetype' },
   ];
   const hasBundle = typeof CARD_COMPONENTS_BUNDLE !== 'undefined';
   const css = FONTS.map(({ family, file, fmt }) => {
@@ -534,7 +535,9 @@ function render() {
   // ── Text overlays ──
 
   // Name
-  g('tName').textContent = (g('cardName').value || 'CARD NAME').toUpperCase();
+  const nameText = (g('cardName').value || 'CARD NAME').toUpperCase();
+  g('tName').textContent = nameText;
+  if (g('tCyberName')) g('tCyberName').textContent = nameText;
 
   // Subtitle: normal for character/battle; faction-banner centred for stratagem
   const subtitle = (g('cardSubtitle').value || '').toUpperCase();
@@ -958,6 +961,7 @@ async function exportCard(cardEl, filename) {
 
         // Per-element upward shift (px) to align exports with the browser preview.
         const SHIFT = {
+          tCyberName:    2,
           tName:         1,
           tSubtitle:     2,
           tTraitBar:     2,
@@ -1172,7 +1176,7 @@ function renderBack() {
   });
 
   // Mirror simple text fields
-  ['tName','tCredit'].forEach(id => {
+  ['tName','tCredit','tCyberName'].forEach(id => {
     const f = g(id), b = p(id);
     if (f && b) b.textContent = f.textContent;
   });

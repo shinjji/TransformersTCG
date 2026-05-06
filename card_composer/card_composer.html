@@ -13,7 +13,7 @@
 <header>
   <h1>TRANSFORMERS TCG</h1>
   <span class="subtitle">Card Composer</span>
-  <span class="tag" style="margin-left:auto;">v0.29</span>
+  <span class="tag" style="margin-left:auto;">v0.30</span>
 </header>
 
 <div class="app">
@@ -254,6 +254,15 @@
 
         <!-- ── Text overlays ── -->
 
+        <!-- Cybertonian watermark name — decorative, top-right of header -->
+        <div id="tCyberName" class="card-text" style="
+          top:1.5%; right:2%;
+          font-family:'CybertonicFont',sans-serif;
+          font-size:15px; color:rgba(210,210,210,0.3);
+          text-transform:uppercase; letter-spacing:2px;
+          text-align:right; white-space:nowrap; overflow:hidden;
+          pointer-events:none;"></div>
+
         <!-- Name (Bayformers font, top-left of header) -->
         <div id="tName" class="card-text" style="
           top:5%; left:4%; right:16%;
@@ -441,6 +450,6 @@
         integrity="sha512-BNaRQnYJYiPSqHHDb58B0yaPfCu+Wgds8Gp/gU33kqBtgNS4tSPHuGibyoeqMV/TJlSKda6FXzoEyYGjTe+vXA=="
         crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 <script src="card_components_bundle.js"></script>
-<script src="card_composer.js?v=29"></script>
+<script src="card_composer.js?v=30"></script>
 </body>
 </html>

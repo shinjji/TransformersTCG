@@ -35,6 +35,7 @@ FONTS = [
     'fonts/Font - Traits - OpenSans SemiBold.ttf',
     'fonts/Font - Wave, Credits - OpenSans Bold.ttf',
     'fonts/Font - Stratagem Target - OpenSans SemiCondensed MediumItalic.ttf',
+    'fonts/Font - Cybertonian - Giedi Ancient Autobot.ttf',
 ]
 
 def collect_files():
