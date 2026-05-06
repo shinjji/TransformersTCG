@@ -6,450 +6,57 @@
 <title>CARD COMPOSER</title>
 <link rel="icon" type="image/png" href="https://wsrv.nl/?url=https://drive.google.com/uc?export=view%26id=1fzWFPem8tnny1MTXyDgVMYxo1KbbxOVK&output=webp&q=90">
 <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;400;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="card_composer.css?v=4">
+<link rel="stylesheet" href="card_composer.css?v=5">
 </head>
 <body>
 
 <header>
   <h1>TRANSFORMERS TCG</h1>
   <span class="subtitle">Card Composer</span>
-  <span class="tag" style="margin-left:auto;">v0.30</span>
+  <div class="composer-tabs" id="composerTabs">
+    <button class="composer-tab active" data-composer="character"      onclick="switchComposer('character')">Character</button>
+    <button class="composer-tab"        data-composer="battle_action"  onclick="switchComposer('battle_action')">Battle</button>
+  </div>
+  <span class="tag" style="margin-left:auto;">v1.0</span>
 </header>
 
-<div class="app">
-
-  <!-- ── LEFT: Controls ── -->
-  <div class="controls-panel">
-
-    <!-- Card Type -->
-    <div class="section" id="sec-type">
-      <div class="section-header" onclick="toggleSec('type')">Card Type <span class="chevron">▾</span></div>
-      <div class="section-body">
-        <div class="field">
-          <label>Type</label>
-          <select id="cardType" onchange="onTypeChange()">
-            <optgroup label="Character">
-              <option value="Character - Standard">Character - Standard</option>
-              <option value="Character - Slim" disabled>Character - Slim</option>
-              <option value="Character - Small" disabled>Character - Small</option>
-            </optgroup>
-            <optgroup label="Other - Small">
-              <option value="Battle - Action" disabled>Battle Action</option>
-              <option value="Battle - Upgrade" disabled>Battle Upgrade</option>
-              <option value="Stratagem - Small" disabled>Stratagem</option>
-            </optgroup>
-          </select>
-        </div>
-        <div class="field" id="factionField">
-          <label>Faction</label>
-          <select id="faction" onchange="render()">
-            <option>Autobot</option>
-            <option>Decepticon</option>
-            <option>Junkion</option>
-            <option selected>Mercenary</option>
-            <option>Quintesson</option>
-            <option>Unicronian</option>
-          </select>
-        </div>
-        <div class="field" id="faction2Field" style="display:none;">
-          <label>Second Faction</label>
-          <select id="faction2" onchange="render()">
-            <option value="">- None -</option>
-            <option>Autobot</option>
-            <option>Decepticon</option>
-            <option>Junkion</option>
-            <option>Mercenary</option>
-            <option>Quintesson</option>
-            <option>Unicronian</option>
-          </select>
-        </div>
-        <div class="field" id="upgradeTypeField" style="display:none;">
-          <label>Upgrade Type</label>
-          <select id="upgradeType" onchange="render()">
-            <option value="Attack">Attack</option>
-            <option value="Defense">Defense</option>
-          </select>
-        </div>
-      </div>
-    </div>
-
-    <!-- Identity -->
-    <div class="section" id="sec-identity">
-      <div class="section-header" onclick="toggleSec('identity')">Identity <span class="chevron">▾</span></div>
-      <div class="section-body">
-        <div class="field">
-          <label>Name</label>
-          <input type="text" id="cardName" value="OPTIMUS PRIME" oninput="render()">
-        </div>
-        <div class="field">
-          <label>Subtitle</label>
-          <input type="text" id="cardSubtitle" value="LEGENDARY AUTOBOT COMMANDER" oninput="render()">
-        </div>
-      </div>
-    </div>
-
-    <!-- Traits -->
-    <div class="section" id="sec-traits">
-      <div class="section-header" onclick="toggleSec('traits')">Traits <span class="chevron">▾</span></div>
-      <div class="section-body">
-        <div style="font-size:9px;color:var(--label);letter-spacing:0.7px;text-transform:uppercase;margin-bottom:4px;">Bot Mode</div>
-        <div id="traitRows"></div>
-        <div style="font-size:9px;color:var(--label);letter-spacing:0.7px;text-transform:uppercase;margin-top:10px;margin-bottom:4px;">Alt Mode</div>
-        <div id="altTraitRows"></div>
-        <div style="margin-top:6px;display:flex;flex-direction:column;gap:4px;" id="traitXSliders">
-          <div style="font-size:9px;color:var(--label);letter-spacing:0.7px;text-transform:uppercase;margin-bottom:2px;">X Position</div>
-          <div id="traitXSliderRows"></div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Stats -->
-    <div class="section" id="sec-stats">
-      <div class="section-header" onclick="toggleSec('stats')">Stats <span class="chevron">▾</span></div>
-      <div class="section-body">
-        <div class="field" id="modeBoxRow">
-          <label>Mode Box</label>
-          <select id="modeBox" onchange="render()">
-            <option value="">None</option>
-            <option value="1 Mode">1 Mode</option>
-            <option value="One Mode">One Mode</option>
-            <option value="2 Modes" selected>2 Modes</option>
-            <option value="3 Modes">3 Modes</option>
-            <option value="Choose One">Choose One</option>
-          </select>
-        </div>
-        <div style="font-size:10px;font-weight:700;letter-spacing:1px;color:#888;text-transform:uppercase;margin:6px 0 4px;">Bot Mode</div>
-        <div class="row-2">
-          <div class="field"><label>ATK</label><input type="number" id="statAtk" value="5" min="0" max="99" oninput="render()"></div>
-          <div class="field"><label>DEF</label><input type="number" id="statDef" value="2" min="0" max="99" oninput="render()"></div>
-        </div>
-        <div class="field">
-          <label>HP</label><input type="number" id="statHp" value="13" min="0" max="99" oninput="render()" style="max-width:80px;">
-        </div>
-        <div id="altStatsRow">
-          <div style="font-size:10px;font-weight:700;letter-spacing:1px;color:#888;text-transform:uppercase;margin:10px 0 4px;">Alt Mode</div>
-          <div class="row-2">
-            <div class="field"><label>ATK</label><input type="number" id="altAtk" value="4" min="0" max="99" oninput="render()"></div>
-            <div class="field"><label>DEF</label><input type="number" id="altDef" value="3" min="0" max="99" oninput="render()"></div>
-          </div>
-        </div>
-        <div class="field">
-          <label>Stars</label>
-          <input type="number" id="starCount" value="0" min="0" max="30" oninput="render()">
-        </div>
-        <div style="display:flex;gap:14px;">
-          <label style="display:flex;align-items:center;gap:5px;font-size:10px;color:var(--label);cursor:pointer;">
-            <input type="checkbox" id="starsUse5" onchange="render()"> Use 5s
-          </label>
-          <label style="display:flex;align-items:center;gap:5px;font-size:10px;color:var(--label);cursor:pointer;">
-            <input type="checkbox" id="starsUse10" onchange="render()"> Use 10s
-          </label>
-        </div>
-      </div>
-    </div>
-
-    <!-- Ability -->
-    <div class="section" id="sec-ability">
-      <div class="section-header" onclick="toggleSec('ability')">Ability Text <span class="chevron">▾</span></div>
-      <div class="section-body">
-        <div class="row-2">
-          <div class="field"><label>Font Size</label><input type="number" id="abilityFontSize" value="7.5" min="4" max="20" step="0.5" oninput="render()"></div>
-        </div>
-        <div class="field"><label>Bot Mode Text</label><textarea id="abilityBody" oninput="render()" style="min-height:100px;">When you flip to this mode → You may draw 2 cards. Your opponents' characters get -1 Attack until end of turn.</textarea></div>
-        <div class="field"><label>Position</label><div style="display:flex;align-items:center;gap:6px;"><input type="range" id="posAbilityBox" min="0" max="50" step="0.1" value="14" oninput="g('posAbilityBoxVal').textContent=this.value+'%';render()" style="flex:1;"><span id="posAbilityBoxVal" style="font-size:10px;color:var(--muted);min-width:34px;">14%</span></div></div>
-        <div id="altAbilitySection" style="margin-top:6px;padding-top:6px;border-top:1px solid var(--border);">
-          <div class="row-2">
-            <div class="field"><label>Font Size</label><input type="number" id="altAbilityFontSize" value="7.5" min="4" max="20" step="0.5" oninput="render()"></div>
-          </div>
-          <div class="field" style="margin-top:6px;"><label>Alt Mode Text</label><textarea id="altAbilityBody" oninput="render()" style="min-height:100px;"></textarea></div>
-          <div class="field"><label>Position</label><div style="display:flex;align-items:center;gap:6px;"><input type="range" id="posAltAbilityBox" min="0" max="50" step="0.1" value="14" oninput="g('posAltAbilityBoxVal').textContent=this.value+'%';render()" style="flex:1;"><span id="posAltAbilityBoxVal" style="font-size:10px;color:var(--muted);min-width:34px;">14%</span></div></div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Artwork -->
-    <div class="section" id="sec-art">
-      <div class="section-header" onclick="toggleSec('art')">Artwork <span class="chevron">▾</span></div>
-      <div class="section-body">
-        <div style="font-size:9px;color:var(--label);letter-spacing:0.7px;text-transform:uppercase;margin-bottom:4px;">Bot Mode</div>
-        <div class="field">
-          <input type="file" id="artUpload" accept="image/*" onchange="loadArt(this,'bot')"
-            style="font-size:11px;color:var(--muted);cursor:pointer;padding:4px 0;">
-          <span id="artSizeWarning" style="display:none;font-size:10px;color:#e67e22;">
-            ⚠ Image over 5 MB — won't be saved in local storage.
-          </span>
-        </div>
-        <div class="field"><label>Vertical Position</label><input type="range" id="artPosY" min="-100" max="100" value="0" oninput="render()" style="padding:0;border:none;background:none;"></div>
-        <div class="field"><label>Scale</label><input type="range" id="artScale" min="50" max="220" value="100" oninput="render()" style="padding:0;border:none;background:none;"></div>
-
-        <div style="font-size:9px;color:var(--label);letter-spacing:0.7px;text-transform:uppercase;margin-top:10px;margin-bottom:4px;">Alt Mode</div>
-        <div class="field">
-          <input type="file" id="altArtUpload" accept="image/*" onchange="loadArt(this,'alt')"
-            style="font-size:11px;color:var(--muted);cursor:pointer;padding:4px 0;">
-          <span id="altArtSizeWarning" style="display:none;font-size:10px;color:#e67e22;">
-            ⚠ Image over 5 MB — won't be saved in local storage.
-          </span>
-        </div>
-        <div class="field"><label>Vertical Position</label><input type="range" id="altArtPosY" min="-100" max="100" value="0" oninput="renderBack()" style="padding:0;border:none;background:none;"></div>
-        <div class="field"><label>Scale</label><input type="range" id="altArtScale" min="50" max="220" value="100" oninput="renderBack()" style="padding:0;border:none;background:none;"></div>
-      </div>
-    </div>
-
-    <!-- Card Info -->
-    <div class="section" id="sec-info">
-      <div class="section-header" onclick="toggleSec('info')">Card Details <span class="chevron">▾</span></div>
-      <div class="section-body">
-        <div class="row-2">
-          <div class="field"><label>Wave</label><input type="text" id="cardWave" value="WAVE 8" oninput="render()"></div>
-          <div class="field"><label>Card ID</label><input type="text" id="cardId" value="CT T01/T38" oninput="render()"></div>
-        </div>
-        <div class="field"><label>Credits</label><input type="text" id="cardCredit" value="Art by Artist Name" oninput="render()"></div>
-      </div>
-    </div>
-
-    <!-- Actions -->
-    <div class="btn-row">
-      <button class="btn btn-secondary" onclick="copyJSON()">Copy JSON</button>
-      <button class="btn btn-secondary" onclick="loadJSON()">Load JSON</button>
-    </div>
-    <button class="btn btn-primary" id="exportBtn" onclick="exportPNG()">Export PNG ↓</button>
-    <button class="btn btn-secondary" onclick="resetToDefaults()" style="width:100%;margin-top:2px;color:#e05a5a;border-color:#5a2a2a;flex-shrink:0;flex-grow:0;">↺ Reset to Defaults</button>
-
-  </div>
-
-  <!-- ── CENTER: Card Preview ── -->
-  <div class="preview-area">
-    <div class="cards-display" id="cardsDisplay">
-
-      <!-- Front card -->
-      <div class="card-col">
-        <div class="card-col-label" id="frontLabel">FRONT</div>
-        <div class="card-wrapper" id="cardWrapper">
-      <div class="card" id="card">
-
-        <!-- Artwork (bottom, normal blend) -->
-        <img id="lArt" class="card-layer" style="display:none; object-fit:cover; object-position:center top; mix-blend-mode:normal;">
-
-        <!-- Structural layers (bottom → top) -->
-        <img id="lGradient"      class="card-layer" alt="">
-        <img id="lHeaderMask"    class="card-layer" alt="">
-        <img id="lTrait4"        class="card-layer" alt="">
-        <img id="lTrait3"        class="card-layer" alt="">
-        <img id="lTrait2"        class="card-layer" alt="">
-        <img id="lTrait1"        class="card-layer" alt="">
-        <img id="lTextbox"       class="card-layer" alt="">
-        <img id="lMainFrame"     class="card-layer" alt="">
-        <img id="lModeBox"       class="card-layer" alt="">
-        <img id="lSetSlash"      class="card-layer" alt="">
-        <img id="lStarSep"       class="card-layer" alt="">
-        <img id="lStamp" src="" alt="" style="position:absolute;bottom:3.4%;left:2.4%;width:6.6%;height:auto;pointer-events:none;display:none;">
-        <img id="lHeaderBg"      class="card-layer" alt="">
-        <img id="lHeaderOverlay"  class="card-layer" alt="">
-        <img id="lHeaderOverlay2" class="card-layer" alt="">
-        <img id="lHeaderLines"   class="card-layer" alt="">
-        <img id="lFactionFrame"  class="card-layer" alt="">
-        <img id="lFactionIcon"   class="card-layer" alt="">
-        <img id="lFactionIcon2"  class="card-layer" alt="">
-        <img id="lFactionDual"   class="card-layer" alt="">
-
-        <!-- ── Text overlays ── -->
-
-        <!-- Cybertonian watermark name — decorative, top-right of header -->
-        <div id="tCyberName" class="card-text" style="
-          top:1.5%; right:2%;
-          font-family:'CybertonicFont',sans-serif;
-          font-size:15px; color:rgba(210,210,210,0.3);
-          text-transform:uppercase; letter-spacing:2px;
-          text-align:right; white-space:nowrap; overflow:hidden;
-          pointer-events:none;"></div>
-
-        <!-- Name (Bayformers font, top-left of header) -->
-        <div id="tName" class="card-text" style="
-          top:5%; left:4%; right:16%;
-          font-family:'BayformersName','Segoe UI',sans-serif;
-          font-size:32px; color:#fff; text-transform:uppercase;
-          letter-spacing:1px;
-          line-height:1; white-space:nowrap; overflow:hidden;"></div>
-
-        <!-- Subtitle - character cards: small text below name -->
-        <div id="tSubtitle" class="card-text" style="
-          top:10.5%; left:4%; right:16%;
-          font-family:'GothamNarrow','Segoe UI',sans-serif;
-          font-size:9px; font-weight:700; color:#fff; text-transform:uppercase;
-          letter-spacing:1px;
-          white-space:nowrap; overflow:hidden;"></div>
-
-        <!-- Stratagem subtitle - rendered differently (italic, centered in faction banner) -->
-        <div id="tStratagemSubtitle" class="card-text" style="
-          top:9%; left:4%; right:4%;
-          font-family:'GothamNarrowItalic','Georgia',serif;
-          font-size:8px; font-weight:700; color:#fff;
-          letter-spacing:1px; text-align:center;
-          text-shadow:1px 1px 2px rgba(0,0,0,0.9);
-          display:none;"></div>
-
-
-        <!-- Trait bar - single HORIZONTAL row across the card (position set by JS per card type) -->
-        <div id="tTraitBar" class="card-text" style="
-          left:3%; right:3%; height:20px;
-          display:none; align-items:center; overflow:hidden;"></div>
-
-        <!-- Stats bar (Character cards only; hidden for Battle/Stratagem) -->
-        <div id="statsBar" class="card-text" style="
-          bottom:27.7%; left:1%; right:1%; height:32px;
-          display:flex; align-items:center; justify-content:space-between;
-          padding:0 8px;">
-          <div style="display:flex;align-items:center;margin-left:36px;">
-            <span id="tAtk" style="font-size:26px;font-weight:900;color:#fff;font-family:'ArmadaCondensed',sans-serif;line-height:1;"></span>
-          </div>
-          <div style="display:flex;align-items:center;margin-left:66px;">
-            <span id="tHp" style="font-size:26px;font-weight:900;color:#fff;font-family:'ArmadaCondensed',sans-serif;line-height:1;"></span>
-          </div>
-          <div style="display:flex;align-items:center;margin-right:52px;">
-            <span id="tDef" style="font-size:26px;font-weight:900;color:#fff;font-family:'ArmadaCondensed',sans-serif;line-height:1;"></span>
-          </div>
-        </div>
-        <!-- Mode label - independent of stats flex row -->
-        <div id="tModeLabel" class="card-text" style="font-size:7px;font-weight:700;letter-spacing:1.5px;color:#fff;text-transform:uppercase;font-family:'OpenSansSCBold',sans-serif;text-align:center;bottom:26.6%;left:calc(50% - 43px);transform:translateX(-50%);height:32px;display:flex;align-items:center;"></div>
-
-        <!-- Ability text box (left portion; right side reserved for mode box) -->
-        <div id="abilityBox" class="card-text" style="bottom:14%;left:12%;right:23%;font-size:7.5px;line-height:1.45;color:#1a1a1a;text-align:center;">
-          <span id="tAbilityName" style="font-weight:700;font-style:italic;font-family:'GothamNarrowItalic','Georgia',serif;"></span>
-          <span id="tAbilityParen" style="font-style:italic;font-family:'GothamNarrowItalic','Georgia',serif;"></span>
-          <span id="tAbilityBody" style="font-family:'GothamNarrow','Arial',sans-serif;"></span>
-        </div>
-
-        <!-- Battle / Stratagem ability text (wider, centred) - no mode box on right -->
-        <div id="abilityBoxWide" class="card-text" style="bottom:6%;left:4%;right:4%;font-size:8.5px;line-height:1.55;color:#1a1a1a;text-align:center;display:none;">
-          <div id="tAbilityBodyWide" style="font-family:'GothamNarrow','Arial',sans-serif;"></div>
-          <div id="tAbilityParenWide" style="font-style:italic;font-family:'GothamNarrowItalic','Georgia',serif;margin-top:4px;"></div>
-        </div>
-
-        <!-- Mode box alt stats (bottom-right, inside mode box component area) -->
-        <div id="altModePanel" class="card-text" style="right:1.5%;bottom:7.5%;width:15%;text-align:center;line-height:1.6;">
-          <div id="tAltModeLabel" style="font-size:10px;letter-spacing:0.8px;color:#444;font-weight:700;text-transform:uppercase;font-family:'OpenSansBold',sans-serif;margin-left:10px;"></div>
-          <div style="display:flex;align-items:center;justify-content:center;gap:1px;margin-top:4px;">
-            <span id="tAltAtk" style="font-size:15px;font-weight:900;color:#444;line-height:1;font-family:'ArmadaCondensed',sans-serif;"></span>
-          </div>
-          <div style="display:flex;align-items:center;justify-content:center;gap:1px;">
-            <span id="tAltDef" style="font-size:15px;font-weight:900;color:#444;line-height:1;font-family:'ArmadaCondensed',sans-serif;"></span>
-          </div>
-        </div>
-
-        <!-- Wave, ID, Credit - standalone for independent positioning -->
-        <span id="tWave" class="card-text" style="font-size:8px;color:#fff;font-weight:600;letter-spacing:0.8px;text-transform:uppercase;font-family:'OpenSansBold',sans-serif;bottom:4.6%;left:3%;"></span>
-        <span id="tId" class="card-text" style="font-size:8px;font-weight:700;color:#fff;letter-spacing:0.5px;font-family:'OpenSansBold',sans-serif;bottom:4.6%;left:30%;white-space:pre;"></span>
-        <div id="tCredit" class="card-text" style="font-size:8px;color:#fff;text-align:right;line-height:1.35;font-family:'OpenSansBold',sans-serif;bottom:4.6%;right:3%;"></div>
-
-        <!-- Stars - alt mode only, positioned independently -->
-        <div id="tStarsFooter" class="card-text" style="display:none;bottom:5%;left:9.7%;align-items:center;gap:2px;"></div>
-
-      </div><!-- .card -->
-        </div><!-- .card-wrapper front -->
-      </div><!-- .card-col front -->
-
-      <!-- Back card (cloned by JS; hidden for Battle types) -->
-      <div class="card-col" id="backCardCol">
-        <div class="card-col-label" id="backLabel">BACK</div>
-        <div class="card-wrapper" id="b_cardWrapper"></div>
-      </div><!-- .card-col back -->
-
-    </div><!-- .cards-display -->
-
-  </div>
-
-  <!-- ── RIGHT: Progress panel ── -->
-  <div class="layers-panel">
-    <div class="layers-title">Progress</div>
-
-    <!-- Progress bar -->
-    <div class="progress-bar-track">
-      <div class="progress-bar-fill" id="progressBarFill"></div>
-    </div>
-    <div class="progress-label" id="progressLabel">0 / 7 complete</div>
-
-    <!-- Steps -->
-    <div class="progress-steps" id="progressSteps">
-      <label class="progress-step">
-        <input type="checkbox" id="prog_type" onchange="updateProgress()">
-        <div class="progress-step-body">
-          <span class="progress-step-name">Card Type &amp; Faction</span>
-        </div>
-      </label>
-      <label class="progress-step">
-        <input type="checkbox" id="prog_identity" onchange="updateProgress()">
-        <div class="progress-step-body">
-          <span class="progress-step-name">Identity</span>
-        </div>
-      </label>
-      <label class="progress-step">
-        <input type="checkbox" id="prog_traits" onchange="updateProgress()">
-        <div class="progress-step-body">
-          <span class="progress-step-name">Traits</span>
-        </div>
-      </label>
-      <label class="progress-step">
-        <input type="checkbox" id="prog_stats" onchange="updateProgress()">
-        <div class="progress-step-body">
-          <span class="progress-step-name">Stats</span>
-        </div>
-      </label>
-      <label class="progress-step">
-        <input type="checkbox" id="prog_ability" onchange="updateProgress()">
-        <div class="progress-step-body">
-          <span class="progress-step-name">Abilities</span>
-        </div>
-      </label>
-      <label class="progress-step">
-        <input type="checkbox" id="prog_artwork" onchange="updateProgress()">
-        <div class="progress-step-body">
-          <span class="progress-step-name">Artwork</span>
-        </div>
-      </label>
-      <label class="progress-step">
-        <input type="checkbox" id="prog_info" onchange="updateProgress()">
-        <div class="progress-step-body">
-          <span class="progress-step-name">Card Details</span>
-        </div>
-      </label>
-    </div>
-
-    <div style="flex:1;"></div>
-
-    <!-- Zoom controls -->
-    <div class="preview-controls" style="padding-top:10px;border-top:1px solid var(--border);margin-top:10px;justify-content:center;">
-      <button class="zoom-btn" onclick="zoom(-0.1)">−</button>
-      <span class="zoom-display" id="zoomDisplay">100%</span>
-      <button class="zoom-btn" onclick="zoom(0.1)">+</button>
-      <button class="zoom-btn" onclick="resetZoom()">Reset</button>
-    </div>
-  </div>
-
-</div><!-- .app -->
-
-<!-- Load JSON Modal -->
-<div id="jsonModal" class="modal-backdrop" onclick="closeJSONModal(event)">
-  <div class="modal">
-    <div class="modal-header">
-      <span class="modal-title">Load JSON</span>
-      <button class="modal-close" onclick="closeJSONModal()">✕</button>
-    </div>
-    <div class="modal-body">
-      <label class="modal-label">Paste card JSON below</label>
-      <textarea id="jsonInput" class="modal-textarea" placeholder='{ "cardType": "Character - Standard", ... }'></textarea>
-      <div id="jsonError" class="modal-error"></div>
-    </div>
-    <div class="modal-footer">
-      <button class="btn btn-secondary" onclick="closeJSONModal()">Cancel</button>
-      <button class="btn btn-primary" onclick="confirmLoadJSON()" style="flex:1;">Load</button>
-    </div>
-  </div>
+<div class="app" id="appMount">
+  <!-- Active composer injects controls + preview + progress panel here -->
 </div>
 
+<!-- Scripts: bundle first, then shared utilities, then each composer -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"
-        integrity="sha512-BNaRQnYJYiPSqHHDb58B0yaPfCu+Wgds8Gp/gU33kqBtgNS4tSPHuGibyoeqMV/TJlSKda6FXzoEyYGjTe+vXA=="
-        crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+  crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 <script src="card_components_bundle.js"></script>
-<script src="card_composer.js?v=30"></script>
+<script src="card_composer_shared.js"></script>
+<script src="composers/character.js"></script>
+<script src="composers/battle_action.js"></script>
+
+<script>
+  // ── Shell controller ────────────────────────────────────────────────
+  let _activeComposer = null;
+  let _activeKey = null;
+
+  function switchComposer(key) {
+    if (key === _activeKey) return;
+    _activeKey = key;
+    // Update tab active state
+    document.querySelectorAll('.composer-tab').forEach(btn => {
+      btn.classList.toggle('active', btn.dataset.composer === key);
+    });
+    if (_activeComposer && _activeComposer.destroy) _activeComposer.destroy();
+    const mountEl = document.getElementById('appMount');
+    mountEl.innerHTML = '';
+    _activeComposer = window.Composers[key];
+    if (_activeComposer) _activeComposer.init(mountEl);
+  }
+
+  // Inject fonts once (shared across all composers)
+  injectBundledFonts();
+
+  // Load the default composer on startup
+  switchComposer('character');
+</script>
+
 </body>
 </html>
