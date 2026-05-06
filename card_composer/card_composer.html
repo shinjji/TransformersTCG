@@ -40,6 +40,7 @@
   function switchComposer(key) {
     if (key === _activeKey) return;
     _activeKey = key;
+    try { localStorage.setItem('tfComposerKey', key); } catch(e) {}
     // Update tab active state
     document.querySelectorAll('.composer-tab').forEach(btn => {
       btn.classList.toggle('active', btn.dataset.composer === key);
@@ -54,8 +55,9 @@
   // Inject fonts once (shared across all composers)
   injectBundledFonts();
 
-  // Load the default composer on startup
-  switchComposer('character');
+  // Restore last active composer, defaulting to character
+  const _savedKey = (() => { try { return localStorage.getItem('tfComposerKey'); } catch(e) { return null; } })();
+  switchComposer((_savedKey && window.Composers[_savedKey]) ? _savedKey : 'character');
 </script>
 
 </body>
