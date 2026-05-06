@@ -156,6 +156,41 @@ function abilityImgSrc(name) {
   return null;
 }
 
+// Pre-converted black versions of trait/stat images — used in ability text
+// so html2canvas exports them correctly (CSS filter:brightness(0) is not supported).
+const _blackCache = new Map();
+
+async function preconvertBlackImages() {
+  const keys = [
+    ...TRAIT_NAMES.map(n => `traits/Trait - ${n}.png`),
+    'icons/Icon - Stat - ATK.png',
+    'icons/Icon - Stat - DEF.png',
+    'icons/Icon - Stat - HEALTH.png',
+  ];
+  await Promise.all(keys.map(key => new Promise(resolve => {
+    const src = assetUrl(key);
+    const img = new Image();
+    img.onload = () => {
+      try {
+        const canvas = document.createElement('canvas');
+        canvas.width = img.width; canvas.height = img.height;
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(img, 0, 0);
+        const id = ctx.getImageData(0, 0, canvas.width, canvas.height);
+        for (let i = 0; i < id.data.length; i += 4) {
+          if (id.data[i + 3] > 0) { id.data[i] = id.data[i+1] = id.data[i+2] = 0; }
+        }
+        ctx.putImageData(id, 0, 0);
+        _blackCache.set(key, canvas.toDataURL('image/png'));
+      } catch(e) { /* canvas tainted (file:// protocol) — CSS filter fallback used */ }
+      resolve();
+    };
+    img.onerror = resolve;
+    img.crossOrigin = 'anonymous';
+    img.src = src;
+  })));
+}
+
 // Always inject @font-face rules — uses bundle base64 when available, file paths for local dev.
 // CSS no longer contains @font-face so there's only one source of truth.
 function injectBundledFonts() {
@@ -189,10 +224,21 @@ function formatAbilityText(text) {
     .replace(/\*\*(.+?)\*\*/g, '<span style="font-family:\'GothamNarrowMedium\',sans-serif;">$1</span>')
     .replace(/\*([^*]+?)\*/g, '<span style="font-family:\'GothamNarrowItalic\',sans-serif;">$1</span>')
     .replace(/\[([^\]]+)\]/g, (_, name) => {
-      const src = abilityImgSrc(name);
-      const filter = (name.startsWith('Trait - ') || name.startsWith('Icon - Stat - ')) ? 'filter:brightness(0);' : '';
+      let src = abilityImgSrc(name);
+      const needsBlack = name.startsWith('Trait - ') || name.startsWith('Icon - Stat - ');
+      if (needsBlack) {
+        const key = name.startsWith('Trait - ') ? `traits/${name}.png` : `icons/${name}.png`;
+        const black = _blackCache.get(key);
+        if (black) {
+          src = black; // use pre-converted black data URL (works in html2canvas exports)
+        } else {
+          // fallback: CSS filter for live preview only (html2canvas won't honour it)
+          const height = name.startsWith('Icon - Small ') ? '1.11em' : '1.3em';
+          return src ? `<img src="${src}" style="height:${height};width:auto;vertical-align:middle;filter:brightness(0);">` : `[${name}]`;
+        }
+      }
       const height = name.startsWith('Icon - Small ') ? '1.11em' : '1.3em';
-      return src ? `<img src="${src}" style="height:${height};width:auto;vertical-align:middle;${filter}">` : `[${name}]`;
+      return src ? `<img src="${src}" style="height:${height};width:auto;vertical-align:middle;">` : `[${name}]`;
     })
     .replace(/\n/g, '<span style="display:block;height:0.2em;"></span>');
 }
@@ -1156,3 +1202,6 @@ onTypeChange(); // sets mode box options etc.
 loadFromStorage(); // restore saved state, falls back to render() if nothing saved
 loadProgressFromStorage();
 restoreSections();
+// Pre-convert trait/stat images to black for html2canvas export compatibility,
+// then re-render so ability text immediately uses the black data URLs.
+preconvertBlackImages().then(() => { render(); renderBack(); });
