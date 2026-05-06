@@ -77,7 +77,7 @@ function buildTraitRows() {
     <div class="trait-row">
       <span class="trait-num">${i}</span>
       <select id="${prefix ? prefix+'Trait' : 'trait'}Type${i}" class="main" onchange="render()">
-        <option value="">— none —</option>${traitOpts}
+        <option value="">— None —</option>${traitOpts}
       </select>
       <select id="${prefix ? prefix+'Trait' : 'trait'}Size${i}" class="size" onchange="render()">
         <option value="Short">Short</option>
@@ -112,7 +112,7 @@ function onTypeChange() {
   const config = CARD_CONFIGS[g('cardType').value];
   const modeBoxSel = g('modeBox');
   const current = modeBoxSel.value;
-  modeBoxSel.innerHTML = '<option value="">None</option>' +
+  modeBoxSel.innerHTML = '<option value="">- None -</option>' +
     config.modeBoxOptions.map(o =>
       `<option value="${o}"${o===current?' selected':''}>${o}</option>`
     ).join('');
@@ -795,7 +795,7 @@ function getHTML() {
         <div class="field" id="modeBoxRow">
           <label>Mode Box</label>
           <select id="modeBox" onchange="render()">
-            <option value="">None</option>
+            <option value="">- None -</option>
             <option value="2 Modes" selected>2 Modes</option>
           </select>
         </div>
