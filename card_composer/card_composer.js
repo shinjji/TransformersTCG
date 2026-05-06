@@ -906,28 +906,40 @@ function updateExportBtn() {
 }
 
 async function exportCard(cardEl, filename) {
-  // Wait for all custom @font-face fonts to be loaded so html2canvas gets correct metrics
+  // Ensure all custom @font-face fonts are loaded before capture
   await document.fonts.ready;
 
+  const savedRadius = cardEl.style.borderRadius;
   cardEl.style.borderRadius = '0';
   try {
-    const canvas = await html2canvas(cardEl, {
-      scale: 3,
-      useCORS: true,
-      allowTaint: true,
-      backgroundColor: '#111111',
-      logging: false,
-      // foreignObjectRendering delegates layout+text to the browser's own engine,
-      // eliminating the few-pixel text-position drift caused by html2canvas's
-      // internal canvas text renderer using slightly different font metrics.
-      foreignObjectRendering: true,
-    });
-    const link = document.createElement('a');
-    link.download = filename;
-    link.href = canvas.toDataURL('image/png');
-    link.click();
+    // html-to-image uses the browser's own SVG-foreignObject rendering path,
+    // so text positions and font metrics exactly match the live preview.
+    // html2canvas has its own internal text engine that drifts a few pixels.
+    if (typeof htmlToImage !== 'undefined') {
+      const dataUrl = await htmlToImage.toPng(cardEl, {
+        pixelRatio: 3,
+        backgroundColor: '#111111',
+      });
+      const link = document.createElement('a');
+      link.download = filename;
+      link.href = dataUrl;
+      link.click();
+    } else {
+      // Fallback to html2canvas if html-to-image didn't load (e.g. offline)
+      const canvas = await html2canvas(cardEl, {
+        scale: 3,
+        useCORS: true,
+        allowTaint: true,
+        backgroundColor: '#111111',
+        logging: false,
+      });
+      const link = document.createElement('a');
+      link.download = filename;
+      link.href = canvas.toDataURL('image/png');
+      link.click();
+    }
   } finally {
-    cardEl.style.borderRadius = '';
+    cardEl.style.borderRadius = savedRadius;
   }
 }
 
