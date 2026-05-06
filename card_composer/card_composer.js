@@ -906,36 +906,28 @@ function updateExportBtn() {
 }
 
 async function exportCard(cardEl, filename) {
-  // Clone the card into a fixed off-screen position at top:0 so html2canvas sees zero
-  // scroll offset — this prevents the few-pixel downward shift caused by the scrolled
-  // .preview-area container pushing getBoundingClientRect() values off by its scrollTop.
-  const clone = cardEl.cloneNode(true);
-  Object.assign(clone.style, {
-    position:     'fixed',
-    top:          '0px',
-    left:         '-99999px',
-    width:        cardEl.offsetWidth  + 'px',
-    height:       cardEl.offsetHeight + 'px',
-    borderRadius: '0',
-    overflow:     'hidden',
-    transform:    'none',
-    zIndex:       '-9999',
-  });
-  document.body.appendChild(clone);
+  // Wait for all custom @font-face fonts to be loaded so html2canvas gets correct metrics
+  await document.fonts.ready;
+
+  cardEl.style.borderRadius = '0';
   try {
-    const canvas = await html2canvas(clone, {
+    const canvas = await html2canvas(cardEl, {
       scale: 3,
       useCORS: true,
       allowTaint: true,
       backgroundColor: '#111111',
       logging: false,
+      // foreignObjectRendering delegates layout+text to the browser's own engine,
+      // eliminating the few-pixel text-position drift caused by html2canvas's
+      // internal canvas text renderer using slightly different font metrics.
+      foreignObjectRendering: true,
     });
     const link = document.createElement('a');
     link.download = filename;
     link.href = canvas.toDataURL('image/png');
     link.click();
   } finally {
-    document.body.removeChild(clone);
+    cardEl.style.borderRadius = '';
   }
 }
 
