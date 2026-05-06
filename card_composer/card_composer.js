@@ -693,6 +693,41 @@ function copyJSON() {
     .catch(() => { const t = document.createElement('textarea'); t.value = JSON.stringify(getState(),null,2); document.body.appendChild(t); t.select(); document.execCommand('copy'); document.body.removeChild(t); alert('Copied!'); });
 }
 
+function resetToDefaults() {
+  if (!confirm('Reset everything to defaults? This will clear all card data and cannot be undone.')) return;
+  try { localStorage.removeItem('tfCardState'); localStorage.removeItem('tfCardArt'); } catch(e) {}
+  artworkSrc = null;
+  // Reset all inputs to their default values
+  g('cardType').value    = 'Character - Standard';
+  g('faction').value     = 'Autobot';
+  if (g('faction2'))     g('faction2').value = '';
+  g('cardName').value    = 'CARD NAME';
+  g('cardSubtitle').value = '';
+  g('starCount').value   = '0';
+  if (g('starsUse5'))  g('starsUse5').checked  = false;
+  if (g('starsUse10')) g('starsUse10').checked = false;
+  g('statAtk').value  = '0';
+  g('statHp').value   = '0';
+  g('statDef').value  = '0';
+  g('altAtk').value   = '0';
+  g('altDef').value   = '0';
+  g('abilityBody').value    = '';
+  g('altAbilityBody').value = '';
+  g('abilityFontSize').value    = '7.5';
+  g('altAbilityFontSize').value = '7.5';
+  g('posAbilityBox').value    = '14';
+  g('posAltAbilityBox').value = '14';
+  g('posAbilityBoxVal').textContent    = '14%';
+  g('posAltAbilityBoxVal').textContent = '14%';
+  g('artPosY').value  = '0';
+  g('artScale').value = '100';
+  g('cardWave').value   = '';
+  g('cardId').value     = '';
+  g('cardCredit').value = '';
+  if (g('artUpload')) g('artUpload').value = '';
+  onTypeChange();
+}
+
 function loadJSON() {
   const json = prompt('Paste card JSON:');
   if (!json) return;
