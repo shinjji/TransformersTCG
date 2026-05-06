@@ -90,8 +90,54 @@ const CARD_CONFIGS = {
 
 
 /* ── State ── */
-let artworkSrc = null;
+let artworkSrc    = null;
+let altArtworkSrc = null;
 let zoomLevel = 1;
+
+/* ── IndexedDB artwork store (no size limit unlike localStorage) ── */
+const artStore = (() => {
+  let _db = null;
+  const DB   = 'tfCardArtDB';
+  const STOR = 'artworks';
+
+  function openDB() {
+    return new Promise((res, rej) => {
+      const req = indexedDB.open(DB, 1);
+      req.onupgradeneeded = e => e.target.result.createObjectStore(STOR);
+      req.onsuccess = e => { _db = e.target.result; res(_db); };
+      req.onerror   = e => rej(e.target.error);
+    });
+  }
+  async function db() { return _db || openDB(); }
+
+  return {
+    async set(key, val) {
+      const d = await db();
+      return new Promise((res, rej) => {
+        const tx = d.transaction(STOR, 'readwrite');
+        tx.objectStore(STOR).put(val, key);
+        tx.oncomplete = res; tx.onerror = e => rej(e.target.error);
+      });
+    },
+    async get(key) {
+      const d = await db();
+      return new Promise((res, rej) => {
+        const tx  = d.transaction(STOR, 'readonly');
+        const req = tx.objectStore(STOR).get(key);
+        req.onsuccess = e => res(e.target.result ?? null);
+        req.onerror   = e => rej(e.target.error);
+      });
+    },
+    async del(key) {
+      const d = await db();
+      return new Promise((res, rej) => {
+        const tx = d.transaction(STOR, 'readwrite');
+        tx.objectStore(STOR).delete(key);
+        tx.oncomplete = res; tx.onerror = e => rej(e.target.error);
+      });
+    },
+  };
+})();
 
 /* ── Helpers ── */
 const g = id => document.getElementById(id);
@@ -485,16 +531,25 @@ function render() {
 }
 
 /* ── Artwork loader ── */
-function loadArt(input) {
+function loadArt(input, mode) {
   const file = input.files[0];
   if (!file) return;
-  if (file.size > 5 * 1024 * 1024) {
-    g('artSizeWarning').style.display = '';
-  } else {
-    g('artSizeWarning').style.display = 'none';
-  }
+  const isAlt     = mode === 'alt';
+  const warnId    = isAlt ? 'altArtSizeWarning' : 'artSizeWarning';
+  const warnEl    = g(warnId);
+  if (warnEl) warnEl.style.display = file.size > 5 * 1024 * 1024 ? '' : 'none';
   const reader = new FileReader();
-  reader.onload = e => { artworkSrc = e.target.result; render(); };
+  reader.onload = e => {
+    if (isAlt) {
+      altArtworkSrc = e.target.result;
+      artStore.set('alt', altArtworkSrc).catch(() => {});
+      renderBack();
+    } else {
+      artworkSrc = e.target.result;
+      artStore.set('bot', artworkSrc).catch(() => {});
+      render();
+    }
+  };
   reader.readAsDataURL(file);
 }
 
@@ -565,6 +620,8 @@ function getState() {
     altAbilityBody: g('altAbilityBody').value,
     artPosY: g('artPosY').value,
     artScale: g('artScale').value,
+    altArtPosY: g('altArtPosY')?.value || '0',
+    altArtScale: g('altArtScale')?.value || '100',
     cardWave: g('cardWave').value,
     cardId: g('cardId').value,
     cardCredit: g('cardCredit').value,
@@ -594,8 +651,10 @@ function applyState(s) {
   });
   set('abilityBody',        s.abilityBody);
   set('altAbilityBody', s.altAbilityBody);
-  set('artPosY',        s.artPosY);
+  set('artPosY',     s.artPosY);
   set('artScale',    s.artScale);
+  set('altArtPosY',  s.altArtPosY);
+  set('altArtScale', s.altArtScale);
   set('cardWave',    s.cardWave);
   set('cardId',      s.cardId);
   set('cardCredit',  s.cardCredit);
@@ -628,32 +687,39 @@ function applyState(s) {
   render();
 }
 
-/* ── localStorage persistence ── */
+/* ── Persistence ── */
+// State JSON → localStorage (small, sync-friendly)
+// Artwork images → IndexedDB (large, no quota issues)
 let _saveTimer = null;
 function saveToStorage() {
   clearTimeout(_saveTimer);
   _saveTimer = setTimeout(() => {
-    try {
-      localStorage.setItem('tfCardState', JSON.stringify(getState()));
-    } catch(e) {}
-    if (artworkSrc) {
-      try {
-        localStorage.setItem('tfCardArt', artworkSrc);
-      } catch(e) {
-        // artwork too large for storage quota — skip silently
-      }
-    } else {
-      localStorage.removeItem('tfCardArt');
-    }
+    try { localStorage.setItem('tfCardState', JSON.stringify(getState())); } catch(e) {}
   }, 300);
 }
 
-function loadFromStorage() {
+// State flush on unload (artworks already persisted to IndexedDB on upload)
+window.addEventListener('beforeunload', () => {
+  try { localStorage.setItem('tfCardState', JSON.stringify(getState())); } catch(e) {}
+});
+
+async function loadFromStorage() {
+  // 1. Restore card state (sync)
   try {
     const raw = localStorage.getItem('tfCardState');
     if (raw) applyState(JSON.parse(raw));
-    const art = localStorage.getItem('tfCardArt');
+  } catch(e) {}
+
+  // 2. Restore bot artwork
+  try {
+    const art = await artStore.get('bot');
     if (art) { artworkSrc = art; render(); }
+  } catch(e) {}
+
+  // 3. Restore alt artwork
+  try {
+    const altArt = await artStore.get('alt');
+    if (altArt) { altArtworkSrc = altArt; renderBack(); }
   } catch(e) {}
 }
 
@@ -665,8 +731,14 @@ function copyJSON() {
 
 function resetToDefaults() {
   if (!confirm('Reset everything to defaults? This will clear all card data and cannot be undone.')) return;
-  try { localStorage.removeItem('tfCardState'); localStorage.removeItem('tfCardArt'); } catch(e) {}
+  try { localStorage.removeItem('tfCardState'); } catch(e) {}
+  // Also clear any old localStorage artwork keys from previous versions
+  try { localStorage.removeItem('tfCardArt'); } catch(e) {}
+  try { localStorage.removeItem('tfCardAltArt'); } catch(e) {}
+  artStore.del('bot').catch(() => {});
+  artStore.del('alt').catch(() => {});
   artworkSrc = null;
+  altArtworkSrc = null;
   // Reset all inputs to their default values
   g('cardType').value    = 'Character - Standard';
   g('faction').value     = 'Autobot';
@@ -691,10 +763,13 @@ function resetToDefaults() {
   g('posAltAbilityBoxVal').textContent = '14%';
   g('artPosY').value  = '0';
   g('artScale').value = '100';
+  if (g('altArtPosY'))  g('altArtPosY').value  = '0';
+  if (g('altArtScale')) g('altArtScale').value  = '100';
   g('cardWave').value   = '';
   g('cardId').value     = '';
   g('cardCredit').value = '';
-  if (g('artUpload')) g('artUpload').value = '';
+  if (g('artUpload'))    g('artUpload').value    = '';
+  if (g('altArtUpload')) g('altArtUpload').value = '';
   resetProgress();
   onTypeChange();
 }
@@ -799,17 +874,37 @@ function renderBack() {
   const p = id => g('b_' + id);
   const config = CARD_CONFIGS[g('cardType').value];
 
-  // Mirror every layer image from front → back (lStarSep excluded — alt mode only, set below)
-  const ALL_LAYERS = ['lArt','lGradient','lHeaderBg','lHeaderLines','lHeaderOverlay','lHeaderOverlay2',
+  // Mirror every layer image from front → back (lArt and lStarSep handled separately below)
+  const ALL_LAYERS = ['lGradient','lHeaderBg','lHeaderLines','lHeaderOverlay','lHeaderOverlay2',
     'lMainFrame','lFactionFrame','lFactionIcon','lFactionIcon2','lFactionDual',
     'lTrait1','lTrait2','lTrait3','lTrait4',
     'lModeBox','lTextbox','lHeaderMask'];
   ALL_LAYERS.forEach(id => {
     const f = g(id), b = p(id);
     if (!f || !b) return;
-    b.src              = f.src;
-    b.style.cssText    = f.style.cssText;
+    b.src           = f.src;
+    b.style.cssText = f.style.cssText;
   });
+
+  // Alt artwork — independent of bot art, no fallback
+  const bArtEl = p('lArt');
+  if (bArtEl) {
+    if (altArtworkSrc) {
+      const config2 = CARD_CONFIGS[g('cardType').value];
+      const posY    = parseInt(g('altArtPosY')?.value)  || 0;
+      const scale   = parseInt(g('altArtScale')?.value) || 100;
+      const baseTop = parseFloat(config2.artTop) || 16;
+      bArtEl.src                  = altArtworkSrc;
+      bArtEl.style.display        = '';
+      bArtEl.style.top            = (baseTop + posY * 0.4) + '%';
+      bArtEl.style.height         = scale + '%';
+      bArtEl.style.width          = '100%';
+      bArtEl.style.objectFit      = 'cover';
+      bArtEl.style.objectPosition = 'center top';
+    } else {
+      bArtEl.src = ''; bArtEl.style.display = 'none';
+    }
+  }
 
   // Set Slash + Stamp — front card only
   const bSetSlash = p('lSetSlash');

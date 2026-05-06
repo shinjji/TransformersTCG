@@ -171,16 +171,27 @@
     <div class="section" id="sec-art">
       <div class="section-header" onclick="toggleSec('art')">Artwork <span class="chevron">▾</span></div>
       <div class="section-body">
+        <div style="font-size:9px;color:var(--label);letter-spacing:0.7px;text-transform:uppercase;margin-bottom:4px;">Bot Mode</div>
         <div class="field">
-          <label>Upload Image</label>
-          <input type="file" id="artUpload" accept="image/*" onchange="loadArt(this)"
+          <input type="file" id="artUpload" accept="image/*" onchange="loadArt(this,'bot')"
             style="font-size:11px;color:var(--muted);cursor:pointer;padding:4px 0;">
           <span id="artSizeWarning" style="display:none;font-size:10px;color:#e67e22;">
-            ⚠ Image over 5 MB - artwork won't be saved in local storage.
+            ⚠ Image over 5 MB — won't be saved in local storage.
           </span>
         </div>
         <div class="field"><label>Vertical Position</label><input type="range" id="artPosY" min="-100" max="100" value="0" oninput="render()" style="padding:0;border:none;background:none;"></div>
         <div class="field"><label>Scale</label><input type="range" id="artScale" min="50" max="220" value="100" oninput="render()" style="padding:0;border:none;background:none;"></div>
+
+        <div style="font-size:9px;color:var(--label);letter-spacing:0.7px;text-transform:uppercase;margin-top:10px;margin-bottom:4px;">Alt Mode</div>
+        <div class="field">
+          <input type="file" id="altArtUpload" accept="image/*" onchange="loadArt(this,'alt')"
+            style="font-size:11px;color:var(--muted);cursor:pointer;padding:4px 0;">
+          <span id="altArtSizeWarning" style="display:none;font-size:10px;color:#e67e22;">
+            ⚠ Image over 5 MB — won't be saved in local storage.
+          </span>
+        </div>
+        <div class="field"><label>Vertical Position</label><input type="range" id="altArtPosY" min="-100" max="100" value="0" oninput="renderBack()" style="padding:0;border:none;background:none;"></div>
+        <div class="field"><label>Scale</label><input type="range" id="altArtScale" min="50" max="220" value="100" oninput="renderBack()" style="padding:0;border:none;background:none;"></div>
       </div>
     </div>
 
@@ -429,6 +440,6 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"
         integrity="sha512-BNaRQnYJYiPSqHHDb58B0yaPfCu+Wgds8Gp/gU33kqBtgNS4tSPHuGibyoeqMV/TJlSKda6FXzoEyYGjTe+vXA=="
         crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-<script src="card_composer.js?v=4"></script>
+<script src="card_composer.js?v=9"></script>
 </body>
 </html>
