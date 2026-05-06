@@ -1064,6 +1064,9 @@ function renderBack() {
 /* ── Progress tracker ── */
 const PROGRESS_STEPS = ['type','identity','traits','stats','ability','artwork','info'];
 
+// Guard: don't overwrite saved progress before it has been loaded from storage
+let _progressReady = false;
+
 function updateProgress() {
   const total    = PROGRESS_STEPS.length;
   const done     = PROGRESS_STEPS.filter(s => g('prog_' + s)?.checked).length;
@@ -1083,6 +1086,7 @@ function updateProgress() {
 }
 
 function saveProgressToStorage() {
+  if (!_progressReady) return; // don't save until initial state has been loaded
   const state = {};
   PROGRESS_STEPS.forEach(s => { state[s] = g('prog_' + s)?.checked || false; });
   try { localStorage.setItem('tfCardProgress', JSON.stringify(state)); } catch(e) {}
@@ -1091,14 +1095,16 @@ function saveProgressToStorage() {
 function loadProgressFromStorage() {
   try {
     const raw = localStorage.getItem('tfCardProgress');
-    if (!raw) return;
-    const state = JSON.parse(raw);
-    PROGRESS_STEPS.forEach(s => {
-      const el = g('prog_' + s);
-      if (el && state[s] !== undefined) el.checked = state[s];
-    });
-    updateProgress();
+    if (raw) {
+      const state = JSON.parse(raw);
+      PROGRESS_STEPS.forEach(s => {
+        const el = g('prog_' + s);
+        if (el && state[s] !== undefined) el.checked = state[s];
+      });
+    }
   } catch(e) {}
+  _progressReady = true; // now safe to save
+  updateProgress();      // update bar + button with restored state
 }
 
 function resetProgress() {
