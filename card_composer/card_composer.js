@@ -1030,7 +1030,7 @@ function renderBack() {
         const item = document.createElement('div');
         item.style.cssText = `position:absolute;top:${traitTopPx}px;left:${leftPx}px;width:${displayW}px;height:${T_BAR_H}px;display:flex;align-items:center;gap:8px;padding:0 6px;overflow:hidden;`;
         item.innerHTML =
-          `<img src="card_components/traits/Trait - ${traitName}.png" style="width:17px;height:17px;object-fit:contain;flex-shrink:0;position:relative;top:3px;">` +
+          `<img src="${cc('traits','Trait - '+traitName+'.png')}" style="width:17px;height:17px;object-fit:contain;flex-shrink:0;position:relative;top:3px;">` +
           `<span style="font-size:8px;font-weight:700;color:#fff;text-transform:uppercase;letter-spacing:0.5px;font-family:'OpenSansSemiBold',sans-serif;white-space:nowrap;">${traitName.toUpperCase()}</span>`;
         backTraitBar.appendChild(item);
       }
