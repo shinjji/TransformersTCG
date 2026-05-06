@@ -141,12 +141,43 @@ const artStore = (() => {
 
 /* ── Helpers ── */
 const g = id => document.getElementById(id);
-const cc = (folder, file) => `card_components/${folder}/${file}`;
+
+// Look up asset from bundle (hosted) or fall back to file path (local dev)
+function assetUrl(key) {
+  return (typeof CARD_COMPONENTS_BUNDLE !== 'undefined' && CARD_COMPONENTS_BUNDLE[key])
+    ? CARD_COMPONENTS_BUNDLE[key]
+    : `card_components/${key}`;
+}
+const cc = (folder, file) => assetUrl(`${folder}/${file}`);
 
 function abilityImgSrc(name) {
-  if (name.startsWith('Trait - ')) return `card_components/traits/${name}.png`;
-  if (name.startsWith('Icon - '))  return `card_components/icons/${name}.png`;
+  if (name.startsWith('Trait - ')) return assetUrl(`traits/${name}.png`);
+  if (name.startsWith('Icon - '))  return assetUrl(`icons/${name}.png`);
   return null;
+}
+
+// Inject @font-face rules from bundle (overrides CSS file-path rules when hosted)
+function injectBundledFonts() {
+  if (typeof CARD_COMPONENTS_BUNDLE === 'undefined') return;
+  const FONTS = [
+    { family: 'BayformersName',     file: 'fonts/Font - Card Name - Bayformers TFTCGName Regular.ttf',          fmt: 'truetype' },
+    { family: 'GothamNarrow',       file: 'fonts/Font - Ability Text - Gotham Narrow-Book.ttf',                 fmt: 'truetype' },
+    { family: 'GothamNarrowMedium', file: 'fonts/Font - Keywords - Gotham Narrow-Medium.otf',                   fmt: 'opentype' },
+    { family: 'GothamNarrowItalic', file: 'fonts/Font - Explanatio Text - Gotham Narrow-Book Italic.otf',       fmt: 'opentype' },
+    { family: 'ArmadaCondensed',    file: 'fonts/Font - Stats - Armada Condensed Bold.otf',                     fmt: 'opentype' },
+    { family: 'OpenSansSCBold',     file: 'fonts/Font - Character Mode - OpenSans SemiCondensed Bold.ttf',      fmt: 'truetype' },
+    { family: 'OpenSansSemiBold',   file: 'fonts/Font - Traits - OpenSans SemiBold.ttf',                        fmt: 'truetype' },
+    { family: 'OpenSansBold',       file: 'fonts/Font - Wave, Credits - OpenSans Bold.ttf',                     fmt: 'truetype' },
+    { family: 'OpenSansSCMedItal',  file: 'fonts/Font - Stratagem Target - OpenSans SemiCondensed MediumItalic.ttf', fmt: 'truetype' },
+  ];
+  const css = FONTS.map(({ family, file, fmt }) => {
+    const src = CARD_COMPONENTS_BUNDLE[file];
+    if (!src) return '';
+    return `@font-face { font-family: '${family}'; src: url('${src}') format('${fmt}'); }`;
+  }).join('\n');
+  const style = document.createElement('style');
+  style.textContent = css;
+  document.head.insertBefore(style, document.head.firstChild);
 }
 
 function formatAbilityText(text) {
@@ -1113,6 +1144,7 @@ function resetProgress() {
 }
 
 /* ── Init ── */
+injectBundledFonts();
 buildBackCard();
 buildTraitRows();
 onTypeChange(); // sets mode box options etc.
