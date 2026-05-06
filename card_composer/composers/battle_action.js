@@ -121,7 +121,14 @@ function render() {
   // Name + Cybertonian watermark
   const nameText = (g('cardName').value || 'CARD NAME').toUpperCase();
   g('tName').textContent = nameText;
-  if (g('tCyberName')) g('tCyberName').textContent = nameText;
+  g('tName').style.left = '45px';
+  g('tName').style.top  = '58px';
+  if (g('tCyberName')) {
+    g('tCyberName').textContent = nameText;
+    g('tCyberName').style.left   = '85px';
+    g('tCyberName').style.top    = '42px';
+    g('tCyberName').style.right  = '';
+  }
 
   // Trait text overlay
   const traitBarEl = g('tTraitBar');
@@ -222,7 +229,7 @@ function resetZoom() { zoomLevel = 1; applyZoom(); }
 /* ── Section toggle ───────────────────────────────────────────────────── */
 function toggleSec(name) {
   g('sec-' + name)?.classList.toggle('collapsed');
-  const collapsed = ['type','traits','ability','art','info']
+  const collapsed = ['type','identity','stats','traits','ability','art','info']
     .filter(n => g('sec-'+n)?.classList.contains('collapsed'));
   try { localStorage.setItem('tfBattleSectionState', JSON.stringify(collapsed)); } catch(e) {}
 }
@@ -410,13 +417,6 @@ function getHTML() {
       </div>
     </div>
 
-    <div class="section" id="sec-traits">
-      <div class="section-header" onclick="toggleSec('traits')">Traits <span class="chevron">▾</span></div>
-      <div class="section-body">
-        <div id="traitRows"></div>
-      </div>
-    </div>
-
     <div class="section" id="sec-identity">
       <div class="section-header" onclick="toggleSec('identity')">Identity <span class="chevron">▾</span></div>
       <div class="section-body">
@@ -424,6 +424,12 @@ function getHTML() {
           <label>Name</label>
           <input type="text" id="cardName" value="ARMED TO THE TEETH" oninput="render()">
         </div>
+      </div>
+    </div>
+
+    <div class="section" id="sec-stats">
+      <div class="section-header" onclick="toggleSec('stats')">Stats <span class="chevron">▾</span></div>
+      <div class="section-body">
         <div class="field">
           <label>Stars</label>
           <input type="number" id="starCount" value="0" min="0" max="30" oninput="render()">
@@ -432,6 +438,13 @@ function getHTML() {
           <label style="display:flex;align-items:center;gap:5px;font-size:10px;color:var(--label);cursor:pointer;"><input type="checkbox" id="starsUse5" onchange="render()"> Use 5s</label>
           <label style="display:flex;align-items:center;gap:5px;font-size:10px;color:var(--label);cursor:pointer;"><input type="checkbox" id="starsUse10" onchange="render()"> Use 10s</label>
         </div>
+      </div>
+    </div>
+
+    <div class="section" id="sec-traits">
+      <div class="section-header" onclick="toggleSec('traits')">Traits <span class="chevron">▾</span></div>
+      <div class="section-body">
+        <div id="traitRows"></div>
       </div>
     </div>
 
@@ -502,8 +515,8 @@ function getHTML() {
             <img id="lFactionFrame"  class="card-layer" alt="">
             <img id="lFactionIcon"   class="card-layer" alt="">
 
-            <div id="tCyberName" class="card-text" style="top:2%;right:2%;font-family:'CybertonicFont',sans-serif;font-size:20px;color:rgba(210,210,210,0.3);text-transform:uppercase;letter-spacing:2px;text-align:right;white-space:nowrap;overflow:hidden;pointer-events:none;"></div>
-            <div id="tName" class="card-text" style="top:5%;left:4%;right:16%;font-family:'BayformersName','Segoe UI',sans-serif;font-size:32px;color:#fff;text-transform:uppercase;letter-spacing:1px;line-height:1;white-space:nowrap;overflow:hidden;"></div>
+            <div id="tCyberName" class="card-text" style="top:2%;right:2%;font-family:'CybertonicFont',sans-serif;font-size:13px;color:rgba(80,80,80,0.85);text-transform:uppercase;letter-spacing:-0.5px;text-align:right;white-space:nowrap;overflow:hidden;pointer-events:none;"></div>
+            <div id="tName" class="card-text" style="font-family:'BayformersName','Segoe UI',sans-serif;font-size:32px;color:#1a1a1a;text-transform:uppercase;letter-spacing:-0.5px;line-height:1;white-space:nowrap;overflow:hidden;"></div>
             <div id="tTraitBar" class="card-text" style="left:3%;right:3%;height:20px;display:block;align-items:center;overflow:hidden;"></div>
             <div id="abilityBoxWide" class="card-text" style="bottom:6%;left:4%;right:4%;font-size:8.5px;line-height:1.55;color:#1a1a1a;text-align:center;">
               <div id="tAbilityBodyWide" style="font-family:'GothamNarrow','Arial',sans-serif;"></div>
