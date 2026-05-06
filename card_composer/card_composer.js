@@ -160,6 +160,11 @@ function abilityImgSrc(name) {
 // so html2canvas exports them correctly (CSS filter:brightness(0) is not supported).
 const _blackCache = new Map();
 
+// Pre-scaled 17×17 trait icon data URLs — html2canvas ignores object-fit:contain,
+// so we pre-render each icon at exactly 17×17 pixels (preserving aspect ratio with
+// letterboxing) and use those as the <img> src instead of the full-size PNG.
+const _traitIconCache = new Map();
+
 async function preconvertBlackImages() {
   const keys = [
     ...TRAIT_NAMES.map(n => `traits/Trait - ${n}.png`),
@@ -188,6 +193,36 @@ async function preconvertBlackImages() {
     img.onerror = resolve;
     img.crossOrigin = 'anonymous';
     img.src = src;
+  })));
+}
+
+async function preconvertTraitIcons() {
+  const CSS_SIZE = 17;
+  // Render at 4× the CSS size so html2canvas (scale:3) has enough source pixels
+  // to produce a crisp result without upscaling blurriness.
+  const RENDER_SIZE = CSS_SIZE * 4;
+  await Promise.all(TRAIT_NAMES.map(name => new Promise(resolve => {
+    const key = `traits/Trait - ${name}.png`;
+    const img = new Image();
+    img.onload = () => {
+      try {
+        const canvas = document.createElement('canvas');
+        canvas.width = canvas.height = RENDER_SIZE;
+        const ctx = canvas.getContext('2d');
+        ctx.imageSmoothingEnabled = true;
+        ctx.imageSmoothingQuality = 'high';
+        // Replicate object-fit:contain — scale to fit within RENDER_SIZE, centred
+        const scale = Math.min(RENDER_SIZE / img.naturalWidth, RENDER_SIZE / img.naturalHeight);
+        const w = img.naturalWidth  * scale;
+        const h = img.naturalHeight * scale;
+        ctx.drawImage(img, (RENDER_SIZE - w) / 2, (RENDER_SIZE - h) / 2, w, h);
+        _traitIconCache.set(name, canvas.toDataURL('image/png'));
+      } catch(e) { /* canvas tainted on file:// — falls back to original src */ }
+      resolve();
+    };
+    img.onerror = resolve;
+    img.crossOrigin = 'anonymous';
+    img.src = assetUrl(key);
   })));
 }
 
@@ -566,7 +601,7 @@ function render() {
       const item = document.createElement('div');
       item.style.cssText = `position:absolute;top:${traitTopPx}px;left:${leftPx}px;width:${displayW}px;height:${T_BAR_H}px;display:flex;align-items:center;gap:8px;padding:0 6px;overflow:hidden;`;
       item.innerHTML =
-        `<img src="${cc('traits','Trait - '+traitName+'.png')}" style="width:17px;height:17px;object-fit:contain;flex-shrink:0;position:relative;top:3px;">` +
+        `<img src="${_traitIconCache.get(traitName) || cc('traits','Trait - '+traitName+'.png')}" width="17" height="17" style="width:17px;height:17px;flex-shrink:0;position:relative;top:3px;">` +
         `<span style="font-size:8px;font-weight:700;color:#fff;text-transform:uppercase;letter-spacing:0.5px;font-family:'OpenSansSemiBold',sans-serif;white-space:nowrap;">${traitName.toUpperCase()}</span>`;
       traitBarEl.appendChild(item);
     }
@@ -919,26 +954,41 @@ async function exportCard(cardEl, filename) {
       backgroundColor: '#111111',
       logging: false,
       onclone: (_doc, clonedCard) => {
-        // html2canvas mis-calculates percentage `bottom` positioning inside
-        // overflow:hidden containers, shifting text down by a few pixels.
-        // Fix: convert every inline bottom:X% / bottom:Xpx to an exact top:Npx
-        // using the original element's browser-rendered height.
-        const CARD_H = cardEl.offsetHeight; // always 530
-        clonedCard.querySelectorAll('*').forEach(el => {
-          const raw = el.style.bottom;
-          if (!raw) return;
-          // Measure height from the original live element (accurate browser value)
-          const origEl = el.id ? cardEl.querySelector('[id="' + el.id + '"]') : null;
-          const elH = origEl ? origEl.offsetHeight : el.offsetHeight;
-          let bottomPx;
-          if (raw.endsWith('%'))  bottomPx = CARD_H * parseFloat(raw) / 100;
-          else if (raw.endsWith('px')) bottomPx = parseFloat(raw);
-          else return;
-          el.style.top    = Math.round(CARD_H - elH - bottomPx) + 'px';
+        clonedCard.style.boxShadow = 'none';
+
+        // Per-element upward shift (px) to align exports with the browser preview.
+        const SHIFT = {
+          tName:         1,
+          tSubtitle:     2,
+          tTraitBar:     2,
+          statsBar:      2,
+          tModeLabel:    1,
+          abilityBox:    2,
+          altModePanel:  1,
+          tWave:         2,
+          tId:           2,
+          tCredit:       2,
+          tStarsFooter:  0,
+        };
+        const cardRect = cardEl.getBoundingClientRect();
+        const zoomY    = cardRect.height / cardEl.offsetHeight;
+        clonedCard.querySelectorAll('.card-text').forEach(el => {
+          if (!el.id) return;
+          const baseId = el.id.replace(/^b_/, ''); // back-card elements have a b_ prefix
+          const shift  = SHIFT[baseId] ?? 2; // default 2px for any unlisted element
+          const orig  = cardEl.querySelector('[id="' + el.id + '"]');
+          if (!orig) return;
+          const relTop = (orig.getBoundingClientRect().top - cardRect.top) / zoomY;
+          el.style.top    = (relTop - shift) + 'px';
           el.style.bottom = '';
         });
-        // Box-shadow is decorative UI chrome — strip it so it can't affect rendering
-        clonedCard.style.boxShadow = 'none';
+
+        // Nudge trait icon <img>s down 2px in the export (text spans are left alone).
+        clonedCard.querySelectorAll('img[width="17"]').forEach(img => {
+          const currentTop = parseFloat(img.style.top) || 3;
+          img.style.top = (currentTop + 2) + 'px';
+        });
+
       },
     });
     const link = document.createElement('a');
@@ -963,7 +1013,7 @@ async function exportPNG() {
       await exportCard(g('card'), buildFilename('f') + '.png');
     }
   } catch(e) {
-    alert('Export failed: ' + e.message + '\n\nTip: serve via "python3 -m http.server 8080" and open localhost:8080 for best results with local images.');
+    alert('Export failed: ' + e.message);
   } finally {
     updateExportBtn(); // sets label and re-applies disabled state from progress
   }
@@ -1107,7 +1157,7 @@ function renderBack() {
         const item = document.createElement('div');
         item.style.cssText = `position:absolute;top:${traitTopPx}px;left:${leftPx}px;width:${displayW}px;height:${T_BAR_H}px;display:flex;align-items:center;gap:8px;padding:0 6px;overflow:hidden;`;
         item.innerHTML =
-          `<img src="${cc('traits','Trait - '+traitName+'.png')}" style="width:17px;height:17px;object-fit:contain;flex-shrink:0;position:relative;top:3px;">` +
+          `<img src="${_traitIconCache.get(traitName) || cc('traits','Trait - '+traitName+'.png')}" width="17" height="17" style="width:17px;height:17px;flex-shrink:0;position:relative;top:3px;">` +
           `<span style="font-size:8px;font-weight:700;color:#fff;text-transform:uppercase;letter-spacing:0.5px;font-family:'OpenSansSemiBold',sans-serif;white-space:nowrap;">${traitName.toUpperCase()}</span>`;
         backTraitBar.appendChild(item);
       }
@@ -1231,6 +1281,6 @@ onTypeChange(); // sets mode box options etc.
 loadFromStorage(); // restore saved state, falls back to render() if nothing saved
 loadProgressFromStorage();
 restoreSections();
-// Pre-convert trait/stat images to black for html2canvas export compatibility,
-// then re-render so ability text immediately uses the black data URLs.
-preconvertBlackImages().then(() => { render(); renderBack(); });
+// Pre-convert images for html2canvas export compatibility, then re-render.
+// Both caches must be ready before render() so icons are correct on first paint.
+Promise.all([preconvertBlackImages(), preconvertTraitIcons()]).then(() => { render(); renderBack(); });
