@@ -906,19 +906,37 @@ function updateExportBtn() {
 }
 
 async function exportCard(cardEl, filename) {
-  cardEl.style.borderRadius = '0';
-  const canvas = await html2canvas(cardEl, {
-    scale: 3,
-    useCORS: true,
-    allowTaint: true,
-    backgroundColor: '#111111',
-    logging: false,
+  // Clone the card into a fixed off-screen position at top:0 so html2canvas sees zero
+  // scroll offset — this prevents the few-pixel downward shift caused by the scrolled
+  // .preview-area container pushing getBoundingClientRect() values off by its scrollTop.
+  const clone = cardEl.cloneNode(true);
+  Object.assign(clone.style, {
+    position:     'fixed',
+    top:          '0px',
+    left:         '-99999px',
+    width:        cardEl.offsetWidth  + 'px',
+    height:       cardEl.offsetHeight + 'px',
+    borderRadius: '0',
+    overflow:     'hidden',
+    transform:    'none',
+    zIndex:       '-9999',
   });
-  cardEl.style.borderRadius = '';
-  const link = document.createElement('a');
-  link.download = filename;
-  link.href = canvas.toDataURL('image/png');
-  link.click();
+  document.body.appendChild(clone);
+  try {
+    const canvas = await html2canvas(clone, {
+      scale: 3,
+      useCORS: true,
+      allowTaint: true,
+      backgroundColor: '#111111',
+      logging: false,
+    });
+    const link = document.createElement('a');
+    link.download = filename;
+    link.href = canvas.toDataURL('image/png');
+    link.click();
+  } finally {
+    document.body.removeChild(clone);
+  }
 }
 
 async function exportPNG() {
