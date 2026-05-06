@@ -6,7 +6,7 @@
 <title>CARD COMPOSER</title>
 <link rel="icon" type="image/png" href="https://wsrv.nl/?url=https://drive.google.com/uc?export=view%26id=1fzWFPem8tnny1MTXyDgVMYxo1KbbxOVK&output=webp&q=90">
 <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;400;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="card_composer.css?v=2">
+<link rel="stylesheet" href="card_composer.css?v=4">
 </head>
 <body>
 
@@ -82,7 +82,7 @@
           <input type="text" id="cardName" value="OPTIMUS PRIME" oninput="render()">
         </div>
         <div class="field">
-          <label>Subtitle / Alt Mode</label>
+          <label>Subtitle</label>
           <input type="text" id="cardSubtitle" value="LEGENDARY AUTOBOT COMMANDER" oninput="render()">
         </div>
       </div>
@@ -186,7 +186,7 @@
 
     <!-- Card Info -->
     <div class="section" id="sec-info">
-      <div class="section-header" onclick="toggleSec('info')">Card Info <span class="chevron">▾</span></div>
+      <div class="section-header" onclick="toggleSec('info')">Card Details <span class="chevron">▾</span></div>
       <div class="section-body">
         <div class="row-2">
           <div class="field"><label>Wave</label><input type="text" id="cardWave" value="WAVE 8" oninput="render()"></div>
@@ -338,10 +338,65 @@
 
   </div>
 
-  <!-- ── RIGHT: Layers panel ── -->
+  <!-- ── RIGHT: Progress panel ── -->
   <div class="layers-panel">
-    <div class="layers-title">Layer Stack</div>
-    <div id="layerStack" style="flex:1;"></div>
+    <div class="layers-title">Progress</div>
+
+    <!-- Progress bar -->
+    <div class="progress-bar-track">
+      <div class="progress-bar-fill" id="progressBarFill"></div>
+    </div>
+    <div class="progress-label" id="progressLabel">0 / 7 complete</div>
+
+    <!-- Steps -->
+    <div class="progress-steps" id="progressSteps">
+      <label class="progress-step">
+        <input type="checkbox" id="prog_type" onchange="updateProgress()">
+        <div class="progress-step-body">
+          <span class="progress-step-name">Card Type &amp; Faction</span>
+        </div>
+      </label>
+      <label class="progress-step">
+        <input type="checkbox" id="prog_identity" onchange="updateProgress()">
+        <div class="progress-step-body">
+          <span class="progress-step-name">Identity</span>
+        </div>
+      </label>
+      <label class="progress-step">
+        <input type="checkbox" id="prog_traits" onchange="updateProgress()">
+        <div class="progress-step-body">
+          <span class="progress-step-name">Traits</span>
+        </div>
+      </label>
+      <label class="progress-step">
+        <input type="checkbox" id="prog_stats" onchange="updateProgress()">
+        <div class="progress-step-body">
+          <span class="progress-step-name">Stats</span>
+        </div>
+      </label>
+      <label class="progress-step">
+        <input type="checkbox" id="prog_ability" onchange="updateProgress()">
+        <div class="progress-step-body">
+          <span class="progress-step-name">Abilities</span>
+        </div>
+      </label>
+      <label class="progress-step">
+        <input type="checkbox" id="prog_artwork" onchange="updateProgress()">
+        <div class="progress-step-body">
+          <span class="progress-step-name">Artwork</span>
+        </div>
+      </label>
+      <label class="progress-step">
+        <input type="checkbox" id="prog_info" onchange="updateProgress()">
+        <div class="progress-step-body">
+          <span class="progress-step-name">Card Details</span>
+        </div>
+      </label>
+    </div>
+
+    <div style="flex:1;"></div>
+
+    <!-- Zoom controls -->
     <div class="preview-controls" style="padding-top:10px;border-top:1px solid var(--border);margin-top:10px;justify-content:center;">
       <button class="zoom-btn" onclick="zoom(-0.1)">−</button>
       <span class="zoom-display" id="zoomDisplay">100%</span>
@@ -374,6 +429,6 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"
         integrity="sha512-BNaRQnYJYiPSqHHDb58B0yaPfCu+Wgds8Gp/gU33kqBtgNS4tSPHuGibyoeqMV/TJlSKda6FXzoEyYGjTe+vXA=="
         crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-<script src="card_composer.js?v=2"></script>
+<script src="card_composer.js?v=4"></script>
 </body>
 </html>

@@ -88,28 +88,6 @@ const CARD_CONFIGS = {
   },
 };
 
-/* ── Layer display list for the right panel ── */
-const LAYER_LABELS = [
-  { id: 'lArt',          label: 'Character Art' },
-  { id: 'lHeaderBg',     label: 'Header Background' },
-  { id: 'lGradient',     label: 'Gradient' },
-  { id: 'lHeaderMask',   label: 'Header Mask' },
-  { id: 'lMainFrame',    label: 'Main Frame' },
-  { id: 'lTrait1',       label: 'Trait 1' },
-  { id: 'lTrait2',       label: 'Trait 2' },
-  { id: 'lTrait3',       label: 'Trait 3' },
-  { id: 'lTrait4',       label: 'Trait 4' },
-  { id: 'lModeBox',      label: 'Mode Box' },
-  { id: 'lSetSlash',     label: 'Set Slash' },
-  { id: 'lStarSep',      label: 'Star Separator' },
-  { id: 'lTextbox',      label: 'Textbox' },
-  { id: 'lHeaderLines',  label: 'Header Lines' },
-  { id: 'lHeaderOverlay',label: 'Header Overlay' },
-  { id: 'lFactionFrame',  label: 'Faction Icon Frame' },
-  { id: 'lFactionIcon',   label: 'Faction Icon' },
-  { id: 'lFactionIcon2',  label: 'Faction Icon 2' },
-  { id: 'lFactionDual',   label: 'Dual-Faction Line' },
-];
 
 /* ── State ── */
 let artworkSrc = null;
@@ -145,12 +123,6 @@ function setLayer(id, src) {
   if (!el) return;
   if (src) { el.src = src; el.style.display = ''; }
   else      { el.src = ''; el.style.display = 'none'; }
-  // Update layer panel indicator
-  const li = g('li-' + id);
-  if (li) {
-    li.classList.toggle('active', !!src);
-    li.classList.toggle('hidden', !src);
-  }
 }
 
 /* ── Build trait row controls ── */
@@ -245,7 +217,7 @@ function onTypeChange() {
   g('backLabel').textContent  = lbl[1];
 
   // Stratagem subtitle label
-  const subLabel = config.isStratagem ? 'Stratagem Name / Target' : 'Subtitle / Alt Mode';
+  const subLabel = config.isStratagem ? 'Stratagem Name / Target' : 'Subtitle';
   g('cardSubtitle').previousElementSibling.textContent = subLabel;
 
   buildTraitRows();
@@ -374,8 +346,6 @@ function render() {
           const xAdj = parseInt(g(`traitOffX${slot}`)?.value) || 0;
           el.src = src;
           el.style.cssText = `position:absolute; display:block; pointer-events:none; top:${traitTopPx}px; left:${offsetRight + (TRAIT_X_BASE[slot]||0) + xAdj}px; width:${displayW}px; height:${BAR_H}px; object-fit:fill;`;
-          const li = g('li-lTrait' + slot);
-          if (li) { li.classList.add('active'); li.classList.remove('hidden'); }
         } else {
           el.style.display = 'none';
         }
@@ -725,6 +695,7 @@ function resetToDefaults() {
   g('cardId').value     = '';
   g('cardCredit').value = '';
   if (g('artUpload')) g('artUpload').value = '';
+  resetProgress();
   onTypeChange();
 }
 
@@ -992,23 +963,48 @@ function renderBack() {
   }
 }
 
-/* ── Build layers panel ── */
-function buildLayersPanel() {
-  const stack = g('layerStack');
-  stack.innerHTML = '';
-  [...LAYER_LABELS].reverse().forEach(({ id, label }) => {
-    const div = document.createElement('div');
-    div.id = 'li-' + id;
-    div.className = 'layer-item active';
-    div.innerHTML = `<div class="layer-dot"></div><span style="flex:1">${label}</span>`;
-    stack.appendChild(div);
-  });
+/* ── Progress tracker ── */
+const PROGRESS_STEPS = ['type','identity','traits','stats','ability','artwork','info'];
+
+function updateProgress() {
+  const total = PROGRESS_STEPS.length;
+  const done  = PROGRESS_STEPS.filter(s => g('prog_' + s)?.checked).length;
+  const pct   = Math.round((done / total) * 100);
+  const fill  = g('progressBarFill');
+  const label = g('progressLabel');
+  if (fill)  { fill.style.width = pct + '%'; fill.classList.toggle('complete', done === total); }
+  if (label) label.textContent = done === total ? '✦ Complete' : `${done} / ${total} complete`;
+  saveProgressToStorage();
+}
+
+function saveProgressToStorage() {
+  const state = {};
+  PROGRESS_STEPS.forEach(s => { state[s] = g('prog_' + s)?.checked || false; });
+  try { localStorage.setItem('tfCardProgress', JSON.stringify(state)); } catch(e) {}
+}
+
+function loadProgressFromStorage() {
+  try {
+    const raw = localStorage.getItem('tfCardProgress');
+    if (!raw) return;
+    const state = JSON.parse(raw);
+    PROGRESS_STEPS.forEach(s => {
+      const el = g('prog_' + s);
+      if (el && state[s] !== undefined) el.checked = state[s];
+    });
+    updateProgress();
+  } catch(e) {}
+}
+
+function resetProgress() {
+  PROGRESS_STEPS.forEach(s => { const el = g('prog_' + s); if (el) el.checked = false; });
+  updateProgress();
 }
 
 /* ── Init ── */
-buildLayersPanel();
 buildBackCard();
 buildTraitRows();
 onTypeChange(); // sets mode box options etc.
 loadFromStorage(); // restore saved state, falls back to render() if nothing saved
+loadProgressFromStorage();
 restoreSections();
