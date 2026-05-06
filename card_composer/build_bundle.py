@@ -52,6 +52,10 @@ def collect_files():
     for path in sorted(glob.glob(os.path.join(BASE, 'icons', '*.png'))):
         files.append(path)
 
+    # Stamp SVG(s)
+    for path in sorted(glob.glob(os.path.join(BASE, 'stamp', '*.svg'))):
+        files.append(path)
+
     # Specific fonts only
     for rel in FONTS:
         path = os.path.join(BASE, rel)

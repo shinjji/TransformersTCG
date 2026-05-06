@@ -156,24 +156,26 @@ function abilityImgSrc(name) {
   return null;
 }
 
-// Inject @font-face rules from bundle (overrides CSS file-path rules when hosted)
+// Always inject @font-face rules — uses bundle base64 when available, file paths for local dev.
+// CSS no longer contains @font-face so there's only one source of truth.
 function injectBundledFonts() {
-  if (typeof CARD_COMPONENTS_BUNDLE === 'undefined') return;
   const FONTS = [
-    { family: 'BayformersName',     file: 'fonts/Font - Card Name - Bayformers TFTCGName Regular.ttf',          fmt: 'truetype' },
-    { family: 'GothamNarrow',       file: 'fonts/Font - Ability Text - Gotham Narrow-Book.ttf',                 fmt: 'truetype' },
-    { family: 'GothamNarrowMedium', file: 'fonts/Font - Keywords - Gotham Narrow-Medium.otf',                   fmt: 'opentype' },
-    { family: 'GothamNarrowItalic', file: 'fonts/Font - Explanatio Text - Gotham Narrow-Book Italic.otf',       fmt: 'opentype' },
-    { family: 'ArmadaCondensed',    file: 'fonts/Font - Stats - Armada Condensed Bold.otf',                     fmt: 'opentype' },
-    { family: 'OpenSansSCBold',     file: 'fonts/Font - Character Mode - OpenSans SemiCondensed Bold.ttf',      fmt: 'truetype' },
-    { family: 'OpenSansSemiBold',   file: 'fonts/Font - Traits - OpenSans SemiBold.ttf',                        fmt: 'truetype' },
-    { family: 'OpenSansBold',       file: 'fonts/Font - Wave, Credits - OpenSans Bold.ttf',                     fmt: 'truetype' },
+    { family: 'BayformersName',     file: 'fonts/Font - Card Name - Bayformers TFTCGName Regular.ttf',               fmt: 'truetype' },
+    { family: 'GothamNarrow',       file: 'fonts/Font - Ability Text - Gotham Narrow-Book.ttf',                      fmt: 'truetype' },
+    { family: 'GothamNarrowMedium', file: 'fonts/Font - Keywords - Gotham Narrow-Medium.otf',                        fmt: 'opentype' },
+    { family: 'GothamNarrowItalic', file: 'fonts/Font - Explanatio Text - Gotham Narrow-Book Italic.otf',            fmt: 'opentype' },
+    { family: 'ArmadaCondensed',    file: 'fonts/Font - Stats - Armada Condensed Bold.otf',                          fmt: 'opentype' },
+    { family: 'OpenSansSCBold',     file: 'fonts/Font - Character Mode - OpenSans SemiCondensed Bold.ttf',           fmt: 'truetype' },
+    { family: 'OpenSansSemiBold',   file: 'fonts/Font - Traits - OpenSans SemiBold.ttf',                             fmt: 'truetype' },
+    { family: 'OpenSansBold',       file: 'fonts/Font - Wave, Credits - OpenSans Bold.ttf',                          fmt: 'truetype' },
     { family: 'OpenSansSCMedItal',  file: 'fonts/Font - Stratagem Target - OpenSans SemiCondensed MediumItalic.ttf', fmt: 'truetype' },
   ];
+  const hasBundle = typeof CARD_COMPONENTS_BUNDLE !== 'undefined';
   const css = FONTS.map(({ family, file, fmt }) => {
-    const src = CARD_COMPONENTS_BUNDLE[file];
-    if (!src) return '';
-    return `@font-face { font-family: '${family}'; src: url('${src}') format('${fmt}'); }`;
+    const src = hasBundle && CARD_COMPONENTS_BUNDLE[file]
+      ? `url('${CARD_COMPONENTS_BUNDLE[file]}') format('${fmt}')`
+      : `url('card_components/${file}') format('${fmt}')`;
+    return `@font-face { font-family: '${family}'; src: ${src}; }`;
   }).join('\n');
   const style = document.createElement('style');
   style.textContent = css;
@@ -1145,6 +1147,9 @@ function resetProgress() {
 
 /* ── Init ── */
 injectBundledFonts();
+// Set stamp src via assetUrl so it works from bundle (hosted) and file path (local dev)
+const _stampEl = g('lStamp');
+if (_stampEl) { _stampEl.src = assetUrl('stamp/wave11_tbc.svg'); _stampEl.style.display = ''; }
 buildBackCard();
 buildTraitRows();
 onTypeChange(); // sets mode box options etc.

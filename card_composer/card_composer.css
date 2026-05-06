@@ -1,39 +1,4 @@
-@font-face {
-  font-family: 'BayformersName';
-  src: url('card_components/fonts/Font - Card Name - Bayformers TFTCGName Regular.ttf') format('truetype');
-}
-@font-face {
-  font-family: 'GothamNarrow';
-  src: url('card_components/fonts/Font - Ability Text - Gotham Narrow-Book.ttf') format('truetype');
-}
-@font-face {
-  font-family: 'GothamNarrowMedium';
-  src: url('card_components/fonts/Font - Keywords - Gotham Narrow-Medium.otf') format('opentype');
-}
-@font-face {
-  font-family: 'GothamNarrowItalic';
-  src: url('card_components/fonts/Font - Explanatio Text - Gotham Narrow-Book Italic.otf') format('opentype');
-}
-@font-face {
-  font-family: 'ArmadaCondensed';
-  src: url('card_components/fonts/Font - Stats - Armada Condensed Bold.otf') format('opentype');
-}
-@font-face {
-  font-family: 'OpenSansSCBold';
-  src: url('card_components/fonts/Font - Character Mode - OpenSans SemiCondensed Bold.ttf') format('truetype');
-}
-@font-face {
-  font-family: 'OpenSansSemiBold';
-  src: url('card_components/fonts/Font - Traits - OpenSans SemiBold.ttf') format('truetype');
-}
-@font-face {
-  font-family: 'OpenSansBold';
-  src: url('card_components/fonts/Font - Wave, Credits - OpenSans Bold.ttf') format('truetype');
-}
-@font-face {
-  font-family: 'OpenSansSCMedItal';
-  src: url('card_components/fonts/Font - Stratagem Target - OpenSans SemiCondensed MediumItalic.ttf') format('truetype');
-}
+/* @font-face rules are injected by injectBundledFonts() in card_composer.js */
 
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
