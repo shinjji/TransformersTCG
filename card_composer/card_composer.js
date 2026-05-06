@@ -906,38 +906,45 @@ function updateExportBtn() {
 }
 
 async function exportCard(cardEl, filename) {
-  // Ensure all custom @font-face fonts are loaded before capture
+  // Ensure all custom @font-face fonts are fully loaded before capture
   await document.fonts.ready;
 
   const savedRadius = cardEl.style.borderRadius;
   cardEl.style.borderRadius = '0';
   try {
-    // html-to-image uses the browser's own SVG-foreignObject rendering path,
-    // so text positions and font metrics exactly match the live preview.
-    // html2canvas has its own internal text engine that drifts a few pixels.
-    if (typeof htmlToImage !== 'undefined') {
-      const dataUrl = await htmlToImage.toPng(cardEl, {
-        pixelRatio: 3,
-        backgroundColor: '#111111',
-      });
-      const link = document.createElement('a');
-      link.download = filename;
-      link.href = dataUrl;
-      link.click();
-    } else {
-      // Fallback to html2canvas if html-to-image didn't load (e.g. offline)
-      const canvas = await html2canvas(cardEl, {
-        scale: 3,
-        useCORS: true,
-        allowTaint: true,
-        backgroundColor: '#111111',
-        logging: false,
-      });
-      const link = document.createElement('a');
-      link.download = filename;
-      link.href = canvas.toDataURL('image/png');
-      link.click();
-    }
+    const canvas = await html2canvas(cardEl, {
+      scale: 3,
+      useCORS: true,
+      allowTaint: true,
+      backgroundColor: '#111111',
+      logging: false,
+      onclone: (_doc, clonedCard) => {
+        // html2canvas mis-calculates percentage `bottom` positioning inside
+        // overflow:hidden containers, shifting text down by a few pixels.
+        // Fix: convert every inline bottom:X% / bottom:Xpx to an exact top:Npx
+        // using the original element's browser-rendered height.
+        const CARD_H = cardEl.offsetHeight; // always 530
+        clonedCard.querySelectorAll('*').forEach(el => {
+          const raw = el.style.bottom;
+          if (!raw) return;
+          // Measure height from the original live element (accurate browser value)
+          const origEl = el.id ? cardEl.querySelector('[id="' + el.id + '"]') : null;
+          const elH = origEl ? origEl.offsetHeight : el.offsetHeight;
+          let bottomPx;
+          if (raw.endsWith('%'))  bottomPx = CARD_H * parseFloat(raw) / 100;
+          else if (raw.endsWith('px')) bottomPx = parseFloat(raw);
+          else return;
+          el.style.top    = Math.round(CARD_H - elH - bottomPx) + 'px';
+          el.style.bottom = '';
+        });
+        // Box-shadow is decorative UI chrome — strip it so it can't affect rendering
+        clonedCard.style.boxShadow = 'none';
+      },
+    });
+    const link = document.createElement('a');
+    link.download = filename;
+    link.href = canvas.toDataURL('image/png');
+    link.click();
   } finally {
     cardEl.style.borderRadius = savedRadius;
   }
