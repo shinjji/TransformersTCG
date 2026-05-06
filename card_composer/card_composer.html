@@ -6,7 +6,7 @@
 <title>CARD COMPOSER</title>
 <link rel="icon" type="image/png" href="https://wsrv.nl/?url=https://drive.google.com/uc?export=view%26id=1fzWFPem8tnny1MTXyDgVMYxo1KbbxOVK&output=webp&q=90">
 <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;400;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="card_composer.css">
+<link rel="stylesheet" href="card_composer.css?v=2">
 </head>
 <body>
 
@@ -352,9 +352,28 @@
 
 </div><!-- .app -->
 
+<!-- Load JSON Modal -->
+<div id="jsonModal" class="modal-backdrop" onclick="closeJSONModal(event)">
+  <div class="modal">
+    <div class="modal-header">
+      <span class="modal-title">Load JSON</span>
+      <button class="modal-close" onclick="closeJSONModal()">✕</button>
+    </div>
+    <div class="modal-body">
+      <label class="modal-label">Paste card JSON below</label>
+      <textarea id="jsonInput" class="modal-textarea" placeholder='{ "cardType": "Character - Standard", ... }'></textarea>
+      <div id="jsonError" class="modal-error"></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeJSONModal()">Cancel</button>
+      <button class="btn btn-primary" onclick="confirmLoadJSON()" style="flex:1;">Load</button>
+    </div>
+  </div>
+</div>
+
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"
         integrity="sha512-BNaRQnYJYiPSqHHDb58B0yaPfCu+Wgds8Gp/gU33kqBtgNS4tSPHuGibyoeqMV/TJlSKda6FXzoEyYGjTe+vXA=="
         crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-<script src="card_composer.js"></script>
+<script src="card_composer.js?v=2"></script>
 </body>
 </html>

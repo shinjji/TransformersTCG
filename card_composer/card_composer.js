@@ -729,10 +729,26 @@ function resetToDefaults() {
 }
 
 function loadJSON() {
-  const json = prompt('Paste card JSON:');
+  g('jsonInput').value = '';
+  g('jsonError').textContent = '';
+  g('jsonModal').classList.add('open');
+  setTimeout(() => g('jsonInput').focus(), 50);
+}
+
+function closeJSONModal(e) {
+  if (e && e.target !== g('jsonModal')) return; // only close on backdrop click
+  g('jsonModal').classList.remove('open');
+}
+
+function confirmLoadJSON() {
+  const json = g('jsonInput').value.trim();
   if (!json) return;
-  try { applyState(JSON.parse(json)); }
-  catch(e) { alert('Invalid JSON: ' + e.message); }
+  try {
+    applyState(JSON.parse(json));
+    g('jsonModal').classList.remove('open');
+  } catch(e) {
+    g('jsonError').textContent = '⚠ Invalid JSON — ' + e.message;
+  }
 }
 
 /* ── Filename builder ── */
