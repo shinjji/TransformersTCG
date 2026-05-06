@@ -819,7 +819,10 @@ function buildFilename(side) {
 function updateExportBtn() {
   const hasTwoSides = g('backCardCol')?.style.display !== 'none';
   const btn = g('exportBtn');
-  if (btn) btn.textContent = hasTwoSides ? 'Export PNGs ↓' : 'Export PNG ↓';
+  if (!btn) return;
+  btn.textContent = hasTwoSides ? 'Export PNGs ↓' : 'Export PNG ↓';
+  // Re-apply disabled state based on current progress
+  updateProgress();
 }
 
 async function exportCard(cardEl, filename) {
@@ -853,8 +856,7 @@ async function exportPNG() {
   } catch(e) {
     alert('Export failed: ' + e.message + '\n\nTip: serve via "python3 -m http.server 8080" and open localhost:8080 for best results with local images.');
   } finally {
-    updateExportBtn();
-    btn.disabled = false;
+    updateExportBtn(); // sets label and re-applies disabled state from progress
   }
 }
 
@@ -1062,13 +1064,20 @@ function renderBack() {
 const PROGRESS_STEPS = ['type','identity','traits','stats','ability','artwork','info'];
 
 function updateProgress() {
-  const total = PROGRESS_STEPS.length;
-  const done  = PROGRESS_STEPS.filter(s => g('prog_' + s)?.checked).length;
-  const pct   = Math.round((done / total) * 100);
-  const fill  = g('progressBarFill');
-  const label = g('progressLabel');
-  if (fill)  { fill.style.width = pct + '%'; fill.classList.toggle('complete', done === total); }
-  if (label) label.textContent = done === total ? '✦ Complete' : `${done} / ${total} complete`;
+  const total    = PROGRESS_STEPS.length;
+  const done     = PROGRESS_STEPS.filter(s => g('prog_' + s)?.checked).length;
+  const complete = done === total;
+  const pct      = Math.round((done / total) * 100);
+  const fill     = g('progressBarFill');
+  const label    = g('progressLabel');
+  const btn      = g('exportBtn');
+  if (fill)  { fill.style.width = pct + '%'; fill.classList.toggle('complete', complete); }
+  if (label) label.textContent = complete ? '✦ Complete' : `${done} / ${total} complete`;
+  if (btn) {
+    btn.disabled = !complete;
+    btn.style.opacity = complete ? '' : '0.4';
+    btn.title = complete ? '' : 'Complete all progress steps to enable export';
+  }
   saveProgressToStorage();
 }
 
