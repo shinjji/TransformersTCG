@@ -54,7 +54,7 @@ function buildTraitRows() {
       <div class="trait-row">
         <span class="trait-num">${i}</span>
         <select id="traitType${i}" class="main" onchange="render()">
-          <option value="">— none —</option>${traitOpts}
+          <option value="">- None -</option>${traitOpts}
         </select>
         <select id="traitSize${i}" class="size" onchange="render()">
           <option value="Short">Short</option>
@@ -75,7 +75,7 @@ function render() {
     'lSetSlash','lModeBox','lStarSep','lFactionFrame','lFactionIcon'];
   ALL_LAYERS.forEach(id => setLayer(id, null));
 
-  setLayer('lHeaderOverlay', cp(`Header Overlay ${faction}`));
+  if (faction) setLayer('lHeaderOverlay', cp(`Header Overlay ${faction}`));
   setLayer('lMainFrame',     cp('Main Frame'));
   setLayer('lSetSlash',      cp('Set Slash'));
   setLayer('lHeaderMask',    cp('Header Mask'));
@@ -145,7 +145,15 @@ function render() {
     traitBarEl.appendChild(item);
   }
 
-  // Ability text (wide, centred — no mode box)
+  // ACTION label — fixed position
+  const actionEl = g('tActionLabel');
+  if (actionEl) {
+    actionEl.textContent = 'Action';
+    actionEl.style.left = '52px';
+    actionEl.style.top  = '309px';
+  }
+
+  // Ability text (wide, centred - no mode box)
   const aFontSize = parseFloat(g('abilityFontSize')?.value) || 8.5;
   const posAb     = parseFloat(g('posAbilityBox')?.value) ?? 6;
   g('abilityBoxWide').style.display  = '';
@@ -291,7 +299,7 @@ function resetToDefaults() {
   try { localStorage.removeItem('tfBattleActionState'); } catch(e) {}
   artStore.del('battle_action_bot').catch(()=>{});
   artworkSrc = null;
-  g('faction').value = 'Autobot'; g('cardName').value = 'CARD NAME';
+  g('faction').value = ''; g('cardName').value = 'CARD NAME';
   g('starCount').value = '0';
   if (g('starsUse5'))  g('starsUse5').checked  = false;
   if (g('starsUse10')) g('starsUse10').checked = false;
@@ -317,7 +325,7 @@ function closeJSONModal(e) {
 function confirmLoadJSON() {
   const json = g('jsonInput').value.trim(); if (!json) return;
   try { applyState(JSON.parse(json)); g('jsonModal').classList.remove('open'); }
-  catch(e) { g('jsonError').textContent = '⚠ Invalid JSON — ' + e.message; }
+  catch(e) { g('jsonError').textContent = '⚠ Invalid JSON - ' + e.message; }
 }
 
 /* ── Filename ─────────────────────────────────────────────────────────── */
@@ -371,7 +379,7 @@ async function exportPNG() {
 }
 
 /* ── HTML template ────────────────────────────────────────────────────── */
-const FACTIONS_HTML = FACTIONS.map(f => `<option>${f}</option>`).join('');
+const FACTIONS_HTML = `<option value="">- None -</option>` + FACTIONS.map(f => `<option>${f}</option>`).join('');
 
 function getHTML() {
   return `
@@ -381,13 +389,20 @@ function getHTML() {
       <div class="section-header" onclick="toggleSec('type')">Card Type <span class="chevron">▾</span></div>
       <div class="section-body">
         <div class="field">
+          <label>Sub-type</label>
+          <select id="battleSubType">
+            <option value="Battle - Action">Battle Action</option>
+            <option value="Battle - Upgrade" disabled>Battle Upgrade</option>
+          </select>
+        </div>
+        <div class="field">
           <label>Faction</label>
           <select id="faction" onchange="render()">${FACTIONS_HTML}</select>
         </div>
-        <div class="field">
+<div class="field">
           <label>Explanation Badge</label>
           <select id="explanationType" onchange="render()">
-            <option value="">None</option>
+            <option value="">- None -</option>
             <option value="Rolling Action">Rolling Action</option>
             <option value="Secret Action">Secret Action</option>
           </select>
@@ -498,6 +513,7 @@ function getHTML() {
             <span id="tId"     class="card-text" style="font-size:8px;font-weight:700;color:#fff;letter-spacing:0.5px;font-family:'OpenSansBold',sans-serif;bottom:4.6%;left:30%;white-space:pre;"></span>
             <div  id="tCredit" class="card-text" style="font-size:8px;color:#fff;text-align:right;line-height:1.35;font-family:'OpenSansBold',sans-serif;bottom:4.6%;right:3%;"></div>
             <div  id="tStarsFooter" class="card-text" style="display:none;bottom:5%;left:9.7%;align-items:center;gap:2px;"></div>
+            <div id="tActionLabel" class="card-text" style="font-family:'BattleCardType',sans-serif;font-size:13px;color:#1a1a1a;text-transform:uppercase;letter-spacing:1px;pointer-events:none;"></div>
           </div><!-- .card -->
         </div>
       </div>

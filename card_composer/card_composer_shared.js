@@ -158,6 +158,7 @@ function injectBundledFonts() {
     { family: 'OpenSansBold',       file: 'fonts/Font - Wave, Credits - OpenSans Bold.ttf',                          fmt: 'truetype' },
     { family: 'OpenSansSCMedItal',  file: 'fonts/Font - Stratagem Target - OpenSans SemiCondensed MediumItalic.ttf', fmt: 'truetype' },
     { family: 'CybertonicFont',     file: 'fonts/Font - Cybertonian - Giedi Ancient Autobot.ttf',                    fmt: 'truetype' },
+    { family: 'BattleCardType',     file: 'fonts/Font - Battle Card Type - Source Sans Pro Bold It.otf',              fmt: 'opentype' },
   ];
   const hasBundle = typeof CARD_COMPONENTS_BUNDLE !== 'undefined';
   const css = FONTS.map(({ family, file, fmt }) => {
