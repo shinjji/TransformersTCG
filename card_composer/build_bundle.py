@@ -36,6 +36,7 @@ FONTS = [
     'fonts/Font - Wave, Credits - OpenSans Bold.ttf',
     'fonts/Font - Stratagem Target - OpenSans SemiCondensed MediumItalic.ttf',
     'fonts/Font - Cybertonian - Giedi Ancient Autobot.ttf',
+    'fonts/Font - Battle Card Type - Source Sans Pro Bold It.otf',
 ]
 
 def collect_files():
