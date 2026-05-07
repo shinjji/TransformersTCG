@@ -358,7 +358,7 @@ async function exportPNG() {
   try {
     await exportCard(g('card'), buildFilename()+'.png', { shiftMap: EXPORT_SHIFT, iconNudge: 2 });
   } catch(e) { alert('Export failed: '+e.message); }
-  finally { updateProgress(); }
+  finally { btn.textContent = 'Export PNG ↓'; updateProgress(); }
 }
 
 /* ── HTML template ────────────────────────────────────────────────────── */
