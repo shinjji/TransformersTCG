@@ -471,7 +471,7 @@ function getHTML() {
 
             <div id="tCyberName" class="card-text" style="top:2%;right:2%;font-family:'CybertonicFont',sans-serif;font-size:13px;color:rgba(80,80,80,0.85);text-transform:uppercase;letter-spacing:-0.5px;text-align:right;white-space:nowrap;overflow:hidden;pointer-events:none;"></div>
             <div id="tName" class="card-text" style="font-family:'BayformersName','Segoe UI',sans-serif;font-size:32px;color:#1a1a1a;text-transform:uppercase;letter-spacing:-0.5px;line-height:1;white-space:nowrap;overflow:hidden;"></div>
-            <div id="abilityBoxWide" class="card-text" style="bottom:6%;left:4%;right:4%;font-size:8.5px;line-height:1.55;color:#1a1a1a;text-align:center;">
+            <div id="abilityBoxWide" class="card-text" style="bottom:6%;left:8%;right:8%;font-size:8.5px;line-height:1.55;color:#1a1a1a;text-align:center;">
               <div id="tAbilityBodyWide" style="font-family:'GothamNarrow','Arial',sans-serif;"></div>
               <div id="tAbilityParenWide" style="font-style:italic;font-family:'GothamNarrowItalic','Georgia',serif;margin-top:4px;"></div>
             </div>

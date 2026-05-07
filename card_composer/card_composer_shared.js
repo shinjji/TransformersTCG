@@ -94,6 +94,9 @@ async function preconvertBlackImages() {
     'icons/Icon - Stat - ATK.png',
     'icons/Icon - Stat - DEF.png',
     'icons/Icon - Stat - HEALTH.png',
+    'icons/Icon - Stars 1.png',
+    'icons/Icon - Stars 5.png',
+    'icons/Icon - Stars 10.png',
   ];
   await Promise.all(keys.map(key => new Promise(resolve => {
     const img = new Image();
@@ -183,19 +186,21 @@ function formatAbilityText(text) {
     .replace(/\*([^*]+?)\*/g, '<span style="font-family:\'GothamNarrowItalic\',sans-serif;">$1</span>')
     .replace(/\[([^\]]+)\]/g, (_, name) => {
       let src = abilityImgSrc(name);
-      const needsBlack = name.startsWith('Trait - ') || name.startsWith('Icon - Stat - ');
+      const needsBlack = name.startsWith('Trait - ') || name.startsWith('Icon - Stat - ') || name.startsWith('Icon - Stars');
       if (needsBlack) {
         const key = name.startsWith('Trait - ') ? `traits/${name}.png` : `icons/${name}.png`;
         const black = _blackCache.get(key);
         if (black) {
           src = black;
         } else {
-          const height = name.startsWith('Icon - Small ') ? '1.11em' : '1.3em';
-          return src ? `<img src="${src}" style="height:${height};width:auto;vertical-align:middle;filter:brightness(0);">` : `[${name}]`;
+          const height = name.startsWith('Icon - Small ') ? '1.11em' : name.startsWith('Icon - Stars') ? '0.9em' : '1.3em';
+          const vAlign = name.startsWith('Icon - Stars') ? 'vertical-align:middle;transform:translateY(-2px);' : 'vertical-align:middle;';
+          return src ? `<img src="${src}" style="height:${height};width:auto;${vAlign}filter:brightness(0);">` : `[${name}]`;
         }
       }
-      const height = name.startsWith('Icon - Small ') ? '1.11em' : '1.3em';
-      return src ? `<img src="${src}" style="height:${height};width:auto;vertical-align:middle;">` : `[${name}]`;
+      const height = name.startsWith('Icon - Small ') ? '1.11em' : name.startsWith('Icon - Stars') ? '0.9em' : '1.3em';
+      const vAlign = name.startsWith('Icon - Stars') ? 'vertical-align:middle;transform:translateY(-2px);' : 'vertical-align:middle;';
+      return src ? `<img src="${src}" style="height:${height};width:auto;${vAlign}">` : `[${name}]`;
     })
     .replace(/\n/g, '<span style="display:block;height:0.2em;"></span>');
 }
