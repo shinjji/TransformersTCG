@@ -782,8 +782,12 @@ document.addEventListener('DOMContentLoaded', () => {
   populateFilters();
   showRandomCard();
   renderRules();
-  // Fetch icons fresh on every load
-  fetchIconMap().then(m => { iconMap = m; });
+  // Auto-sync on load if credentials are configured, otherwise fetch icons from cache
+  if (config.apiKey && config.sheetId) {
+    syncFromSheet();
+  } else {
+    fetchIconMap().then(m => { iconMap = m; });
+  }
 });
 
 function loadConfig() {
