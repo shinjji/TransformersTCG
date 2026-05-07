@@ -119,8 +119,8 @@ function render() {
   }
 
   // Ability text (wide, centred - no mode box)
-  const aFontSize = parseFloat(g('abilityFontSize')?.value) || 8.5;
-  const posAb     = parseFloat(g('posAbilityBox')?.value) ?? 6;
+  const aFontSize = parseFloat(g('abilityFontSize')?.value) || 15;
+  const posAb     = parseFloat(g('posAbilityBox')?.value) ?? 18;
   g('abilityBoxWide').style.display  = '';
   g('abilityBoxWide').style.fontSize = aFontSize + 'px';
   g('abilityBoxWide').style.bottom   = posAb + '%';
@@ -284,10 +284,13 @@ function resetToDefaults() {
   if (g('starsUse5'))  g('starsUse5').checked  = false;
   if (g('starsUse10')) g('starsUse10').checked = false;
   if (g('explanationType')) g('explanationType').value = '';
-  g('abilityBody').value = ''; g('abilityFontSize').value = '8.5';
-  g('posAbilityBox').value = '6'; if (g('posAbilityBoxVal')) g('posAbilityBoxVal').textContent = '6%';
+  if (g('battleIcon1')) g('battleIcon1').value = '';
+  if (g('battleIcon2')) g('battleIcon2').value = '';
+  if (g('battleIcon3')) g('battleIcon3').value = '';
+  g('abilityBody').value = ''; g('abilityFontSize').value = '15';
+  g('posAbilityBox').value = '18'; if (g('posAbilityBoxVal')) g('posAbilityBoxVal').textContent = '25%';
   g('artPosY').value = '0'; g('artScale').value = '100';
-  g('cardWave').value = ''; g('cardId').value = ''; g('cardCredit').value = '';
+  g('cardWave').value = ''; g('cardId').value = ''; g('cardCredit').value = 'Designed by SHINJJI';
   if (g('artUpload')) g('artUpload').value = '';
   resetProgress();
   render();
@@ -421,10 +424,10 @@ function getHTML() {
       <div class="section-header" onclick="toggleSec('ability')">Ability Text <span class="chevron">▾</span></div>
       <div class="section-body">
         <div class="row-2">
-          <div class="field"><label>Font Size</label><input type="number" id="abilityFontSize" value="8.5" min="4" max="20" step="0.5" oninput="render()"></div>
+          <div class="field"><label>Font Size</label><input type="number" id="abilityFontSize" value="15" min="4" max="20" step="0.5" oninput="render()"></div>
         </div>
         <div class="field"><label>Text</label><textarea id="abilityBody" oninput="render()" style="min-height:120px;"></textarea></div>
-        <div class="field"><label>Position</label><div style="display:flex;align-items:center;gap:6px;"><input type="range" id="posAbilityBox" min="0" max="50" step="0.1" value="6" oninput="g('posAbilityBoxVal').textContent=this.value+'%';render()" style="flex:1;"><span id="posAbilityBoxVal" style="font-size:10px;color:var(--muted);min-width:34px;">6%</span></div></div>
+        <div class="field"><label>Position</label><div style="display:flex;align-items:center;gap:6px;"><input type="range" id="posAbilityBox" min="0" max="50" step="0.1" value="18" oninput="g('posAbilityBoxVal').textContent=this.value+'%';render()" style="flex:1;"><span id="posAbilityBoxVal" style="font-size:10px;color:var(--muted);min-width:34px;">25%</span></div></div>
       </div>
     </div>
 
@@ -447,7 +450,7 @@ function getHTML() {
           <div class="field"><label>Wave</label><input type="text" id="cardWave" value="WAVE 8" oninput="render()"></div>
           <div class="field"><label>Card ID</label><input type="text" id="cardId" value="" oninput="render()"></div>
         </div>
-        <div class="field"><label>Credits</label><input type="text" id="cardCredit" value="" oninput="render()"></div>
+        <div class="field"><label>Credits</label><input type="text" id="cardCredit" value="Designed by SHINJJI" oninput="render()"></div>
       </div>
     </div>
 
