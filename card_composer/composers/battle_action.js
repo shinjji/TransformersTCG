@@ -147,19 +147,32 @@ function render() {
       starsEl.appendChild(img); running+=v;
     });
     starsEl.style.left   = '32px';
-    starsEl.style.top    = '473px';
+    starsEl.style.top    = '478px';
     starsEl.style.bottom = '';
     starsEl.style.display = 'flex';
   } else { starsEl.style.display = 'none'; }
 
+  // Stamp
+  const stampEl = g('lStamp');
+  if (stampEl) {
+    stampEl.src = assetUrl('stamp/wave11_tbc.svg');
+    stampEl.style.left    = (starCount > 0 ? 213 : 33) + 'px';
+    stampEl.style.top     = '473px';
+    stampEl.style.width   = '20px';
+    stampEl.style.height  = 'auto';
+    stampEl.style.display = 'block';
+  }
+
   // Footer
   g('tWave').textContent    = g('cardWave').value;
-  g('tWave').style.left     = '10.9%';
+  g('tWave').style.left     = '87px';
+  g('tWave').style.bottom   = '39px';
   g('tId').textContent      = g('cardId').value;
-  g('tId').style.left       = '24.2%';
+  g('tId').style.left       = '140px';
+  g('tId').style.bottom     = '39px';
   g('tCredit').innerHTML    = g('cardCredit').value || '';
-  g('tCredit').style.bottom = '4.6%';
-  g('tCredit').style.right  = '3%'; // no mode box, credit goes to edge
+  g('tCredit').style.bottom = '39px';
+  g('tCredit').style.right  = '34px';
 
   saveToStorage();
 }
@@ -475,11 +488,12 @@ function getHTML() {
               <div id="tAbilityBodyWide" style="font-family:'GothamNarrow','Arial',sans-serif;"></div>
               <div id="tAbilityParenWide" style="font-style:italic;font-family:'GothamNarrowItalic','Georgia',serif;margin-top:4px;"></div>
             </div>
-            <span id="tWave"   class="card-text" style="font-size:8px;color:#fff;font-weight:600;letter-spacing:0.8px;text-transform:uppercase;font-family:'OpenSansBold',sans-serif;bottom:4.6%;left:3%;"></span>
-            <span id="tId"     class="card-text" style="font-size:8px;font-weight:700;color:#fff;letter-spacing:0.5px;font-family:'OpenSansBold',sans-serif;bottom:4.6%;left:30%;white-space:pre;"></span>
-            <div  id="tCredit" class="card-text" style="font-size:8px;color:#fff;text-align:right;line-height:1.35;font-family:'OpenSansBold',sans-serif;bottom:4.6%;right:3%;"></div>
+            <span id="tWave"   class="card-text" style="font-size:10px;color:#fff;font-weight:600;letter-spacing:0.8px;text-transform:uppercase;font-family:'OpenSansBold',sans-serif;bottom:4.6%;left:3%;"></span>
+            <span id="tId"     class="card-text" style="font-size:10px;font-weight:700;color:#fff;letter-spacing:0.5px;font-family:'OpenSansBold',sans-serif;bottom:4.6%;left:30%;white-space:pre;"></span>
+            <div  id="tCredit" class="card-text" style="font-size:10px;color:#fff;text-align:right;line-height:1.35;font-family:'OpenSansBold',sans-serif;bottom:4.6%;right:3%;"></div>
             <div  id="tStarsFooter" class="card-text" style="display:none;bottom:5%;left:9.7%;align-items:center;gap:2px;"></div>
             <div id="tBattleIcons" class="card-text" style="top:0;right:0;display:flex;flex-direction:column;align-items:center;pointer-events:none;"></div>
+            <img id="lStamp" class="card-text" style="display:none;position:absolute;pointer-events:none;">
             <div id="tActionLabel" class="card-text" style="font-family:'BattleCardType',sans-serif;font-size:13px;color:#1a1a1a;text-transform:uppercase;letter-spacing:0px;pointer-events:none;"></div>
           </div><!-- .card -->
         </div>
