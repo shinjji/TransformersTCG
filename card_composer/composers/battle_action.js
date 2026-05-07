@@ -42,7 +42,7 @@ let _saveTimer  = null;
 let _progressReady = false;
 let _modalEl    = null;
 
-const PROGRESS_STEPS = ['type','ability','artwork','info'];
+const PROGRESS_STEPS = ['faction','identity','stats','ability','artwork','info'];
 
 
 /* ── Main render ──────────────────────────────────────────────────────── */
@@ -505,12 +505,14 @@ function getHTML() {
   <div class="layers-panel">
     <div class="layers-title">Progress</div>
     <div class="progress-bar-track"><div class="progress-bar-fill" id="progressBarFill"></div></div>
-    <div class="progress-label" id="progressLabel">0 / 4 complete</div>
+    <div class="progress-label" id="progressLabel">0 / 6 complete</div>
     <div class="progress-steps">
-      <label class="progress-step"><input type="checkbox" id="prog_type"    onchange="updateProgress()"><div class="progress-step-body"><span class="progress-step-name">Faction &amp; Badges</span></div></label>
-      <label class="progress-step"><input type="checkbox" id="prog_ability" onchange="updateProgress()"><div class="progress-step-body"><span class="progress-step-name">Ability Text</span></div></label>
-      <label class="progress-step"><input type="checkbox" id="prog_artwork" onchange="updateProgress()"><div class="progress-step-body"><span class="progress-step-name">Artwork</span></div></label>
-      <label class="progress-step"><input type="checkbox" id="prog_info"    onchange="updateProgress()"><div class="progress-step-body"><span class="progress-step-name">Card Details</span></div></label>
+      <label class="progress-step"><input type="checkbox" id="prog_faction"  onchange="updateProgress()"><div class="progress-step-body"><span class="progress-step-name">Card Type &amp; Faction</span></div></label>
+      <label class="progress-step"><input type="checkbox" id="prog_identity" onchange="updateProgress()"><div class="progress-step-body"><span class="progress-step-name">Identity</span></div></label>
+      <label class="progress-step"><input type="checkbox" id="prog_stats"    onchange="updateProgress()"><div class="progress-step-body"><span class="progress-step-name">Stats</span></div></label>
+      <label class="progress-step"><input type="checkbox" id="prog_ability"  onchange="updateProgress()"><div class="progress-step-body"><span class="progress-step-name">Abilities</span></div></label>
+      <label class="progress-step"><input type="checkbox" id="prog_artwork"  onchange="updateProgress()"><div class="progress-step-body"><span class="progress-step-name">Artwork</span></div></label>
+      <label class="progress-step"><input type="checkbox" id="prog_info"     onchange="updateProgress()"><div class="progress-step-body"><span class="progress-step-name">Card Details</span></div></label>
     </div>
     <div style="flex:1;"></div>
     <div class="preview-controls" style="padding-top:10px;border-top:1px solid var(--border);margin-top:10px;justify-content:center;">
