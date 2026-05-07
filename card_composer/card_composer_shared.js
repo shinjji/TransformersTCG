@@ -217,7 +217,7 @@ function setLayer(id, src) {
 /* ── PNG Export ──────────────────────────────────────────────────────────
    shiftMap: { elementId: pixelsUp } — composer-specific corrections.
    iconNudge: extra px to nudge trait icon <img width="17"> elements down.*/
-async function exportCard(cardEl, filename, { shiftMap = {}, iconNudge = 0 } = {}) {
+async function exportCard(cardEl, filename, { shiftMap = {}, leftShiftMap = {}, iconNudge = 0 } = {}) {
   await document.fonts.ready;
   const savedRadius = cardEl.style.borderRadius;
   cardEl.style.borderRadius = '0';
@@ -241,6 +241,11 @@ async function exportCard(cardEl, filename, { shiftMap = {}, iconNudge = 0 } = {
           const relTop = (orig.getBoundingClientRect().top - cardRect.top) / zoomY;
           el.style.top    = (relTop - shift) + 'px';
           el.style.bottom = '';
+          const leftShift = leftShiftMap[baseId];
+          if (leftShift !== undefined) {
+            const origLeft = parseFloat(orig.style.left) || 0;
+            el.style.left = (origLeft + leftShift) + 'px';
+          }
         });
         if (iconNudge !== 0) {
           clonedCard.querySelectorAll('img[width="17"]').forEach(img => {

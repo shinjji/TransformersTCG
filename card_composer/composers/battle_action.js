@@ -28,11 +28,14 @@ const CONFIG = {
 const EXPORT_SHIFT = {
   tCyberName:   1,
   tName:        1,
+  tActionLabel:  1,
+  tBattleIcons:  0,
+  lStamp:       -1,
   abilityBoxWide: 2,
-  tWave:        2,
-  tId:          2,
-  tCredit:      2,
-  tStarsFooter: 0,
+  tWave:        1,
+  tId:          1,
+  tCredit:      1,
+  tStarsFooter: 1,
 };
 
 /* ── Module state ──────────────────────────────────────────────────────── */
@@ -146,7 +149,7 @@ function render() {
       img.src = cc('icons', `Icon - Stars ${v}.png`); img.style.cssText='height:12px;width:auto;';
       starsEl.appendChild(img); running+=v;
     });
-    starsEl.style.left   = '32px';
+    starsEl.style.left   = '37px';
     starsEl.style.top    = '478px';
     starsEl.style.bottom = '';
     starsEl.style.display = 'flex';
@@ -172,7 +175,7 @@ function render() {
   g('tId').style.bottom     = '39px';
   g('tCredit').innerHTML    = g('cardCredit').value || '';
   g('tCredit').style.bottom = '39px';
-  g('tCredit').style.right  = '34px';
+  g('tCredit').style.right  = '40px';
 
   saveToStorage();
 }
@@ -356,7 +359,7 @@ function resetProgress() {
 async function exportPNG() {
   const btn = g('exportBtn'); btn.textContent='Generating…'; btn.disabled=true;
   try {
-    await exportCard(g('card'), buildFilename()+'.png', { shiftMap: EXPORT_SHIFT, iconNudge: 2 });
+    await exportCard(g('card'), buildFilename()+'.png', { shiftMap: EXPORT_SHIFT, leftShiftMap: { tBattleIcons: -9.5 }, iconNudge: 2 });
   } catch(e) { alert('Export failed: '+e.message); }
   finally { btn.textContent = 'Export PNG ↓'; updateProgress(); }
 }
