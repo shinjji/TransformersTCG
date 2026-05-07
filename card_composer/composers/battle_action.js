@@ -9,24 +9,25 @@
 /* ── Data ──────────────────────────────────────────────────────────────── */
 const FACTIONS = ['Autobot','Decepticon','Junkion','Mercenary','Quintesson','Unicronian'];
 
+const BATTLE_ICON_OPTS_HTML = `<option value="">— None —</option>
+  <option value="B">Blue</option>
+  <option value="G">Green</option>
+  <option value="K">Black</option>
+  <option value="O">Orange</option>
+  <option value="W">White</option>`;
+
 const CONFIG = {
   folder:       'battle',
   hasFaction:   true,
-  hasTraits:    true,
   hasHeaderMask: true,
   hasStats:     false,
-  maxTraits:    2,
-  traitBarTop:  '64%',
   artTop:       '13%',
   explanationOptions: ['','Rolling Action','Secret Action'],
 };
 
-const TRAIT_X_BASE = { 1: -20, 2: -4 };
-
 const EXPORT_SHIFT = {
   tCyberName:   1,
   tName:        1,
-  tTraitBar:    2,
   abilityBoxWide: 2,
   tWave:        2,
   tId:          2,
@@ -41,28 +42,8 @@ let _saveTimer  = null;
 let _progressReady = false;
 let _modalEl    = null;
 
-const PROGRESS_STEPS = ['type','traits','ability','artwork','info'];
+const PROGRESS_STEPS = ['type','ability','artwork','info'];
 
-/* ── Trait row builder ─────────────────────────────────────────────────── */
-function buildTraitRows() {
-  const traitOpts = TRAIT_NAMES.map(n => `<option value="${n}">${n}</option>`).join('');
-  const container = g('traitRows');
-  if (!container) return;
-  container.innerHTML = '';
-  for (let i = 1; i <= CONFIG.maxTraits; i++) {
-    container.insertAdjacentHTML('beforeend', `
-      <div class="trait-row">
-        <span class="trait-num">${i}</span>
-        <select id="traitType${i}" class="main" onchange="render()">
-          <option value="">- None -</option>${traitOpts}
-        </select>
-        <select id="traitSize${i}" class="size" onchange="render()">
-          <option value="Short">Short</option>
-          <option value="Long">Long</option>
-        </select>
-      </div>`);
-  }
-}
 
 /* ── Main render ──────────────────────────────────────────────────────── */
 function render() {
@@ -71,7 +52,7 @@ function render() {
   const cp      = comp => cc('battle', `${typeKey} - ${comp}.png`);
 
   const ALL_LAYERS = ['lGradient','lHeaderBg','lHeaderLines','lHeaderOverlay',
-    'lMainFrame','lTrait1','lTrait2','lTextbox','lHeaderMask','lExplanation',
+    'lMainFrame','lTextbox','lHeaderMask','lExplanation',
     'lSetSlash','lModeBox','lStarSep','lFactionFrame','lFactionIcon'];
   ALL_LAYERS.forEach(id => setLayer(id, null));
 
@@ -88,22 +69,6 @@ function render() {
     if (expEl) {
       expEl.style.cssText = 'position:absolute;bottom:13%;left:0;width:40%;height:auto;object-fit:contain;display:block;';
     }
-  }
-
-  // Trait image layers
-  const SCALE = 0.48, BAR_H = Math.round(60*SCALE), GAP = -26;
-  const traitTopPx = parseFloat(CONFIG.traitBarTop) / 100 * 530;
-  let offsetRight = 380;
-  for (let slot = 1; slot <= CONFIG.maxTraits; slot++) {
-    const el   = g(`lTrait${slot}`); if (!el) continue;
-    const size = g(`traitSize${slot}`)?.value || 'Short';
-    const nw   = size === 'Long' ? 393 : 270;
-    const displayW = Math.round(nw * SCALE);
-    offsetRight -= displayW + GAP;
-    if (g(`traitType${slot}`)?.value) {
-      el.src = cc('battle', `Battle - Trait ${slot} ${size}.png`);
-      el.style.cssText = `position:absolute;display:block;pointer-events:none;top:${traitTopPx}px;left:${offsetRight+(TRAIT_X_BASE[slot]||0)}px;width:${displayW}px;height:${BAR_H}px;object-fit:fill;`;
-    } else { el.style.display = 'none'; }
   }
 
   // Artwork
@@ -130,34 +95,27 @@ function render() {
     g('tCyberName').style.right  = '';
   }
 
-  // Trait text overlay
-  const traitBarEl = g('tTraitBar');
-  const T_SCALE = 0.48, T_BAR_H = Math.round(60*T_SCALE), T_GAP = -26;
-  traitBarEl.style.cssText = 'position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;display:block;';
-  traitBarEl.innerHTML = '';
-  let oR = 380;
-  for (let slot = 1; slot <= CONFIG.maxTraits; slot++) {
-    const size     = g(`traitSize${slot}`)?.value || 'Short';
-    const nw       = size === 'Long' ? 393 : 270;
-    const displayW = Math.round(nw * T_SCALE);
-    oR -= displayW + T_GAP;
-    const traitName = g(`traitType${slot}`)?.value || '';
-    if (!traitName) continue;
-    const leftPx = oR + (TRAIT_X_BASE[slot]||0) + 21;
-    const item = document.createElement('div');
-    item.style.cssText = `position:absolute;top:${traitTopPx}px;left:${leftPx}px;width:${displayW}px;height:${T_BAR_H}px;display:flex;align-items:center;gap:8px;padding:0 6px;overflow:hidden;`;
-    item.innerHTML =
-      `<img src="${_traitIconCache.get(traitName) || cc('traits','Trait - '+traitName+'.png')}" width="17" height="17" style="width:17px;height:17px;flex-shrink:0;position:relative;top:3px;">` +
-      `<span style="font-size:8px;font-weight:700;color:#fff;text-transform:uppercase;letter-spacing:0.5px;font-family:'OpenSansSemiBold',sans-serif;white-space:nowrap;">${traitName.toUpperCase()}</span>`;
-    traitBarEl.appendChild(item);
-  }
-
   // ACTION label — fixed position
   const actionEl = g('tActionLabel');
   if (actionEl) {
     actionEl.textContent = 'Action';
     actionEl.style.left = '52px';
     actionEl.style.top  = '309px';
+  }
+
+  // Battle icons — stacked top-right
+  const iconsEl = g('tBattleIcons');
+  if (iconsEl) {
+    iconsEl.style.left = '282px';
+    iconsEl.style.top  = '44px';
+    iconsEl.innerHTML = '';
+    [g('battleIcon1')?.value, g('battleIcon2')?.value, g('battleIcon3')?.value].forEach(v => {
+      if (!v) return;
+      const img = document.createElement('img');
+      img.src = cc('icons', `Icon - Battle ${v}.png`);
+      img.style.cssText = 'width:32px;height:auto;display:block;margin-bottom:3px;';
+      iconsEl.appendChild(img);
+    });
   }
 
   // Ability text (wide, centred - no mode box)
@@ -188,6 +146,9 @@ function render() {
       img.src = cc('icons', `Icon - Stars ${v}.png`); img.style.cssText='height:12px;width:auto;';
       starsEl.appendChild(img); running+=v;
     });
+    starsEl.style.left   = '32px';
+    starsEl.style.top    = '473px';
+    starsEl.style.bottom = '';
     starsEl.style.display = 'flex';
   } else { starsEl.style.display = 'none'; }
 
@@ -229,7 +190,7 @@ function resetZoom() { zoomLevel = 1; applyZoom(); }
 /* ── Section toggle ───────────────────────────────────────────────────── */
 function toggleSec(name) {
   g('sec-' + name)?.classList.toggle('collapsed');
-  const collapsed = ['type','identity','stats','traits','ability','art','info']
+  const collapsed = ['type','identity','stats','ability','art','info']
     .filter(n => g('sec-'+n)?.classList.contains('collapsed'));
   try { localStorage.setItem('tfBattleSectionState', JSON.stringify(collapsed)); } catch(e) {}
 }
@@ -249,7 +210,9 @@ function getState() {
     starsUse5:  g('starsUse5')?.checked  || false,
     starsUse10: g('starsUse10')?.checked || false,
     explanationType: g('explanationType')?.value || '',
-    traits: [1,2].map(i => ({ type: g(`traitType${i}`)?.value||'', size: g(`traitSize${i}`)?.value||'Short' })),
+    battleIcon1: g('battleIcon1')?.value || '',
+    battleIcon2: g('battleIcon2')?.value || '',
+    battleIcon3: g('battleIcon3')?.value || '',
     abilityFontSize: g('abilityFontSize').value,
     posAbilityBox:   g('posAbilityBox').value,
     abilityBody:     g('abilityBody').value,
@@ -269,16 +232,13 @@ function applyState(s) {
   if (g('starsUse5'))  g('starsUse5').checked  = s.starsUse5  || false;
   if (g('starsUse10')) g('starsUse10').checked = s.starsUse10 || false;
   set('explanationType', s.explanationType);
+  set('battleIcon1', s.battleIcon1); set('battleIcon2', s.battleIcon2); set('battleIcon3', s.battleIcon3);
   set('abilityFontSize', s.abilityFontSize);
   set('posAbilityBox',   s.posAbilityBox);
   const posLbl = g('posAbilityBoxVal'); if (posLbl && s.posAbilityBox) posLbl.textContent = s.posAbilityBox + '%';
   set('abilityBody', s.abilityBody);
   set('artPosY', s.artPosY); set('artScale', s.artScale);
   set('cardWave', s.cardWave); set('cardId', s.cardId); set('cardCredit', s.cardCredit);
-  if (s.traits) s.traits.forEach((t, i) => {
-    const ti = g(`traitType${i+1}`); if (ti) ti.value = t.type || '';
-    const si = g(`traitSize${i+1}`); if (si) si.value = t.size || 'Short';
-  });
   render();
 }
 
@@ -430,6 +390,9 @@ function getHTML() {
     <div class="section" id="sec-stats">
       <div class="section-header" onclick="toggleSec('stats')">Stats <span class="chevron">▾</span></div>
       <div class="section-body">
+        <div class="field"><label>Battle Icon 1</label><select id="battleIcon1" onchange="render()">${BATTLE_ICON_OPTS_HTML}</select></div>
+        <div class="field"><label>Battle Icon 2</label><select id="battleIcon2" onchange="render()">${BATTLE_ICON_OPTS_HTML}</select></div>
+        <div class="field"><label>Battle Icon 3</label><select id="battleIcon3" onchange="render()">${BATTLE_ICON_OPTS_HTML}</select></div>
         <div class="field">
           <label>Stars</label>
           <input type="number" id="starCount" value="0" min="0" max="30" oninput="render()">
@@ -438,13 +401,6 @@ function getHTML() {
           <label style="display:flex;align-items:center;gap:5px;font-size:10px;color:var(--label);cursor:pointer;"><input type="checkbox" id="starsUse5" onchange="render()"> Use 5s</label>
           <label style="display:flex;align-items:center;gap:5px;font-size:10px;color:var(--label);cursor:pointer;"><input type="checkbox" id="starsUse10" onchange="render()"> Use 10s</label>
         </div>
-      </div>
-    </div>
-
-    <div class="section" id="sec-traits">
-      <div class="section-header" onclick="toggleSec('traits')">Traits <span class="chevron">▾</span></div>
-      <div class="section-body">
-        <div id="traitRows"></div>
       </div>
     </div>
 
@@ -501,8 +457,6 @@ function getHTML() {
             <img id="lArt" class="card-layer" style="display:none;object-fit:cover;object-position:center top;mix-blend-mode:normal;">
             <img id="lGradient"      class="card-layer" alt="">
             <img id="lHeaderMask"    class="card-layer" alt="">
-            <img id="lTrait2"        class="card-layer" alt="">
-            <img id="lTrait1"        class="card-layer" alt="">
             <img id="lTextbox"       class="card-layer" alt="">
             <img id="lExplanation"   class="card-layer" alt="" style="display:none;">
             <img id="lMainFrame"     class="card-layer" alt="">
@@ -517,7 +471,6 @@ function getHTML() {
 
             <div id="tCyberName" class="card-text" style="top:2%;right:2%;font-family:'CybertonicFont',sans-serif;font-size:13px;color:rgba(80,80,80,0.85);text-transform:uppercase;letter-spacing:-0.5px;text-align:right;white-space:nowrap;overflow:hidden;pointer-events:none;"></div>
             <div id="tName" class="card-text" style="font-family:'BayformersName','Segoe UI',sans-serif;font-size:32px;color:#1a1a1a;text-transform:uppercase;letter-spacing:-0.5px;line-height:1;white-space:nowrap;overflow:hidden;"></div>
-            <div id="tTraitBar" class="card-text" style="left:3%;right:3%;height:20px;display:block;align-items:center;overflow:hidden;"></div>
             <div id="abilityBoxWide" class="card-text" style="bottom:6%;left:4%;right:4%;font-size:8.5px;line-height:1.55;color:#1a1a1a;text-align:center;">
               <div id="tAbilityBodyWide" style="font-family:'GothamNarrow','Arial',sans-serif;"></div>
               <div id="tAbilityParenWide" style="font-style:italic;font-family:'GothamNarrowItalic','Georgia',serif;margin-top:4px;"></div>
@@ -526,7 +479,8 @@ function getHTML() {
             <span id="tId"     class="card-text" style="font-size:8px;font-weight:700;color:#fff;letter-spacing:0.5px;font-family:'OpenSansBold',sans-serif;bottom:4.6%;left:30%;white-space:pre;"></span>
             <div  id="tCredit" class="card-text" style="font-size:8px;color:#fff;text-align:right;line-height:1.35;font-family:'OpenSansBold',sans-serif;bottom:4.6%;right:3%;"></div>
             <div  id="tStarsFooter" class="card-text" style="display:none;bottom:5%;left:9.7%;align-items:center;gap:2px;"></div>
-            <div id="tActionLabel" class="card-text" style="font-family:'BattleCardType',sans-serif;font-size:13px;color:#1a1a1a;text-transform:uppercase;letter-spacing:1px;pointer-events:none;"></div>
+            <div id="tBattleIcons" class="card-text" style="top:0;right:0;display:flex;flex-direction:column;align-items:center;pointer-events:none;"></div>
+            <div id="tActionLabel" class="card-text" style="font-family:'BattleCardType',sans-serif;font-size:13px;color:#1a1a1a;text-transform:uppercase;letter-spacing:0px;pointer-events:none;"></div>
           </div><!-- .card -->
         </div>
       </div>
@@ -537,10 +491,9 @@ function getHTML() {
   <div class="layers-panel">
     <div class="layers-title">Progress</div>
     <div class="progress-bar-track"><div class="progress-bar-fill" id="progressBarFill"></div></div>
-    <div class="progress-label" id="progressLabel">0 / 5 complete</div>
+    <div class="progress-label" id="progressLabel">0 / 4 complete</div>
     <div class="progress-steps">
       <label class="progress-step"><input type="checkbox" id="prog_type"    onchange="updateProgress()"><div class="progress-step-body"><span class="progress-step-name">Faction &amp; Badges</span></div></label>
-      <label class="progress-step"><input type="checkbox" id="prog_traits"  onchange="updateProgress()"><div class="progress-step-body"><span class="progress-step-name">Traits</span></div></label>
       <label class="progress-step"><input type="checkbox" id="prog_ability" onchange="updateProgress()"><div class="progress-step-body"><span class="progress-step-name">Ability Text</span></div></label>
       <label class="progress-step"><input type="checkbox" id="prog_artwork" onchange="updateProgress()"><div class="progress-step-body"><span class="progress-step-name">Artwork</span></div></label>
       <label class="progress-step"><input type="checkbox" id="prog_info"    onchange="updateProgress()"><div class="progress-step-body"><span class="progress-step-name">Card Details</span></div></label>
@@ -592,7 +545,6 @@ function init(mountEl) {
     exportPNG, updateProgress, resetToDefaults };
   GLOBALS.forEach(k => { window[k] = fns[k]; });
 
-  buildTraitRows();
   loadFromStorage();
   loadProgressFromStorage();
   restoreSections();
