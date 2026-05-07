@@ -325,8 +325,10 @@ function render() {
   // Footer
   g('tWave').textContent    = g('cardWave').value;
   g('tWave').style.left     = '10.9%';
-  g('tId').textContent      = g('cardId').value;
-  g('tId').style.left       = '24.2%';
+  const _idParts = [g('cardRarity').value, g('cardNum').value].filter(Boolean).join('  ');
+  const _total   = g('cardTotal').value;
+  g('tId').textContent = _total ? _idParts + '   ' + _total : _idParts;
+  g('tId').style.left       = '23.8%';
   g('tCredit').innerHTML    = g('cardCredit').value || '';
   g('tCredit').style.bottom = '4.6%';
   g('tCredit').style.right  = '22.2%';
@@ -559,7 +561,9 @@ function getState() {
     altArtPosY:  g('altArtPosY')?.value  || '0',
     altArtScale: g('altArtScale')?.value || '100',
     cardWave:   g('cardWave').value,
-    cardId:     g('cardId').value,
+    cardRarity: g('cardRarity').value,
+    cardNum:    g('cardNum').value,
+    cardTotal:  g('cardTotal').value,
     cardCredit: g('cardCredit').value,
   };
 }
@@ -583,7 +587,10 @@ function applyState(s) {
   set('abilityBody', s.abilityBody); set('altAbilityBody', s.altAbilityBody);
   set('artPosY', s.artPosY); set('artScale', s.artScale);
   set('altArtPosY', s.altArtPosY); set('altArtScale', s.altArtScale);
-  set('cardWave', s.cardWave); set('cardId', s.cardId); set('cardCredit', s.cardCredit);
+  set('cardWave', s.cardWave);
+  set('cardRarity', s.cardRarity); set('cardNum', s.cardNum); set('cardTotal', s.cardTotal);
+  // legacy: if old save has cardId, leave the new fields empty (they'll just show blank)
+  set('cardCredit', s.cardCredit);
   if (g('faction2') && s.faction2 !== undefined) g('faction2').value = s.faction2;
   onTypeChange();
   set('modeBox', s.modeBox);
@@ -643,7 +650,7 @@ function resetToDefaults() {
   g('artPosY').value='0'; g('artScale').value='100';
   if (g('altArtPosY'))  g('altArtPosY').value='0';
   if (g('altArtScale')) g('altArtScale').value='100';
-  g('cardWave').value=''; g('cardId').value=''; g('cardCredit').value='';
+  g('cardWave').value=''; g('cardRarity').value=''; g('cardNum').value=''; g('cardTotal').value=''; g('cardCredit').value='';
   if (g('artUpload'))    g('artUpload').value='';
   if (g('altArtUpload')) g('altArtUpload').value='';
   resetProgress();
@@ -668,7 +675,8 @@ function confirmLoadJSON() {
 /* ── Filename builder ─────────────────────────────────────────────────── */
 function buildFilename(side) {
   const waveNum  = (g('cardWave').value || '').match(/\d+/)?.[0] || '0';
-  const idMatch  = (g('cardId').value   || '').match(/T(\d+)/);
+  const idVal    = (g('cardNum').value || '').trim();
+  const idMatch  = idVal.match(/T(\d+)/) || idVal.match(/^(\d+)$/);
   const cardNum  = idMatch ? idMatch[1].padStart(3,'0') : '000';
   return `FMW${waveNum}_C_${cardNum}_${side}`;
 }
@@ -868,7 +876,11 @@ function getHTML() {
       <div class="section-body">
         <div class="row-2">
           <div class="field"><label>Wave</label><input type="text" id="cardWave" value="WAVE " oninput="render()"></div>
-          <div class="field"><label>Card ID</label><input type="text" id="cardId" value="CT T01   T38" oninput="render()"></div>
+          <div class="field"><label>Rarity</label><input type="text" id="cardRarity" value="" oninput="render()"></div>
+        </div>
+        <div class="row-2">
+          <div class="field"><label>Card ID</label><input type="text" id="cardNum" value="" oninput="render()"></div>
+          <div class="field"><label>Total</label><input type="text" id="cardTotal" value="" oninput="render()"></div>
         </div>
         <div class="field"><label>Credits</label><input type="text" id="cardCredit" value="Designed by SHINJJI" oninput="render()"></div>
       </div>
