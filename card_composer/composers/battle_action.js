@@ -170,8 +170,10 @@ function render() {
   g('tWave').textContent    = g('cardWave').value;
   g('tWave').style.left     = '87px';
   g('tWave').style.bottom   = '39px';
-  g('tId').textContent      = g('cardId').value;
-  g('tId').style.left       = '140px';
+  const _idParts = [g('cardRarity').value, g('cardNum').value].filter(Boolean).join('  ');
+  const _total   = g('cardTotal').value;
+  g('tId').textContent = _total ? _idParts + '   ' + _total : _idParts;
+  g('tId').style.left       = '136px';
   g('tId').style.bottom     = '39px';
   g('tCredit').innerHTML    = g('cardCredit').value || '';
   g('tCredit').style.bottom = '39px';
@@ -234,8 +236,10 @@ function getState() {
     abilityBody:     g('abilityBody').value,
     artPosY:   g('artPosY').value,
     artScale:  g('artScale').value,
-    cardWave:  g('cardWave').value,
-    cardId:    g('cardId').value,
+    cardWave:   g('cardWave').value,
+    cardRarity: g('cardRarity').value,
+    cardNum:    g('cardNum').value,
+    cardTotal:  g('cardTotal').value,
     cardCredit: g('cardCredit').value,
   };
 }
@@ -254,7 +258,9 @@ function applyState(s) {
   const posLbl = g('posAbilityBoxVal'); if (posLbl && s.posAbilityBox) posLbl.textContent = s.posAbilityBox + '%';
   set('abilityBody', s.abilityBody);
   set('artPosY', s.artPosY); set('artScale', s.artScale);
-  set('cardWave', s.cardWave); set('cardId', s.cardId); set('cardCredit', s.cardCredit);
+  set('cardWave', s.cardWave);
+  set('cardRarity', s.cardRarity); set('cardNum', s.cardNum); set('cardTotal', s.cardTotal);
+  set('cardCredit', s.cardCredit);
   render();
 }
 
@@ -293,7 +299,7 @@ function resetToDefaults() {
   g('abilityBody').value = ''; g('abilityFontSize').value = '15';
   g('posAbilityBox').value = '18'; if (g('posAbilityBoxVal')) g('posAbilityBoxVal').textContent = '25%';
   g('artPosY').value = '0'; g('artScale').value = '100';
-  g('cardWave').value = ''; g('cardId').value = ''; g('cardCredit').value = 'Designed by SHINJJI';
+  g('cardWave').value = ''; g('cardRarity').value = ''; g('cardNum').value = ''; g('cardTotal').value = ''; g('cardCredit').value = 'Designed by SHINJJI';
   if (g('artUpload')) g('artUpload').value = '';
   resetProgress();
   render();
@@ -317,7 +323,8 @@ function confirmLoadJSON() {
 /* ── Filename ─────────────────────────────────────────────────────────── */
 function buildFilename() {
   const waveNum = (g('cardWave').value || '').match(/\d+/)?.[0] || '0';
-  const idMatch = (g('cardId').value   || '').match(/T(\d+)/);
+  const idVal   = (g('cardNum').value || '').trim();
+  const idMatch = idVal.match(/T(\d+)/) || idVal.match(/^(\d+)$/);
   const cardNum = idMatch ? idMatch[1].padStart(3,'0') : '000';
   return `FMW${waveNum}_B_${cardNum}_f`;
 }
@@ -451,7 +458,11 @@ function getHTML() {
       <div class="section-body">
         <div class="row-2">
           <div class="field"><label>Wave</label><input type="text" id="cardWave" value="WAVE 8" oninput="render()"></div>
-          <div class="field"><label>Card ID</label><input type="text" id="cardId" value="" oninput="render()"></div>
+          <div class="field"><label>Rarity</label><input type="text" id="cardRarity" value="" oninput="render()"></div>
+        </div>
+        <div class="row-2">
+          <div class="field"><label>Card ID</label><input type="text" id="cardNum" value="" oninput="render()"></div>
+          <div class="field"><label>Total</label><input type="text" id="cardTotal" value="" oninput="render()"></div>
         </div>
         <div class="field"><label>Credits</label><input type="text" id="cardCredit" value="Designed by SHINJJI" oninput="render()"></div>
       </div>
