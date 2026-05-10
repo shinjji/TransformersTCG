@@ -490,7 +490,7 @@ function getHTML() {
       <div class="section-body">
         <div class="field">
           <label>Name</label>
-          <input type="text" id="cardName" value="ARMED TO THE TEETH" oninput="render()">
+          <input type="text" id="cardName" value="CARD NAME" oninput="render()">
         </div>
       </div>
     </div>
