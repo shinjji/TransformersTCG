@@ -105,9 +105,10 @@ function render() {
 
   // Name + Cybertonian watermark
   const nameText = (g('cardName').value || 'CARD NAME').toUpperCase();
-  g('tName').textContent = nameText;
-  g('tName').style.left = '45px';
-  g('tName').style.top  = '58px';
+  g('tName').textContent   = nameText;
+  g('tName').style.left    = '45px';
+  g('tName').style.top     = '58px';
+  g('tName').style.color   = isUpgrade ? '#ffffff' : '#1a1a1a';
   if (g('tCyberName')) {
     g('tCyberName').textContent      = nameText;
     g('tCyberName').style.left       = '';
