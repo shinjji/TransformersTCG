@@ -48,31 +48,48 @@ let _modalEl    = null;
 const PROGRESS_STEPS = ['faction','identity','stats','ability','artwork','info'];
 
 
+/* ── Sub-type UI toggle ───────────────────────────────────────────────── */
+function onSubTypeChange() {
+  const isUpgrade = (g('battleSubType')?.value || '') === 'Battle - Upgrade';
+  const rowExp = g('rowExplanation');
+  const rowUpg = g('rowUpgradeType');
+  if (rowExp) rowExp.style.display = isUpgrade ? 'none' : '';
+  if (rowUpg) rowUpg.style.display = isUpgrade ? ''     : 'none';
+  render();
+}
+
 /* ── Main render ──────────────────────────────────────────────────────── */
 function render() {
-  const faction = g('faction').value;
-  const typeKey = 'Battle - Action';
-  const cp      = comp => cc('battle', `${typeKey} - ${comp}.png`);
+  const faction     = g('faction').value;
+  const subType     = g('battleSubType')?.value || 'Battle - Action';
+  const isUpgrade   = subType === 'Battle - Upgrade';
+  const upgradeType = g('upgradeType')?.value || 'Attack';
+  const cp          = comp => cc('battle', `${subType} - ${comp}.png`);
 
   const ALL_LAYERS = ['lGradient','lHeaderBg','lHeaderLines','lHeaderOverlay',
     'lMainFrame','lTextbox','lHeaderMask','lExplanation',
     'lSetSlash','lModeBox','lStarSep','lFactionFrame','lFactionIcon'];
   ALL_LAYERS.forEach(id => setLayer(id, null));
 
-  if (faction) setLayer('lHeaderOverlay', cp(`Header Overlay ${faction}`));
-  setLayer('lMainFrame',     cp('Main Frame'));
-  setLayer('lSetSlash',      cp('Set Slash'));
-  setLayer('lHeaderMask',    cp('Header Mask'));
-
-  // Explanation badge
-  const expVal = g('explanationType')?.value || '';
-  if (expVal) {
-    setLayer('lExplanation', cp(`Explanation ${expVal}`));
-    const expEl = g('lExplanation');
-    if (expEl) {
-      expEl.style.cssText = 'position:absolute;bottom:13%;left:0;width:40%;height:auto;object-fit:contain;display:block;';
+  if (isUpgrade) {
+    // Upgrade: BG layer replaces gradient, no header mask
+    setLayer('lGradient', cc('battle', `Battle - Upgrade - ${upgradeType} BG.png`));
+  } else {
+    // Action: header mask + explanation badge
+    setLayer('lHeaderMask', cp('Header Mask'));
+    const expVal = g('explanationType')?.value || '';
+    if (expVal) {
+      setLayer('lExplanation', cp(`Explanation ${expVal}`));
+      const expEl = g('lExplanation');
+      if (expEl) {
+        expEl.style.cssText = 'position:absolute;bottom:13%;left:0;width:40%;height:auto;object-fit:contain;display:block;';
+      }
     }
   }
+
+  if (faction) setLayer('lHeaderOverlay', cp(`Header Overlay ${faction}`));
+  setLayer('lMainFrame', cp('Main Frame'));
+  setLayer('lSetSlash',  cp('Set Slash'));
 
   // Artwork
   const artEl = g('lArt');
@@ -92,18 +109,24 @@ function render() {
   g('tName').style.left = '45px';
   g('tName').style.top  = '58px';
   if (g('tCyberName')) {
-    g('tCyberName').textContent = nameText;
-    g('tCyberName').style.left   = '85px';
-    g('tCyberName').style.top    = '42px';
-    g('tCyberName').style.right  = '';
+    g('tCyberName').textContent      = nameText;
+    g('tCyberName').style.left       = '';
+    g('tCyberName').style.right      = '94px';
+    g('tCyberName').style.top        = '42px';
+    g('tCyberName').style.textAlign  = 'right';
   }
 
-  // ACTION label — fixed position
+  // Card col label
+  const frontLabel = g('frontLabel');
+  if (frontLabel) frontLabel.textContent = isUpgrade ? 'BATTLE UPGRADE' : 'BATTLE ACTION';
+
+  // Type label — fixed position
   const actionEl = g('tActionLabel');
   if (actionEl) {
-    actionEl.textContent = 'Action';
-    actionEl.style.left = '52px';
-    actionEl.style.top  = '309px';
+    actionEl.textContent = isUpgrade ? `Upgrade - ${upgradeType}` : 'Action';
+    actionEl.style.left  = '52px';
+    actionEl.style.top   = '309px';
+    actionEl.style.color = isUpgrade ? '#ffffff' : '#1a1a1a';
   }
 
   // Battle icons — stacked top-right
@@ -222,6 +245,8 @@ function restoreSections() {
 /* ── State / persistence ──────────────────────────────────────────────── */
 function getState() {
   return {
+    battleSubType: g('battleSubType')?.value || 'Battle - Action',
+    upgradeType:   g('upgradeType')?.value  || 'Armor',
     faction:    g('faction').value,
     cardName:   g('cardName').value,
     starCount:  g('starCount').value,
@@ -246,6 +271,9 @@ function getState() {
 
 function applyState(s) {
   const set = (id, val) => { if (val !== undefined && g(id)) g(id).value = val; };
+  set('battleSubType', s.battleSubType);
+  set('upgradeType',   s.upgradeType);
+  onSubTypeChange();
   set('faction',    s.faction);
   set('cardName',   s.cardName);
   set('starCount',  s.starCount);
@@ -288,6 +316,9 @@ function resetToDefaults() {
   try { localStorage.removeItem('tfBattleActionState'); } catch(e) {}
   artStore.del('battle_action_bot').catch(()=>{});
   artworkSrc = null;
+  if (g('battleSubType')) g('battleSubType').value = 'Battle - Action';
+  if (g('upgradeType'))   g('upgradeType').value   = 'Armor';
+  onSubTypeChange();
   g('faction').value = ''; g('cardName').value = 'CARD NAME';
   g('starCount').value = '0';
   if (g('starsUse5'))  g('starsUse5').checked  = false;
@@ -383,16 +414,24 @@ function getHTML() {
       <div class="section-body">
         <div class="field">
           <label>Sub-type</label>
-          <select id="battleSubType">
+          <select id="battleSubType" onchange="onSubTypeChange()">
             <option value="Battle - Action">Battle Action</option>
-            <option value="Battle - Upgrade" disabled>Battle Upgrade</option>
+            <option value="Battle - Upgrade">Battle Upgrade</option>
           </select>
         </div>
         <div class="field">
           <label>Faction</label>
           <select id="faction" onchange="render()">${FACTIONS_HTML}</select>
         </div>
-<div class="field">
+        <div class="field" id="rowUpgradeType" style="display:none;">
+          <label>Upgrade Type</label>
+          <select id="upgradeType" onchange="render()">
+            <option value="Weapon">Weapon</option>
+            <option value="Utility">Utility</option>
+            <option value="Armor" selected>Armor</option>
+          </select>
+        </div>
+        <div class="field" id="rowExplanation">
           <label>Explanation Badge</label>
           <select id="explanationType" onchange="render()">
             <option value="">- None -</option>
@@ -563,7 +602,7 @@ const MODAL_HTML = `
 
 /* ── Composer interface ───────────────────────────────────────────────── */
 const GLOBALS = ['render','loadArt','zoom','resetZoom','toggleSec',
-  'copyJSON','loadJSON','closeJSONModal','confirmLoadJSON',
+  'onSubTypeChange','copyJSON','loadJSON','closeJSONModal','confirmLoadJSON',
   'exportPNG','updateProgress','resetToDefaults'];
 
 function init(mountEl) {
@@ -574,7 +613,7 @@ function init(mountEl) {
   document.body.appendChild(_modalEl.firstElementChild);
 
   const fns = { render, loadArt, zoom, resetZoom, toggleSec,
-    copyJSON, loadJSON, closeJSONModal, confirmLoadJSON,
+    onSubTypeChange, copyJSON, loadJSON, closeJSONModal, confirmLoadJSON,
     exportPNG, updateProgress, resetToDefaults };
   GLOBALS.forEach(k => { window[k] = fns[k]; });
 

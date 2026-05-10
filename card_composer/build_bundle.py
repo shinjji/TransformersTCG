@@ -50,6 +50,10 @@ def collect_files():
     for path in sorted(glob.glob(os.path.join(BASE, 'battle', 'Battle - Action - *.png'))):
         files.append(path)
 
+    # Battle - Upgrade PNGs
+    for path in sorted(glob.glob(os.path.join(BASE, 'battle', 'Battle - Upgrade - *.png'))):
+        files.append(path)
+
     # Battle shared trait PNGs (used by all Battle types)
     for path in sorted(glob.glob(os.path.join(BASE, 'battle', 'Battle - Trait *.png'))):
         files.append(path)
