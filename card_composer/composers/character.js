@@ -920,10 +920,10 @@ function getHTML() {
             <img id="lHeaderOverlay"  class="card-layer" alt="">
             <img id="lHeaderOverlay2" class="card-layer" alt="">
             <img id="lHeaderLines"    class="card-layer" alt="">
-            <img id="lFactionFrame"   class="card-layer" alt="">
             <img id="lFactionIcon"    class="card-layer" alt="">
             <img id="lFactionIcon2"   class="card-layer" alt="">
             <img id="lFactionDual"    class="card-layer" alt="">
+            <img id="lFactionFrame"   class="card-layer" alt="">
 
             <div id="tCyberName" class="card-text" style="top:1.5%;right:2%;font-family:'CybertonicFont',sans-serif;font-size:15px;color:rgba(210,210,210,0.3);text-transform:uppercase;letter-spacing:2px;text-align:right;white-space:nowrap;overflow:hidden;pointer-events:none;"></div>
             <div id="tName" class="card-text" style="top:5%;left:4%;right:16%;font-family:'BayformersName','Segoe UI',sans-serif;font-size:32px;color:#fff;text-transform:uppercase;letter-spacing:1px;line-height:1;white-space:nowrap;overflow:hidden;"></div>
