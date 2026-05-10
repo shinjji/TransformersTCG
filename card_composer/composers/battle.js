@@ -53,8 +53,12 @@ function onSubTypeChange() {
   const isUpgrade = (g('battleSubType')?.value || '') === 'Battle - Upgrade';
   const rowExp = g('rowExplanation');
   const rowUpg = g('rowUpgradeType');
+  const rowAtk = g('rowUpgradeAtk');
+  const rowDef = g('rowUpgradeDef');
   if (rowExp) rowExp.style.display = isUpgrade ? 'none' : '';
   if (rowUpg) rowUpg.style.display = isUpgrade ? ''     : 'none';
+  if (rowAtk) rowAtk.style.display = isUpgrade ? ''     : 'none';
+  if (rowDef) rowDef.style.display = isUpgrade ? ''     : 'none';
   render();
 }
 
@@ -66,15 +70,47 @@ function render() {
   const upgradeType = g('upgradeType')?.value || 'Attack';
   const cp          = comp => cc('battle', `${subType} - ${comp}.png`);
 
-  const ALL_LAYERS = ['lGradient','lHeaderBg','lHeaderLines','lHeaderOverlay',
+  const ALL_LAYERS = ['lGradient','lGradient2','lHeaderBg','lHeaderLines','lHeaderOverlay',
     'lMainFrame','lTextbox','lHeaderMask','lExplanation',
     'lSetSlash','lModeBox','lStarSep','lFactionFrame','lFactionIcon'];
   ALL_LAYERS.forEach(id => setLayer(id, null));
 
   if (isUpgrade) {
-    // Upgrade: BG layer replaces gradient, no header mask
-    setLayer('lGradient', cc('battle', `Battle - Upgrade - ${upgradeType} BG.png`));
+    // Upgrade: BG driven by whichever stat field has a value
+    const atkVal = parseInt(g('upgradeAtk')?.value) || 0;
+    const defVal = parseInt(g('upgradeDef')?.value) || 0;
+    if (atkVal > 0) setLayer('lGradient',  cc('battle', 'Battle - Upgrade - Attack BG.png'));
+    if (defVal > 0) setLayer('lGradient2', cc('battle', 'Battle - Upgrade - Defense BG.png'));
+
+    // ATK number
+    const atkEl = g('tUpgradeAtk');
+    if (atkEl) {
+      if (atkVal > 0) {
+        atkEl.textContent     = (g('atkMinus')?.checked ? '-' : '+') + atkVal;
+        atkEl.style.display   = '';
+        atkEl.style.left      = '52px';
+        atkEl.style.top       = '432px';
+        atkEl.style.transform = '';
+        atkEl.style.fontSize  = '28px';
+      } else { atkEl.style.display = 'none'; }
+    }
+    // DEF number
+    const defEl = g('tUpgradeDef');
+    if (defEl) {
+      if (defVal > 0) {
+        defEl.textContent     = (g('defMinus')?.checked ? '-' : '+') + defVal;
+        defEl.style.display   = '';
+        defEl.style.left      = '290px';
+        defEl.style.top       = '432px';
+        defEl.style.transform = '';
+        defEl.style.fontSize  = '28px';
+      } else { defEl.style.display = 'none'; }
+    }
   } else {
+    // Hide upgrade-only elements for action cards
+    const _atkEl = g('tUpgradeAtk'); if (_atkEl) _atkEl.style.display = 'none';
+    const _defEl = g('tUpgradeDef'); if (_defEl) _defEl.style.display = 'none';
+
     // Action: header mask + explanation badge
     setLayer('lHeaderMask', cp('Header Mask'));
     const expVal = g('explanationType')?.value || '';
@@ -254,6 +290,8 @@ function getState() {
     starsUse5:  g('starsUse5')?.checked  || false,
     starsUse10: g('starsUse10')?.checked || false,
     explanationType: g('explanationType')?.value || '',
+    upgradeAtk: g('upgradeAtk')?.value || '0', atkMinus: g('atkMinus')?.checked || false,
+    upgradeDef: g('upgradeDef')?.value || '0', defMinus: g('defMinus')?.checked || false,
     battleIcon1: g('battleIcon1')?.value || '',
     battleIcon2: g('battleIcon2')?.value || '',
     battleIcon3: g('battleIcon3')?.value || '',
@@ -281,6 +319,8 @@ function applyState(s) {
   if (g('starsUse5'))  g('starsUse5').checked  = s.starsUse5  || false;
   if (g('starsUse10')) g('starsUse10').checked = s.starsUse10 || false;
   set('explanationType', s.explanationType);
+  set('upgradeAtk', s.upgradeAtk); if (g('atkMinus')) g('atkMinus').checked = s.atkMinus || false;
+  set('upgradeDef', s.upgradeDef); if (g('defMinus')) g('defMinus').checked = s.defMinus || false;
   set('battleIcon1', s.battleIcon1); set('battleIcon2', s.battleIcon2); set('battleIcon3', s.battleIcon3);
   set('abilityFontSize', s.abilityFontSize);
   set('posAbilityBox',   s.posAbilityBox);
@@ -325,6 +365,8 @@ function resetToDefaults() {
   if (g('starsUse5'))  g('starsUse5').checked  = false;
   if (g('starsUse10')) g('starsUse10').checked = false;
   if (g('explanationType')) g('explanationType').value = '';
+  if (g('upgradeAtk')) g('upgradeAtk').value = '0'; if (g('atkMinus')) g('atkMinus').checked = false;
+  if (g('upgradeDef')) g('upgradeDef').value = '0'; if (g('defMinus')) g('defMinus').checked = false;
   if (g('battleIcon1')) g('battleIcon1').value = '';
   if (g('battleIcon2')) g('battleIcon2').value = '';
   if (g('battleIcon3')) g('battleIcon3').value = '';
@@ -456,6 +498,18 @@ function getHTML() {
     <div class="section" id="sec-stats">
       <div class="section-header" onclick="toggleSec('stats')">Stats <span class="chevron">▾</span></div>
       <div class="section-body">
+        <div id="rowUpgradeAtk" style="display:none;">
+          <div style="display:flex;align-items:center;gap:8px;">
+            <div class="field" style="flex:1;"><label>ATK</label><input type="number" id="upgradeAtk" value="0" min="0" max="99" oninput="render()"></div>
+            <label style="display:flex;align-items:center;gap:4px;font-size:10px;color:var(--label);cursor:pointer;margin-top:12px;white-space:nowrap;"><input type="checkbox" id="atkMinus" onchange="render()"> Minus</label>
+          </div>
+        </div>
+        <div id="rowUpgradeDef" style="display:none;">
+          <div style="display:flex;align-items:center;gap:8px;">
+            <div class="field" style="flex:1;"><label>DEF</label><input type="number" id="upgradeDef" value="0" min="0" max="99" oninput="render()"></div>
+            <label style="display:flex;align-items:center;gap:4px;font-size:10px;color:var(--label);cursor:pointer;margin-top:12px;white-space:nowrap;"><input type="checkbox" id="defMinus" onchange="render()"> Minus</label>
+          </div>
+        </div>
         <div class="field"><label>Battle Icon 1</label><select id="battleIcon1" onchange="render()">${BATTLE_ICON_OPTS_HTML}</select></div>
         <div class="field"><label>Battle Icon 2</label><select id="battleIcon2" onchange="render()">${BATTLE_ICON_OPTS_HTML}</select></div>
         <div class="field"><label>Battle Icon 3</label><select id="battleIcon3" onchange="render()">${BATTLE_ICON_OPTS_HTML}</select></div>
@@ -525,11 +579,12 @@ function getHTML() {
         <div class="card-wrapper" id="cardWrapper">
           <div class="card" id="card">
             <img id="lArt" class="card-layer" style="display:none;object-fit:cover;object-position:center top;mix-blend-mode:normal;">
-            <img id="lGradient"      class="card-layer" alt="">
             <img id="lHeaderMask"    class="card-layer" alt="">
             <img id="lTextbox"       class="card-layer" alt="">
             <img id="lExplanation"   class="card-layer" alt="" style="display:none;">
             <img id="lMainFrame"     class="card-layer" alt="">
+            <img id="lGradient"      class="card-layer" alt="">
+            <img id="lGradient2"     class="card-layer" alt="">
             <img id="lSetSlash"      class="card-layer" alt="">
             <img id="lStarSep"       class="card-layer" alt="" style="display:none;">
             <img id="lModeBox"       class="card-layer" alt="" style="display:none;">
@@ -541,7 +596,7 @@ function getHTML() {
 
             <div id="tCyberName" class="card-text" style="top:2%;right:2%;font-family:'CybertonicFont',sans-serif;font-size:13px;color:rgba(80,80,80,0.85);text-transform:uppercase;letter-spacing:-0.5px;text-align:right;white-space:nowrap;overflow:hidden;pointer-events:none;"></div>
             <div id="tName" class="card-text" style="font-family:'BayformersName','Segoe UI',sans-serif;font-size:32px;color:#1a1a1a;text-transform:uppercase;letter-spacing:-0.5px;line-height:1;white-space:nowrap;overflow:hidden;"></div>
-            <div id="abilityBoxWide" class="card-text" style="bottom:6%;left:8%;right:8%;font-size:8.5px;line-height:1.55;color:#1a1a1a;text-align:center;">
+            <div id="abilityBoxWide" class="card-text" style="bottom:6%;left:10%;right:10%;font-size:8.5px;line-height:1.55;color:#1a1a1a;text-align:center;">
               <div id="tAbilityBodyWide" style="font-family:'GothamNarrow','Arial',sans-serif;"></div>
               <div id="tAbilityParenWide" style="font-style:italic;font-family:'GothamNarrowItalic','Georgia',serif;margin-top:4px;"></div>
             </div>
@@ -552,6 +607,8 @@ function getHTML() {
             <div id="tBattleIcons" class="card-text" style="top:0;right:0;display:flex;flex-direction:column;align-items:center;pointer-events:none;"></div>
             <img id="lStamp" class="card-text" style="display:none;position:absolute;pointer-events:none;">
             <div id="tActionLabel" class="card-text" style="font-family:'BattleCardType',sans-serif;font-size:13px;color:#1a1a1a;text-transform:uppercase;letter-spacing:0px;pointer-events:none;"></div>
+            <div id="tUpgradeAtk" class="card-text" style="display:none;font-family:'ArmadaCondensed',sans-serif;font-size:48px;color:#ffffff;font-weight:700;line-height:1;letter-spacing:4px;left:50%;top:45%;transform:translate(-50%,-50%);pointer-events:none;"></div>
+            <div id="tUpgradeDef" class="card-text" style="display:none;font-family:'ArmadaCondensed',sans-serif;font-size:48px;color:#ffffff;font-weight:700;line-height:1;letter-spacing:4px;left:50%;top:55%;transform:translate(-50%,-50%);pointer-events:none;"></div>
           </div><!-- .card -->
         </div>
       </div>
