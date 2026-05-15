@@ -21,6 +21,7 @@ const PROGRESS_STEPS = ['type', 'identity', 'stats', 'ability', 'artwork', 'info
 
 /* ── Export shift map ──────────────────────────────────────────────────── */
 const EXPORT_SHIFT = {
+  tCyberName:   1,
   tName:        1,
   tTarget:      1,
   tStratLabel:  1,
@@ -95,6 +96,12 @@ function render() {
   g('tName').style.left     = '50px';
   g('tName').style.top      = '48px';
   g('tName').style.fontSize = '29px';
+  if (g('tCyberName')) {
+    g('tCyberName').textContent     = nameText;
+    g('tCyberName').style.right     = '55px';
+    g('tCyberName').style.top       = '41px';
+    g('tCyberName').style.textAlign = 'right';
+  }
 
   // Target
   const targetText = (g('cardTarget').value || '').toUpperCase();
@@ -108,7 +115,12 @@ function render() {
   g('tTarget').style.display    = targetText ? '' : 'none';
 
   // STRATAGEM type label
-  g('tStratLabel').textContent = 'Stratagem';
+  g('tStratLabel').textContent     = 'Stratagem';
+  g('tStratLabel').style.left      = '0';
+  g('tStratLabel').style.right     = '0';
+  g('tStratLabel').style.top       = '304px';
+  g('tStratLabel').style.textAlign = 'center';
+  g('tStratLabel').style.color     = faction ? '#fff' : '#000';
 
   // Ability text
   const aFontSize = parseFloat(g('abilityFontSize')?.value) || 8;
@@ -388,7 +400,8 @@ function resetToDefaults() {
   artStore.del('stratagem_front').catch(()=>{}); artStore.del('stratagem_back').catch(()=>{});
   artworkSrc = null; altArtworkSrc = null;
   g('faction').value = 'Autobot';
-  g('cardName').value = 'STRATAGEM NAME'; g('cardTarget').value = '';
+  g('cardName').value = 'STRATAGEM NAME';
+  g('cardTarget').value = '';
   g('starCount').value = '0';
   if (g('starsUse5'))  g('starsUse5').checked  = false;
   if (g('starsUse10')) g('starsUse10').checked = false;
@@ -499,7 +512,7 @@ function getHTML() {
           <label>Name</label>
           <input type="text" id="cardName" value="STRATAGEM NAME" oninput="render()">
         </div>
-        <div class="field" style="margin-top:8px;padding-top:8px;border-top:1px solid var(--border);">
+        <div class="field">
           <label>Target</label>
           <input type="text" id="cardTarget" value="" placeholder="e.g. OPTIMUS PRIME" oninput="render()">
         </div>
@@ -617,6 +630,7 @@ function getHTML() {
             <img id="lSetSlash"          class="card-layer" alt="">
             <img id="lFaction"           class="card-text"  alt="" style="display:none;position:absolute;pointer-events:none;">
 
+            <div id="tCyberName" class="card-text" style="top:2%;right:2%;font-family:'CybertonicFont',sans-serif;font-size:13px;color:rgba(180,180,180,0.5);text-transform:uppercase;letter-spacing:-2px;text-align:right;white-space:nowrap;overflow:hidden;pointer-events:none;"></div>
             <div id="tName" class="card-text" style="top:29px;left:13px;right:40px;font-family:'BayformersName','Segoe UI',sans-serif;font-size:22px;color:#fff;text-transform:uppercase;letter-spacing:0.5px;line-height:1;white-space:nowrap;overflow:hidden;"></div>
             <div id="tTarget" class="card-text" style="top:55px;left:13px;right:6px;font-family:'OpenSansSCMedItal',sans-serif;font-size:8px;color:#fff;text-transform:uppercase;letter-spacing:0.8px;white-space:nowrap;overflow:hidden;display:none;"></div>
             <div id="tStratLabel" class="card-text" style="top:299px;left:52px;font-family:'BattleCardType',sans-serif;font-size:13px;color:#fff;text-transform:uppercase;letter-spacing:0px;"></div>
