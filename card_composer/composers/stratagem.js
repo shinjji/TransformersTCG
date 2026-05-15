@@ -110,7 +110,7 @@ function render() {
       starsEl.appendChild(img); running+=v;
     });
     starsEl.style.left    = '37px';
-    starsEl.style.top     = '478px';
+    starsEl.style.top     = '463px';
     starsEl.style.bottom  = '';
     starsEl.style.display = 'flex';
   } else { starsEl.style.display = 'none'; }
@@ -120,7 +120,7 @@ function render() {
   if (stampEl) {
     stampEl.src = assetUrl('stamp/wave11_tbc.svg');
     stampEl.style.left    = (starCount > 0 ? 213 : 33) + 'px';
-    stampEl.style.top     = '473px';
+    stampEl.style.top     = '458px';
     stampEl.style.width   = '20px';
     stampEl.style.height  = 'auto';
     stampEl.style.display = 'block';
@@ -469,8 +469,8 @@ function resetProgress() {
 async function exportPNG() {
   const btn = g('exportBtn'); btn.textContent='Generating…'; btn.disabled=true;
   try {
-    await exportCard(g('card'),   buildFilename('f')+'.png', { shiftMap: EXPORT_SHIFT, iconNudge: 2 });
-    await exportCard(g('b_card'), buildFilename('b')+'.png', { shiftMap: EXPORT_SHIFT, iconNudge: 2 });
+    await exportCard(g('card'),   buildFilename('f')+'.png', { shiftMap: EXPORT_SHIFT, iconNudge: 2, scale: 844/380, exportW: 844, exportH: 1139 });
+    await exportCard(g('b_card'), buildFilename('b')+'.png', { shiftMap: EXPORT_SHIFT, iconNudge: 2, scale: 844/380, exportW: 844, exportH: 1139 });
   } catch(e) { alert('Export failed: '+e.message); }
   finally { btn.textContent = 'Export PNGs ↓'; updateProgress(); }
 }
@@ -601,7 +601,7 @@ function getHTML() {
       <div class="card-col">
         <div class="card-col-label" id="frontLabel">STRATAGEM FRONT</div>
         <div class="card-wrapper" id="cardWrapper">
-          <div class="card" id="card">
+          <div class="card" id="card" style="height:513px;">
             <img id="lArt"           class="card-layer" style="display:none;object-fit:cover;object-position:center top;">
             <img id="lMainFrame"     class="card-layer" alt="">
             <img id="lHeaderBg"      class="card-layer" alt="">
@@ -612,9 +612,9 @@ function getHTML() {
             <img id="lHeaderOverlay" class="card-layer" alt="">
             <img id="lSetSlash"      class="card-layer" alt="">
 
-            <div id="tName" class="card-text" style="top:30px;left:13px;right:40px;font-family:'BayformersName','Segoe UI',sans-serif;font-size:22px;color:#fff;text-transform:uppercase;letter-spacing:0.5px;line-height:1;white-space:nowrap;overflow:hidden;"></div>
-            <div id="tTarget" class="card-text" style="top:57px;left:13px;right:6px;font-family:'OpenSansSCMedItal',sans-serif;font-size:8px;color:#fff;text-transform:uppercase;letter-spacing:0.8px;white-space:nowrap;overflow:hidden;display:none;"></div>
-            <div id="tStratLabel" class="card-text" style="top:309px;left:52px;font-family:'BattleCardType',sans-serif;font-size:13px;color:#fff;text-transform:uppercase;letter-spacing:0px;"></div>
+            <div id="tName" class="card-text" style="top:29px;left:13px;right:40px;font-family:'BayformersName','Segoe UI',sans-serif;font-size:22px;color:#fff;text-transform:uppercase;letter-spacing:0.5px;line-height:1;white-space:nowrap;overflow:hidden;"></div>
+            <div id="tTarget" class="card-text" style="top:55px;left:13px;right:6px;font-family:'OpenSansSCMedItal',sans-serif;font-size:8px;color:#fff;text-transform:uppercase;letter-spacing:0.8px;white-space:nowrap;overflow:hidden;display:none;"></div>
+            <div id="tStratLabel" class="card-text" style="top:299px;left:52px;font-family:'BattleCardType',sans-serif;font-size:13px;color:#fff;text-transform:uppercase;letter-spacing:0px;"></div>
             <div id="abilityBox" class="card-text" style="bottom:18%;left:10%;right:10%;font-size:8px;line-height:1.55;color:#1a1a1a;text-align:center;">
               <div id="tAbilityBody" style="font-family:'GothamNarrow','Arial',sans-serif;"></div>
             </div>
@@ -631,7 +631,7 @@ function getHTML() {
       <div class="card-col" id="backCardCol">
         <div class="card-col-label" id="backLabel">STRATAGEM BACK</div>
         <div class="card-wrapper" id="b_cardWrapper">
-          <div class="card" id="b_card">
+          <div class="card" id="b_card" style="height:513px;">
             <img id="b_lBlackBg"        class="card-layer" alt="">
             <img id="b_lArt"            class="card-layer" style="display:none;object-fit:cover;object-position:center top;">
             <img id="b_lArtBorder"      class="card-layer" alt="">
@@ -649,18 +649,18 @@ function getHTML() {
             <img id="b_lStatHp"         class="card-layer" alt="" style="display:none;">
             <img id="b_lSetSlash"       class="card-layer" alt="">
 
-            <div id="b_tName" class="card-text" style="top:30px;left:13px;right:40px;font-family:'BayformersName','Segoe UI',sans-serif;font-size:22px;color:#fff;text-transform:uppercase;letter-spacing:0.5px;line-height:1;white-space:nowrap;overflow:hidden;"></div>
-            <div id="b_tTarget" class="card-text" style="top:57px;left:13px;right:6px;font-family:'OpenSansSCMedItal',sans-serif;font-size:8px;color:#fff;text-transform:uppercase;letter-spacing:0.8px;white-space:nowrap;overflow:hidden;display:none;"></div>
-            <span id="b_tAtk" class="card-text" style="display:none;font-family:'ArmadaCondensed',sans-serif;font-size:24px;font-weight:700;color:#fff;line-height:1;top:415px;left:48px;"></span>
-            <span id="b_tDef" class="card-text" style="display:none;font-family:'ArmadaCondensed',sans-serif;font-size:24px;font-weight:700;color:#fff;line-height:1;top:415px;left:270px;"></span>
-            <span id="b_tHp"  class="card-text" style="display:none;font-family:'ArmadaCondensed',sans-serif;font-size:24px;font-weight:700;color:#fff;line-height:1;top:415px;left:160px;"></span>
+            <div id="b_tName" class="card-text" style="top:29px;left:13px;right:40px;font-family:'BayformersName','Segoe UI',sans-serif;font-size:22px;color:#fff;text-transform:uppercase;letter-spacing:0.5px;line-height:1;white-space:nowrap;overflow:hidden;"></div>
+            <div id="b_tTarget" class="card-text" style="top:55px;left:13px;right:6px;font-family:'OpenSansSCMedItal',sans-serif;font-size:8px;color:#fff;text-transform:uppercase;letter-spacing:0.8px;white-space:nowrap;overflow:hidden;display:none;"></div>
+            <span id="b_tAtk" class="card-text" style="display:none;font-family:'ArmadaCondensed',sans-serif;font-size:24px;font-weight:700;color:#fff;line-height:1;top:402px;left:48px;"></span>
+            <span id="b_tDef" class="card-text" style="display:none;font-family:'ArmadaCondensed',sans-serif;font-size:24px;font-weight:700;color:#fff;line-height:1;top:402px;left:270px;"></span>
+            <span id="b_tHp"  class="card-text" style="display:none;font-family:'ArmadaCondensed',sans-serif;font-size:24px;font-weight:700;color:#fff;line-height:1;top:402px;left:160px;"></span>
             <div id="b_abilityBox" class="card-text" style="bottom:18%;left:10%;right:10%;font-size:8px;line-height:1.55;color:#1a1a1a;text-align:center;">
               <div id="b_tAbilityBody" style="font-family:'GothamNarrow','Arial',sans-serif;"></div>
             </div>
             <span id="b_tWave"   class="card-text" style="display:none;"></span>
             <span id="b_tId"     class="card-text" style="display:none;"></span>
             <div  id="b_tCredit" class="card-text" style="font-size:10px;color:#fff;text-align:right;line-height:1.35;font-family:'OpenSansBold',sans-serif;bottom:39px;right:40px;"></div>
-            <div  id="b_tStarsFooter" class="card-text" style="display:none;align-items:center;gap:2px;top:478px;left:37px;"></div>
+            <div  id="b_tStarsFooter" class="card-text" style="display:none;align-items:center;gap:2px;top:463px;left:37px;"></div>
           </div><!-- .card back -->
         </div><!-- .card-wrapper back -->
       </div><!-- .card-col back -->
