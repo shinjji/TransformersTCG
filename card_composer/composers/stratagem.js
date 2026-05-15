@@ -159,7 +159,7 @@ function render() {
   const stampEl = g('lStamp');
   if (stampEl) {
     stampEl.src = assetUrl('stamp/wave11_tbc.svg');
-    stampEl.style.left    = (starCount > 0 ? 213 : 33) + 'px';
+    stampEl.style.left    = (starCount > 0 ? 213 : 35) + 'px';
     stampEl.style.top     = '458px';
     stampEl.style.width   = '20px';
     stampEl.style.height  = 'auto';
@@ -531,7 +531,7 @@ function getHTML() {
           <label style="display:flex;align-items:center;gap:5px;font-size:10px;color:var(--label);cursor:pointer;"><input type="checkbox" id="starsUse5" onchange="render()"> Use 5s</label>
           <label style="display:flex;align-items:center;gap:5px;font-size:10px;color:var(--label);cursor:pointer;"><input type="checkbox" id="starsUse10" onchange="render()"> Use 10s</label>
         </div>
-        <div style="font-size:10px;font-weight:700;letter-spacing:1px;color:#888;text-transform:uppercase;margin:0 0 6px;">Stat Modifiers (Back Card)</div>
+        <div style="font-size:10px;font-weight:700;letter-spacing:1px;color:#888;text-transform:uppercase;margin:0 0 6px;">Stat Modifiers</div>
         <div class="row-2">
           <div class="field"><label>ATK</label><input type="number" id="statAtk" value="0" min="0" max="99" oninput="render()"></div>
           <div class="field"><label>DEF</label><input type="number" id="statDef" value="0" min="0" max="99" oninput="render()"></div>
