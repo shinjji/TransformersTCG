@@ -50,6 +50,20 @@ function render() {
    'lHeaderLine','lHeaderOverlayBg','lHeaderOverlay','lBorderBottom',
    'lTextboxOverlayBg','lTextbox','lTextboxOverlay','lSetSlash'].forEach(id => setLayer(id, null));
 
+  // Faction icon — front
+  const factionEl = g('lFaction');
+  if (factionEl) {
+    if (faction) {
+      factionEl.src = cc('faction', `Faction - ${faction}.png`);
+      factionEl.style.left    = '154px';
+      factionEl.style.top     = '343px';
+      factionEl.style.width   = '69px';
+      factionEl.style.height  = 'auto';
+      factionEl.style.opacity = '0.15';
+      factionEl.style.display = '';
+    } else { factionEl.src = ''; factionEl.style.display = 'none'; }
+  }
+
   // Layers — back to front
   setLayer('lMainFrame',       sf('Stratagem - Small - Art Border.png'));
   setLayer('lBlackBg',         sf('Stratagem - Small - Black Background.png'));
@@ -158,6 +172,19 @@ function renderBack() {
    'lTextboxOverlayBg','lBorderBottom','lTextbox','lTextboxOverlay',
    'lStatFrame','lStatAtk','lStatDef','lStatHp'
   ].forEach(id => setBackLayer(id, null));
+
+  // Faction icon — back
+  const bFactionEl = g('b_lFaction');
+  if (bFactionEl) {
+    if (faction) {
+      bFactionEl.src = cc('faction', `Faction - ${faction}.png`);
+      bFactionEl.style.left    = '40px';
+      bFactionEl.style.top     = '40px';
+      bFactionEl.style.width   = '63px';
+      bFactionEl.style.height  = 'auto';
+      bFactionEl.style.display = '';
+    } else { bFactionEl.src = ''; bFactionEl.style.display = 'none'; }
+  }
 
   // Back layers — back to front
   setBackLayer('lArtBorder',        sf('Stratagem - Small - Art Border.png'));
@@ -579,6 +606,7 @@ function getHTML() {
             <img id="lTextbox"           class="card-layer" alt="">
             <img id="lTextboxOverlay"    class="card-layer" alt="">
             <img id="lSetSlash"          class="card-layer" alt="">
+            <img id="lFaction"           class="card-text"  alt="" style="display:none;position:absolute;pointer-events:none;">
 
             <div id="tName" class="card-text" style="top:29px;left:13px;right:40px;font-family:'BayformersName','Segoe UI',sans-serif;font-size:22px;color:#fff;text-transform:uppercase;letter-spacing:0.5px;line-height:1;white-space:nowrap;overflow:hidden;"></div>
             <div id="tTarget" class="card-text" style="top:55px;left:13px;right:6px;font-family:'OpenSansSCMedItal',sans-serif;font-size:8px;color:#fff;text-transform:uppercase;letter-spacing:0.8px;white-space:nowrap;overflow:hidden;display:none;"></div>
@@ -606,6 +634,7 @@ function getHTML() {
             <img id="b_lBorderBottom"   class="card-layer" alt="">
             <img id="b_lTextbox"        class="card-layer" alt="">
             <img id="b_lTextboxOverlay" class="card-layer" alt="">
+            <img id="b_lFaction"        class="card-text"  alt="" style="display:none;position:absolute;pointer-events:none;">
             <img id="b_lStatFrame"      class="card-layer" alt="">
             <img id="b_lStatAtk"        class="card-layer" alt="" style="display:none;">
             <img id="b_lStatDef"        class="card-layer" alt="" style="display:none;">

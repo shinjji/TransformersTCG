@@ -66,6 +66,10 @@ def collect_files():
     for path in sorted(glob.glob(os.path.join(BASE, 'stratagem', '*.png'))):
         files.append(path)
 
+    # Faction icon PNGs
+    for path in sorted(glob.glob(os.path.join(BASE, 'faction', '*.png'))):
+        files.append(path)
+
     # All icon PNGs
     for path in sorted(glob.glob(os.path.join(BASE, 'icons', '*.png'))):
         files.append(path)
