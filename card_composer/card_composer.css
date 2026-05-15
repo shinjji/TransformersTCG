@@ -377,6 +377,87 @@ select option { background: var(--panel2); }
 ::-webkit-scrollbar-track { background: transparent; }
 ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
 
+/* ── MOBILE ────────────────────────────────────────────────────────────── */
+@media (max-width: 768px) {
+
+  /* Allow full-page scrolling */
+  html, body {
+    height: auto;
+    min-height: 100%;
+    overflow: auto;
+    overflow-x: hidden;
+  }
+
+  /* Header: wrap tabs onto second row, hide subtitle */
+  header {
+    height: auto;
+    flex-wrap: wrap;
+    padding: 10px 14px;
+    gap: 8px;
+  }
+  header .subtitle { display: none; }
+  .tag { margin-left: 0 !important; }
+  .composer-tabs {
+    order: 10;
+    margin-left: 0;
+    width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    padding-bottom: 2px;
+  }
+
+  /* App: stack vertically — preview on top, controls below */
+  .app {
+    flex-direction: column;
+    overflow: visible;
+    height: auto;
+    min-height: auto;
+  }
+
+  .preview-area {
+    order: 1;
+    flex: none;
+    padding: 16px 8px 8px;
+    overflow: visible;
+    align-items: center;
+    justify-content: flex-start;
+    min-height: auto;
+  }
+
+  .controls-panel {
+    order: 2;
+    width: 100%;
+    max-height: none;
+    overflow: visible;
+    border-right: none;
+    border-top: 1px solid var(--border);
+  }
+
+  /* Hide progress panel — not useful on mobile */
+  .layers-panel { display: none; }
+
+  /* Card: stack front/back vertically and scale to fit */
+  .cards-display {
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+    margin: 0;
+  }
+
+  .card-wrapper { zoom: 0.88; }
+
+  /* Prevent iOS from zooming into inputs on focus */
+  input[type="text"],
+  input[type="number"],
+  select,
+  textarea { font-size: 16px; }
+}
+
+/* Very small phones */
+@media (max-width: 400px) {
+  .card-wrapper { zoom: 0.80; }
+}
+
 /* ── Modal ── */
 .modal-backdrop {
   display: none;
