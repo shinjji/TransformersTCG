@@ -215,15 +215,17 @@ function setLayer(id, src) {
 }
 
 /* ── PNG Export ──────────────────────────────────────────────────────────
-   shiftMap: { elementId: pixelsUp } — composer-specific corrections.
-   iconNudge: extra px to nudge trait icon <img width="17"> elements down.*/
-async function exportCard(cardEl, filename, { shiftMap = {}, leftShiftMap = {}, iconNudge = 0 } = {}) {
+   shiftMap:   { elementId: pixelsUp } — composer-specific corrections.
+   iconNudge:  extra px to nudge trait icon <img width="17"> elements down.
+   scale:      html2canvas render scale (default 3).
+   exportW/H:  if provided, resize canvas to exactly this output size.    */
+async function exportCard(cardEl, filename, { shiftMap = {}, leftShiftMap = {}, iconNudge = 0, scale = 3, exportW, exportH } = {}) {
   await document.fonts.ready;
   const savedRadius = cardEl.style.borderRadius;
   cardEl.style.borderRadius = '0';
   try {
-    const canvas = await html2canvas(cardEl, {
-      scale: 3,
+    let canvas = await html2canvas(cardEl, {
+      scale,
       useCORS: true,
       allowTaint: true,
       backgroundColor: '#111111',
@@ -254,6 +256,14 @@ async function exportCard(cardEl, filename, { shiftMap = {}, leftShiftMap = {}, 
         }
       },
     });
+    // Resize to exact output dimensions if specified
+    if (exportW && exportH && (canvas.width !== exportW || canvas.height !== exportH)) {
+      const resized = document.createElement('canvas');
+      resized.width  = exportW;
+      resized.height = exportH;
+      resized.getContext('2d').drawImage(canvas, 0, 0, exportW, exportH);
+      canvas = resized;
+    }
     const link = document.createElement('a');
     link.download = filename;
     link.href = canvas.toDataURL('image/png');

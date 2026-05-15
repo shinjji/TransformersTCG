@@ -32,9 +32,9 @@ const EXPORT_SHIFT = {
   tBattleIcons:  0,
   lStamp:       -1,
   abilityBoxWide: 2,
-  tWave:        1,
-  tId:          1,
-  tCredit:      1,
+  tWave:        0,
+  tId:          0,
+  tCredit:      0,
   tStarsFooter: 1,
 };
 
@@ -89,7 +89,7 @@ function render() {
         atkEl.textContent     = (g('atkMinus')?.checked ? '-' : '+') + atkVal;
         atkEl.style.display   = '';
         atkEl.style.left      = '52px';
-        atkEl.style.top       = '432px';
+        atkEl.style.top       = '418px';
         atkEl.style.transform = '';
         atkEl.style.fontSize  = '28px';
       } else { atkEl.style.display = 'none'; }
@@ -101,7 +101,7 @@ function render() {
         defEl.textContent     = (g('defMinus')?.checked ? '-' : '+') + defVal;
         defEl.style.display   = '';
         defEl.style.left      = '290px';
-        defEl.style.top       = '432px';
+        defEl.style.top       = '418px';
         defEl.style.transform = '';
         defEl.style.fontSize  = '28px';
       } else { defEl.style.display = 'none'; }
@@ -142,14 +142,14 @@ function render() {
   // Name + Cybertonian watermark
   const nameText = (g('cardName').value || 'CARD NAME').toUpperCase();
   g('tName').textContent   = nameText;
-  g('tName').style.left    = '45px';
-  g('tName').style.top     = '58px';
+  g('tName').style.left    = '47px';
+  g('tName').style.top     = '56px';
   g('tName').style.color   = isUpgrade ? '#ffffff' : '#1a1a1a';
   if (g('tCyberName')) {
     g('tCyberName').textContent      = nameText;
     g('tCyberName').style.left       = '';
     g('tCyberName').style.right      = '94px';
-    g('tCyberName').style.top        = '42px';
+    g('tCyberName').style.top        = '41px';
     g('tCyberName').style.textAlign  = 'right';
   }
 
@@ -162,15 +162,15 @@ function render() {
   if (actionEl) {
     actionEl.textContent = isUpgrade ? `Upgrade - ${upgradeType}` : 'Action';
     actionEl.style.left  = '52px';
-    actionEl.style.top   = '309px';
+    actionEl.style.top   = '299px';
     actionEl.style.color = isUpgrade ? '#ffffff' : '#1a1a1a';
   }
 
   // Battle icons — stacked top-right
   const iconsEl = g('tBattleIcons');
   if (iconsEl) {
-    iconsEl.style.left = '282px';
-    iconsEl.style.top  = '44px';
+    iconsEl.style.left = '273px';
+    iconsEl.style.top  = '43px';
     iconsEl.innerHTML = '';
     [g('battleIcon1')?.value, g('battleIcon2')?.value, g('battleIcon3')?.value].forEach(v => {
       if (!v) return;
@@ -210,7 +210,7 @@ function render() {
       starsEl.appendChild(img); running+=v;
     });
     starsEl.style.left   = '37px';
-    starsEl.style.top    = '478px';
+    starsEl.style.top    = '463px';
     starsEl.style.bottom = '';
     starsEl.style.display = 'flex';
   } else { starsEl.style.display = 'none'; }
@@ -220,7 +220,7 @@ function render() {
   if (stampEl) {
     stampEl.src = assetUrl('stamp/wave11_tbc.svg');
     stampEl.style.left    = (starCount > 0 ? 213 : 33) + 'px';
-    stampEl.style.top     = '473px';
+    stampEl.style.top     = '458px';
     stampEl.style.width   = '20px';
     stampEl.style.height  = 'auto';
     stampEl.style.display = 'block';
@@ -229,14 +229,14 @@ function render() {
   // Footer
   g('tWave').textContent    = g('cardWave').value;
   g('tWave').style.left     = '87px';
-  g('tWave').style.bottom   = '39px';
+  g('tWave').style.bottom   = '38px';
   const _idParts = [g('cardRarity').value, g('cardNum').value].filter(Boolean).join('  ');
   const _total   = g('cardTotal').value;
   g('tId').textContent = _total ? _idParts + '   ' + _total : _idParts;
   g('tId').style.left       = '136px';
-  g('tId').style.bottom     = '39px';
+  g('tId').style.bottom     = '38px';
   g('tCredit').innerHTML    = g('cardCredit').value || '';
-  g('tCredit').style.bottom = '39px';
+  g('tCredit').style.bottom = '38px';
   g('tCredit').style.right  = '40px';
 
   saveToStorage();
@@ -440,7 +440,7 @@ function resetProgress() {
 async function exportPNG() {
   const btn = g('exportBtn'); btn.textContent='Generating…'; btn.disabled=true;
   try {
-    await exportCard(g('card'), buildFilename()+'.png', { shiftMap: EXPORT_SHIFT, leftShiftMap: { tBattleIcons: -9.5, lStamp: 3 }, iconNudge: 2 });
+    await exportCard(g('card'), buildFilename()+'.png', { shiftMap: EXPORT_SHIFT, leftShiftMap: { tBattleIcons: -0.5, lStamp: 3 }, iconNudge: 2, scale: 844/380, exportW: 844, exportH: 1139 });
   } catch(e) { alert('Export failed: '+e.message); }
   finally { btn.textContent = 'Export PNG ↓'; updateProgress(); }
 }
@@ -577,7 +577,7 @@ function getHTML() {
       <div class="card-col">
         <div class="card-col-label" id="frontLabel">BATTLE ACTION</div>
         <div class="card-wrapper" id="cardWrapper">
-          <div class="card" id="card">
+          <div class="card" id="card" style="height:513px;">
             <img id="lArt" class="card-layer" style="display:none;object-fit:cover;object-position:center top;mix-blend-mode:normal;">
             <img id="lHeaderMask"    class="card-layer" alt="">
             <img id="lTextbox"       class="card-layer" alt="">
