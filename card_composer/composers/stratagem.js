@@ -46,18 +46,23 @@ function render() {
   const faction = g('faction').value;
 
   // Clear all front layers
-  ['lMainFrame','lHeaderBg','lHeaderGrid','lHeaderCorner',
-   'lHeaderLine','lHeaderOverlayBg','lHeaderOverlay','lSetSlash'].forEach(id => setLayer(id, null));
+  ['lMainFrame','lBlackBg','lHeaderBg','lHeaderGrid',
+   'lHeaderLine','lHeaderOverlayBg','lHeaderOverlay','lBorderBottom',
+   'lTextboxOverlayBg','lTextbox','lTextboxOverlay','lSetSlash'].forEach(id => setLayer(id, null));
 
   // Layers — back to front
-  setLayer('lMainFrame',       sf('Stratagem - Standard - Art Border.png'));
+  setLayer('lMainFrame',       sf('Stratagem - Small - Art Border.png'));
+  setLayer('lBlackBg',         sf('Stratagem - Small - Black Background.png'));
   setLayer('lHeaderBg',        sf('Stratagem - Small - Header.png'));
-  setLayer('lHeaderGrid',      sf('Stratagem - Small - Header Grid Black.png'));
-  setLayer('lHeaderCorner',    sf('Stratagem - Small - Header Corner.png'));
+  setLayer('lHeaderGrid', sf(faction ? 'Stratagem - Small - Header Grid White.png' : 'Stratagem - Small - Header Grid Black.png'));
   setLayer('lHeaderLine',      sf('Stratagem - Small - Header Line.png'));
   setLayer('lHeaderOverlayBg', sf('Stratagem - Small - Header Overlay Background.png'));
   if (faction) setLayer('lHeaderOverlay', sf(`Stratagem - Small - Header Overlay ${faction}.png`));
-  setLayer('lSetSlash', sf('Stratagem - Small - Set Slash.png'));
+  setLayer('lBorderBottom',     sf('Stratagem - Small - Border Bottom.png'));
+  setLayer('lTextboxOverlayBg', sf('Stratagem - Small - Textbox Overlay Background.png'));
+  setLayer('lTextbox',          sf('Stratagem - Small - Textbox.png'));
+  if (faction) setLayer('lTextboxOverlay', sf(`Stratagem - Small - Textbox Overlay ${faction}.png`));
+  setLayer('lSetSlash',         sf('Stratagem - Small - Set Slash.png'));
 
   // Artwork
   const artEl = g('lArt');
@@ -604,13 +609,17 @@ function getHTML() {
           <div class="card" id="card" style="height:513px;">
             <img id="lArt"           class="card-layer" style="display:none;object-fit:cover;object-position:center top;">
             <img id="lMainFrame"     class="card-layer" alt="">
-            <img id="lHeaderBg"      class="card-layer" alt="">
-            <img id="lHeaderGrid"    class="card-layer" alt="">
-            <img id="lHeaderCorner"  class="card-layer" alt="">
-            <img id="lHeaderLine"    class="card-layer" alt="">
+            <img id="lBlackBg"       class="card-layer" alt="">
             <img id="lHeaderOverlayBg" class="card-layer" alt="">
+            <img id="lHeaderBg"      class="card-layer" alt="">
+            <img id="lHeaderLine"    class="card-layer" alt="">
             <img id="lHeaderOverlay" class="card-layer" alt="">
-            <img id="lSetSlash"      class="card-layer" alt="">
+            <img id="lHeaderGrid"    class="card-layer" alt="">
+            <img id="lBorderBottom"      class="card-layer" alt="">
+            <img id="lTextboxOverlayBg"  class="card-layer" alt="">
+            <img id="lTextbox"           class="card-layer" alt="">
+            <img id="lTextboxOverlay"    class="card-layer" alt="">
+            <img id="lSetSlash"          class="card-layer" alt="">
 
             <div id="tName" class="card-text" style="top:29px;left:13px;right:40px;font-family:'BayformersName','Segoe UI',sans-serif;font-size:22px;color:#fff;text-transform:uppercase;letter-spacing:0.5px;line-height:1;white-space:nowrap;overflow:hidden;"></div>
             <div id="tTarget" class="card-text" style="top:55px;left:13px;right:6px;font-family:'OpenSansSCMedItal',sans-serif;font-size:8px;color:#fff;text-transform:uppercase;letter-spacing:0.8px;white-space:nowrap;overflow:hidden;display:none;"></div>
