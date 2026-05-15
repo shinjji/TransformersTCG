@@ -154,30 +154,26 @@ function renderBack() {
   const faction = g('faction').value;
 
   // Clear all back layers
-  ['lBlackBg','lArt','lArtBorder','lBorder','lBorderBottom',
-   'lHeaderBg','lHeaderOverlayBg','lHeaderOverlay',
-   'lTextbox','lTextboxOverlayBg','lTextboxOverlay',
-   'lStatFrame','lStatAtk','lStatDef','lStatHp','lSetSlash'
+  ['lArt','lArtBorder',
+   'lTextboxOverlayBg','lBorderBottom','lTextbox','lTextboxOverlay',
+   'lStatFrame','lStatAtk','lStatDef','lStatHp'
   ].forEach(id => setBackLayer(id, null));
 
   // Back layers — back to front
-  setBackLayer('lBlackBg',          sf('Stratagem - Small - Black Background.png'));
   setBackLayer('lArtBorder',        sf('Stratagem - Small - Art Border.png'));
-  setBackLayer('lBorder',           sf('Stratagem - Small - Border Regular.png'));
-  setBackLayer('lBorderBottom',     sf('Stratagem - Small - Border Bottom.png'));
-  setBackLayer('lHeaderBg',         sf('Stratagem - Small - Header.png'));
-  setBackLayer('lHeaderOverlayBg',  sf('Stratagem - Small - Header Overlay Background.png'));
-  if (faction) setBackLayer('lHeaderOverlay', sf(`Stratagem - Small - Header Overlay ${faction}.png`));
-  setBackLayer('lTextbox',          sf('Stratagem - Small - Textbox.png'));
-  setBackLayer('lTextboxOverlayBg', sf('Stratagem - Small - Textbox Overlay Background.png'));
-  if (faction) setBackLayer('lTextboxOverlay', sf(`Stratagem - Small - Textbox Overlay ${faction}.png`));
-  setBackLayer('lStatFrame',        sf('Stratagem - Small - Stat Frame.png'));
-  setBackLayer('lSetSlash',         sf('Stratagem - Small - Set Slash.png'));
-
+  const hasBackAbility = (g('altAbilityBody').value || '').trim().length > 0;
+  if (hasBackAbility) {
+    setBackLayer('lTextboxOverlayBg', sf('Stratagem - Small - Textbox Overlay Background.png'));
+    setBackLayer('lBorderBottom',     sf('Stratagem - Small - Border Bottom.png'));
+    setBackLayer('lTextbox',          sf('Stratagem - Small - Textbox.png'));
+    if (faction) setBackLayer('lTextboxOverlay', sf(`Stratagem - Small - Textbox Overlay ${faction}.png`));
+  }
   // Conditional stat layers
   const atkVal = parseInt(g('statAtk').value) || 0;
   const defVal = parseInt(g('statDef').value) || 0;
   const hpVal  = parseInt(g('statHp').value)  || 0;
+  const hasStats = atkVal > 0 || defVal > 0 || hpVal > 0;
+  if (hasStats) setBackLayer('lStatFrame', sf('Stratagem - Small - Stat Frame.png'));
   if (atkVal > 0) setBackLayer('lStatAtk', sf('Stratagem - Small - Stat Attack.png'));
   if (defVal > 0) setBackLayer('lStatDef', sf('Stratagem - Small - Stat Defense.png'));
   if (hpVal  > 0) setBackLayer('lStatHp',  sf('Stratagem - Small - Stat Health.png'));
@@ -193,16 +189,6 @@ function renderBack() {
       bArtEl.style.height = scale + '%'; bArtEl.style.width = '100%';
       bArtEl.style.objectFit = 'cover'; bArtEl.style.objectPosition = 'center top';
     } else { bArtEl.src = ''; bArtEl.style.display = 'none'; }
-  }
-
-  // Back name + target
-  const bName = g('b_tName');
-  if (bName) bName.textContent = (g('cardName').value || 'STRATAGEM NAME').toUpperCase();
-  const bTarget = g('b_tTarget');
-  if (bTarget) {
-    const t = (g('cardTarget').value || '').toUpperCase();
-    bTarget.textContent = t;
-    bTarget.style.display = t ? '' : 'none';
   }
 
   // Back stat values
@@ -233,36 +219,9 @@ function renderBack() {
   const bAbBody = g('b_tAbilityBody');
   if (bAbBody) bAbBody.innerHTML = formatAbilityText(g('altAbilityBody').value);
 
-  // Back stars — same as front, on back card
-  const bStarsEl   = g('b_tStarsFooter');
-  if (bStarsEl) {
-    const backStarCount = parseInt(g('starCount').value) || 0;
-    bStarsEl.innerHTML = '';
-    if (backStarCount > 0) {
-      const use10 = g('starsUse10')?.checked;
-      const use5  = g('starsUse5')?.checked;
-      let sc = backStarCount; const imgs = [];
-      if (use10) { const n=Math.floor(sc/10); sc%=10; for(let i=0;i<n;i++) imgs.push(10); }
-      if (use5)  { const n=Math.floor(sc/5);  sc%=5;  for(let i=0;i<n;i++) imgs.push(5);  }
-      for (let i=0;i<sc;i++) imgs.push(1);
-      imgs.forEach(v => {
-        const img = document.createElement('img');
-        img.src = cc('icons', `Icon - Stars ${v}.png`); img.style.cssText='height:12px;width:auto;';
-        bStarsEl.appendChild(img);
-      });
-      bStarsEl.style.display = 'flex';
-    } else { bStarsEl.style.display = 'none'; }
-  }
-
-  // Back footer — wave/id hidden, credit shown
+  // Back footer — wave/id hidden
   const bWave = g('b_tWave'); if (bWave) { bWave.textContent = ''; bWave.style.display = 'none'; }
   const bId   = g('b_tId');   if (bId)   { bId.textContent   = ''; bId.style.display   = 'none'; }
-  const bCredit = g('b_tCredit');
-  if (bCredit) {
-    bCredit.innerHTML    = g('cardCredit').value || '';
-    bCredit.style.bottom = '39px';
-    bCredit.style.right  = '40px';
-  }
 }
 
 /* ── Artwork loaders ────────────────────────────────────────────────────── */
@@ -641,25 +600,16 @@ function getHTML() {
         <div class="card-col-label" id="backLabel">STRATAGEM BACK</div>
         <div class="card-wrapper" id="b_cardWrapper">
           <div class="card" id="b_card" style="height:513px;">
-            <img id="b_lBlackBg"        class="card-layer" alt="">
             <img id="b_lArt"            class="card-layer" style="display:none;object-fit:cover;object-position:center top;">
             <img id="b_lArtBorder"      class="card-layer" alt="">
-            <img id="b_lBorder"         class="card-layer" alt="">
-            <img id="b_lBorderBottom"   class="card-layer" alt="">
-            <img id="b_lHeaderBg"       class="card-layer" alt="">
-            <img id="b_lHeaderOverlayBg" class="card-layer" alt="">
-            <img id="b_lHeaderOverlay"  class="card-layer" alt="">
-            <img id="b_lTextbox"        class="card-layer" alt="">
             <img id="b_lTextboxOverlayBg" class="card-layer" alt="">
+            <img id="b_lBorderBottom"   class="card-layer" alt="">
+            <img id="b_lTextbox"        class="card-layer" alt="">
             <img id="b_lTextboxOverlay" class="card-layer" alt="">
             <img id="b_lStatFrame"      class="card-layer" alt="">
             <img id="b_lStatAtk"        class="card-layer" alt="" style="display:none;">
             <img id="b_lStatDef"        class="card-layer" alt="" style="display:none;">
             <img id="b_lStatHp"         class="card-layer" alt="" style="display:none;">
-            <img id="b_lSetSlash"       class="card-layer" alt="">
-
-            <div id="b_tName" class="card-text" style="top:29px;left:13px;right:40px;font-family:'BayformersName','Segoe UI',sans-serif;font-size:22px;color:#fff;text-transform:uppercase;letter-spacing:0.5px;line-height:1;white-space:nowrap;overflow:hidden;"></div>
-            <div id="b_tTarget" class="card-text" style="top:55px;left:13px;right:6px;font-family:'OpenSansSCMedItal',sans-serif;font-size:8px;color:#fff;text-transform:uppercase;letter-spacing:0.8px;white-space:nowrap;overflow:hidden;display:none;"></div>
             <span id="b_tAtk" class="card-text" style="display:none;font-family:'ArmadaCondensed',sans-serif;font-size:24px;font-weight:700;color:#fff;line-height:1;top:402px;left:48px;"></span>
             <span id="b_tDef" class="card-text" style="display:none;font-family:'ArmadaCondensed',sans-serif;font-size:24px;font-weight:700;color:#fff;line-height:1;top:402px;left:270px;"></span>
             <span id="b_tHp"  class="card-text" style="display:none;font-family:'ArmadaCondensed',sans-serif;font-size:24px;font-weight:700;color:#fff;line-height:1;top:402px;left:160px;"></span>
@@ -668,8 +618,6 @@ function getHTML() {
             </div>
             <span id="b_tWave"   class="card-text" style="display:none;"></span>
             <span id="b_tId"     class="card-text" style="display:none;"></span>
-            <div  id="b_tCredit" class="card-text" style="font-size:10px;color:#fff;text-align:right;line-height:1.35;font-family:'OpenSansBold',sans-serif;bottom:39px;right:40px;"></div>
-            <div  id="b_tStarsFooter" class="card-text" style="display:none;align-items:center;gap:2px;top:463px;left:37px;"></div>
           </div><!-- .card back -->
         </div><!-- .card-wrapper back -->
       </div><!-- .card-col back -->
