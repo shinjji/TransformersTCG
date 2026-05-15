@@ -545,19 +545,13 @@ function getHTML() {
     <div class="section" id="sec-ability">
       <div class="section-header" onclick="toggleSec('ability')">Ability Text <span class="chevron">▾</span></div>
       <div class="section-body">
-        <div style="font-size:9px;color:var(--label);letter-spacing:0.7px;text-transform:uppercase;margin-bottom:4px;">Front (Play Effect)</div>
-        <div class="row-2">
-          <div class="field"><label>Font Size</label><input type="number" id="abilityFontSize" value="8" min="4" max="20" step="0.5" oninput="render()"></div>
-        </div>
-        <div class="field"><label>Text</label><textarea id="abilityBody" oninput="render()" style="min-height:100px;"></textarea></div>
-        <div class="field"><label>Position</label><div style="display:flex;align-items:center;gap:6px;"><input type="range" id="posAbilityBox" min="0" max="50" step="0.1" value="18" oninput="g('posAbilityBoxVal').textContent=this.value+'%';render()" style="flex:1;"><span id="posAbilityBoxVal" style="font-size:10px;color:var(--muted);min-width:34px;">18%</span></div></div>
+        <div class="field"><label>Front Font Size</label><input type="number" id="abilityFontSize" value="8" min="4" max="20" step="0.5" oninput="render()"></div>
+        <div class="field"><label>Front Text</label><textarea id="abilityBody" oninput="render()" style="min-height:100px;"></textarea></div>
+        <div class="field"><label>Front Position</label><div style="display:flex;align-items:center;gap:6px;"><input type="range" id="posAbilityBox" min="0" max="50" step="0.1" value="18" oninput="g('posAbilityBoxVal').textContent=this.value+'%';render()" style="flex:1;"><span id="posAbilityBoxVal" style="font-size:10px;color:var(--muted);min-width:34px;">18%</span></div></div>
         <div style="margin-top:8px;padding-top:8px;border-top:1px solid var(--border);">
-          <div style="font-size:9px;color:var(--label);letter-spacing:0.7px;text-transform:uppercase;margin-bottom:4px;">Back (While Attached)</div>
-          <div class="row-2">
-            <div class="field"><label>Font Size</label><input type="number" id="altAbilityFontSize" value="8" min="4" max="20" step="0.5" oninput="renderBack()"></div>
-          </div>
-          <div class="field"><label>Text</label><textarea id="altAbilityBody" oninput="renderBack()" style="min-height:80px;"></textarea></div>
-          <div class="field"><label>Position</label><div style="display:flex;align-items:center;gap:6px;"><input type="range" id="posAltAbilityBox" min="0" max="50" step="0.1" value="18" oninput="g('posAltAbilityBoxVal').textContent=this.value+'%';renderBack()" style="flex:1;"><span id="posAltAbilityBoxVal" style="font-size:10px;color:var(--muted);min-width:34px;">18%</span></div></div>
+          <div class="field"><label>Back Font Size</label><input type="number" id="altAbilityFontSize" value="8" min="4" max="20" step="0.5" oninput="renderBack()"></div>
+          <div class="field"><label>Back Text</label><textarea id="altAbilityBody" oninput="renderBack()" style="min-height:80px;"></textarea></div>
+          <div class="field"><label>Back Position</label><div style="display:flex;align-items:center;gap:6px;"><input type="range" id="posAltAbilityBox" min="0" max="50" step="0.1" value="18" oninput="g('posAltAbilityBoxVal').textContent=this.value+'%';renderBack()" style="flex:1;"><span id="posAltAbilityBoxVal" style="font-size:10px;color:var(--muted);min-width:34px;">18%</span></div></div>
         </div>
       </div>
     </div>
@@ -634,7 +628,7 @@ function getHTML() {
             <div id="tName" class="card-text" style="top:29px;left:13px;right:40px;font-family:'BayformersName','Segoe UI',sans-serif;font-size:22px;color:#fff;text-transform:uppercase;letter-spacing:0.5px;line-height:1;white-space:nowrap;overflow:hidden;"></div>
             <div id="tTarget" class="card-text" style="top:55px;left:13px;right:6px;font-family:'OpenSansSCMedItal',sans-serif;font-size:8px;color:#fff;text-transform:uppercase;letter-spacing:0.8px;white-space:nowrap;overflow:hidden;display:none;"></div>
             <div id="tStratLabel" class="card-text" style="top:299px;left:52px;font-family:'BattleCardType',sans-serif;font-size:13px;color:#fff;text-transform:uppercase;letter-spacing:0px;"></div>
-            <div id="abilityBox" class="card-text" style="bottom:18%;left:10%;right:10%;font-size:8px;line-height:1.55;color:#1a1a1a;text-align:center;">
+            <div id="abilityBox" class="card-text" style="bottom:18%;left:13%;right:13%;font-size:8px;line-height:1.3;color:#1a1a1a;text-align:center;">
               <div id="tAbilityBody" style="font-family:'GothamNarrow','Arial',sans-serif;"></div>
             </div>
             <span id="tWave"   class="card-text" style="font-size:10px;color:#fff;font-weight:600;letter-spacing:0.8px;text-transform:uppercase;font-family:'OpenSansBold',sans-serif;bottom:39px;"></span>
@@ -665,7 +659,7 @@ function getHTML() {
             <span id="b_tAtk" class="card-text" style="display:none;font-family:'ArmadaCondensed',sans-serif;font-size:24px;font-weight:700;color:#fff;line-height:1;top:402px;left:48px;"></span>
             <span id="b_tDef" class="card-text" style="display:none;font-family:'ArmadaCondensed',sans-serif;font-size:24px;font-weight:700;color:#fff;line-height:1;top:402px;left:270px;"></span>
             <span id="b_tHp"  class="card-text" style="display:none;font-family:'ArmadaCondensed',sans-serif;font-size:24px;font-weight:700;color:#fff;line-height:1;top:402px;left:160px;"></span>
-            <div id="b_abilityBox" class="card-text" style="bottom:18%;left:10%;right:10%;font-size:8px;line-height:1.55;color:#1a1a1a;text-align:center;">
+            <div id="b_abilityBox" class="card-text" style="bottom:18%;left:13%;right:13%;font-size:8px;line-height:1.3;color:#1a1a1a;text-align:center;">
               <div id="b_tAbilityBody" style="font-family:'GothamNarrow','Arial',sans-serif;"></div>
             </div>
             <span id="b_tWave"   class="card-text" style="display:none;"></span>
