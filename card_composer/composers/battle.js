@@ -440,7 +440,7 @@ function resetProgress() {
 async function exportPNG() {
   const btn = g('exportBtn'); btn.textContent='Generating…'; btn.disabled=true;
   try {
-    await exportCard(g('card'), buildFilename()+'.png', { shiftMap: EXPORT_SHIFT, leftShiftMap: { tBattleIcons: -9.5 }, iconNudge: 2 });
+    await exportCard(g('card'), buildFilename()+'.png', { shiftMap: EXPORT_SHIFT, leftShiftMap: { tBattleIcons: -9.5, lStamp: 3 }, iconNudge: 2 });
   } catch(e) { alert('Export failed: '+e.message); }
   finally { btn.textContent = 'Export PNG ↓'; updateProgress(); }
 }
