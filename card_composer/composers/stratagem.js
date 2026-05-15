@@ -91,12 +91,21 @@ function render() {
 
   // Name
   const nameText = (g('cardName').value || 'STRATAGEM NAME').toUpperCase();
-  g('tName').textContent = nameText;
+  g('tName').textContent    = nameText;
+  g('tName').style.left     = '50px';
+  g('tName').style.top      = '48px';
+  g('tName').style.fontSize = '29px';
 
-  // Target (Cybertonian watermark-style label)
+  // Target
   const targetText = (g('cardTarget').value || '').toUpperCase();
-  g('tTarget').textContent    = targetText;
-  g('tTarget').style.display  = targetText ? '' : 'none';
+  g('tTarget').textContent      = targetText;
+  g('tTarget').style.left       = '0';
+  g('tTarget').style.right      = '0';
+  g('tTarget').style.top        = '80px';
+  g('tTarget').style.fontSize   = '11px';
+  g('tTarget').style.textAlign  = 'center';
+  g('tTarget').style.color      = faction ? '#fff' : '#000';
+  g('tTarget').style.display    = targetText ? '' : 'none';
 
   // STRATAGEM type label
   g('tStratLabel').textContent = 'Stratagem';
@@ -490,8 +499,8 @@ function getHTML() {
           <label>Name</label>
           <input type="text" id="cardName" value="STRATAGEM NAME" oninput="render()">
         </div>
-        <div class="field">
-          <label>Target Character</label>
+        <div class="field" style="margin-top:8px;padding-top:8px;border-top:1px solid var(--border);">
+          <label>Target</label>
           <input type="text" id="cardTarget" value="" placeholder="e.g. OPTIMUS PRIME" oninput="render()">
         </div>
       </div>
