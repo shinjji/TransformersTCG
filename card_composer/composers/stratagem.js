@@ -30,6 +30,10 @@ const EXPORT_SHIFT = {
   tId:          1,
   tCredit:      1,
   tStarsFooter: 1,
+  lStamp:       0,
+  tAtk:         0,
+  tDef:         0,
+  tHp:          0,
 };
 
 /* ── Helpers ────────────────────────────────────────────────────────────── */
@@ -463,7 +467,7 @@ function confirmLoadJSON() {
 function buildFilename(side) {
   const waveNum = (g('cardWave').value || '').match(/\d+/)?.[0] || '0';
   const idVal   = (g('cardNum').value || '').trim();
-  const idMatch = idVal.match(/T(\d+)/) || idVal.match(/^(\d+)$/);
+  const idMatch = idVal.match(/S(\d+)/) || idVal.match(/T(\d+)/) || idVal.match(/^(\d+)$/);
   const cardNum = idMatch ? idMatch[1].padStart(3,'0') : '000';
   return `FMW${waveNum}_S_${cardNum}_${side}`;
 }
