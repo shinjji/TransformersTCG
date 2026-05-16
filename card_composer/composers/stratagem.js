@@ -243,18 +243,30 @@ function renderBack() {
   // Back stat values
   const bAtk = g('b_tAtk');
   if (bAtk) {
-    if (atkVal > 0) { bAtk.textContent = '+' + atkVal; bAtk.style.display = ''; }
-    else { bAtk.style.display = 'none'; }
+    if (atkVal > 0) {
+      bAtk.textContent  = '+' + atkVal;
+      bAtk.style.left   = '48px';
+      bAtk.style.top    = '421px';
+      bAtk.style.display = '';
+    } else { bAtk.style.display = 'none'; }
   }
   const bDef = g('b_tDef');
   if (bDef) {
-    if (defVal > 0) { bDef.textContent = '+' + defVal; bDef.style.display = ''; }
-    else { bDef.style.display = 'none'; }
+    if (defVal > 0) {
+      bDef.textContent  = '+' + defVal;
+      bDef.style.left   = '288px';
+      bDef.style.top    = '421px';
+      bDef.style.display = '';
+    } else { bDef.style.display = 'none'; }
   }
   const bHp = g('b_tHp');
   if (bHp) {
-    if (hpVal > 0) { bHp.textContent = '+' + hpVal; bHp.style.display = ''; }
-    else { bHp.style.display = 'none'; }
+    if (hpVal > 0) {
+      bHp.textContent  = '+' + hpVal;
+      bHp.style.left   = '164px';
+      bHp.style.top    = '421px';
+      bHp.style.display = '';
+    } else { bHp.style.display = 'none'; }
   }
 
   // Back ability text
@@ -538,7 +550,7 @@ function getHTML() {
           <div class="field"><label>DEF</label><input type="number" id="statDef" value="0" min="0" max="99" oninput="render()"></div>
         </div>
         <div class="field">
-          <label>HP</label><input type="number" id="statHp" value="0" min="0" max="99" oninput="render()" style="max-width:80px;">
+          <label>HP</label><input type="number" id="statHp" value="0" min="0" max="99" oninput="render()">
         </div>
       </div>
     </div>
@@ -657,9 +669,9 @@ function getHTML() {
             <img id="b_lStatAtk"        class="card-layer" alt="" style="display:none;">
             <img id="b_lStatDef"        class="card-layer" alt="" style="display:none;">
             <img id="b_lStatHp"         class="card-layer" alt="" style="display:none;">
-            <span id="b_tAtk" class="card-text" style="display:none;font-family:'ArmadaCondensed',sans-serif;font-size:24px;font-weight:700;color:#fff;line-height:1;top:402px;left:48px;"></span>
-            <span id="b_tDef" class="card-text" style="display:none;font-family:'ArmadaCondensed',sans-serif;font-size:24px;font-weight:700;color:#fff;line-height:1;top:402px;left:270px;"></span>
-            <span id="b_tHp"  class="card-text" style="display:none;font-family:'ArmadaCondensed',sans-serif;font-size:24px;font-weight:700;color:#fff;line-height:1;top:402px;left:160px;"></span>
+            <span id="b_tAtk" class="card-text" style="display:none;font-family:'ArmadaCondensed',sans-serif;font-size:24px;font-weight:700;color:#fff;line-height:1;letter-spacing:4px;top:402px;left:48px;"></span>
+            <span id="b_tDef" class="card-text" style="display:none;font-family:'ArmadaCondensed',sans-serif;font-size:24px;font-weight:700;color:#fff;line-height:1;letter-spacing:4px;top:402px;left:270px;"></span>
+            <span id="b_tHp"  class="card-text" style="display:none;font-family:'ArmadaCondensed',sans-serif;font-size:24px;font-weight:700;color:#fff;line-height:1;letter-spacing:4px;top:402px;left:160px;"></span>
             <div id="b_abilityBox" class="card-text" style="bottom:18%;left:13%;right:13%;font-size:8px;line-height:1.3;color:#1a1a1a;text-align:center;">
               <div id="b_tAbilityBody" style="font-family:'GothamNarrow','Arial',sans-serif;"></div>
             </div>
