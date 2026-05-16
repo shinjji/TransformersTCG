@@ -159,7 +159,7 @@ function render() {
   const stampEl = g('lStamp');
   if (stampEl) {
     stampEl.src = assetUrl('stamp/wave11_tbc.svg');
-    stampEl.style.left    = (starCount > 0 ? 213 : 35) + 'px';
+    stampEl.style.left    = (starCount > 0 ? 100 : 35) + 'px';
     stampEl.style.top     = '458px';
     stampEl.style.width   = '20px';
     stampEl.style.height  = 'auto';
@@ -168,15 +168,16 @@ function render() {
 
   // Footer
   g('tWave').textContent    = g('cardWave').value;
-  g('tWave').style.left     = '87px';
-  g('tWave').style.bottom   = '39px';
-  const _idParts = [g('cardRarity').value, g('cardNum').value].filter(Boolean).join('  ');
+  g('tWave').style.left     = '195px';
+  g('tWave').style.bottom   = '38px';
+  const _rarity  = g('cardRarity').value;
+  const _idParts = [_rarity, g('cardNum').value].filter(Boolean).join('  ');
   const _total   = g('cardTotal').value;
   g('tId').textContent   = _total ? _idParts + '   ' + _total : _idParts;
-  g('tId').style.left    = '136px';
-  g('tId').style.bottom  = '39px';
+  g('tId').style.left    = '126px';
+  g('tId').style.bottom  = '38px';
   g('tCredit').innerHTML    = g('cardCredit').value || '';
-  g('tCredit').style.bottom = '39px';
+  g('tCredit').style.bottom = '38px';
   g('tCredit').style.right  = '40px';
 
   saveToStorage();
