@@ -52,7 +52,7 @@ function render() {
 
   // Clear all front layers
   ['lMainFrame','lBlackBg','lHeaderBg','lHeaderGrid',
-   'lHeaderLine','lHeaderOverlayBg','lHeaderOverlay','lBorderBottom',
+   'lHeaderLine','lHeaderCorner','lHeaderOverlayBg','lHeaderOverlay','lBorderBottom',
    'lTextboxOverlayBg','lTextbox','lTextboxOverlay','lSetSlash'].forEach(id => setLayer(id, null));
 
   // Faction icon — front
@@ -75,6 +75,7 @@ function render() {
   setLayer('lHeaderBg',        sf('Stratagem - Small - Header.png'));
   setLayer('lHeaderGrid', sf(faction ? 'Stratagem - Small - Header Grid White.png' : 'Stratagem - Small - Header Grid Black.png'));
   setLayer('lHeaderLine',      sf('Stratagem - Small - Header Line.png'));
+  setLayer('lHeaderCorner',    sf('Stratagem - Small - Header Corner.png'));
   setLayer('lHeaderOverlayBg', sf('Stratagem - Small - Header Overlay Background.png'));
   if (faction) setLayer('lHeaderOverlay', sf(`Stratagem - Small - Header Overlay ${faction}.png`));
   setLayer('lBorderBottom',     sf('Stratagem - Small - Border Bottom.png'));
@@ -216,7 +217,7 @@ function renderBack() {
   setBackLayer('lArtBorder',        sf('Stratagem - Small - Art Border.png'));
   const hasBackAbility = (g('altAbilityBody').value || '').trim().length > 0;
   if (hasBackAbility) {
-    setBackLayer('lBlackBg',          sf('Stratagem - Small - Black Background.png'));
+    setBackLayer('lBlackBg',          sf('Stratagem - Small - Black Background Back.png'));
     setBackLayer('lTextboxOverlayBg', sf('Stratagem - Small - Textbox Overlay Background.png'));
     setBackLayer('lBorderBottom',     sf('Stratagem - Small - Border Bottom.png'));
     setBackLayer('lTextbox',          sf('Stratagem - Small - Textbox.png'));
@@ -639,6 +640,7 @@ function getHTML() {
             <img id="lArt"           class="card-layer" style="display:none;object-fit:cover;object-position:center top;">
             <img id="lMainFrame"     class="card-layer" alt="">
             <img id="lBlackBg"       class="card-layer" alt="">
+            <img id="lHeaderCorner"    class="card-layer" alt="">
             <img id="lHeaderOverlayBg" class="card-layer" alt="">
             <img id="lHeaderBg"      class="card-layer" alt="">
             <img id="lHeaderLine"    class="card-layer" alt="">
