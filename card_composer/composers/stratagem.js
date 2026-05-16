@@ -118,7 +118,7 @@ function render() {
   g('tStratLabel').textContent     = 'Stratagem';
   g('tStratLabel').style.left      = '0';
   g('tStratLabel').style.right     = '0';
-  g('tStratLabel').style.top       = '304px';
+  g('tStratLabel').style.top       = '305px';
   g('tStratLabel').style.textAlign = 'center';
   g('tStratLabel').style.color     = faction ? '#fff' : '#000';
 
@@ -191,8 +191,8 @@ function renderBack() {
 
   // Clear all back layers
   ['lArt','lArtBorder',
-   'lTextboxOverlayBg','lBorderBottom','lTextbox','lTextboxOverlay',
-   'lStatFrame','lStatAtk','lStatDef','lStatHp'
+   'lBlackBg','lTextboxOverlayBg','lBorderBottom','lTextbox','lTextboxOverlay',
+   'lStatFrame','lStatAtk','lStatDef','lStatHp','lMainFrame'
   ].forEach(id => setBackLayer(id, null));
 
   // Faction icon — back
@@ -212,10 +212,20 @@ function renderBack() {
   setBackLayer('lArtBorder',        sf('Stratagem - Small - Art Border.png'));
   const hasBackAbility = (g('altAbilityBody').value || '').trim().length > 0;
   if (hasBackAbility) {
+    setBackLayer('lBlackBg',          sf('Stratagem - Small - Black Background.png'));
     setBackLayer('lTextboxOverlayBg', sf('Stratagem - Small - Textbox Overlay Background.png'));
     setBackLayer('lBorderBottom',     sf('Stratagem - Small - Border Bottom.png'));
     setBackLayer('lTextbox',          sf('Stratagem - Small - Textbox.png'));
     if (faction) setBackLayer('lTextboxOverlay', sf(`Stratagem - Small - Textbox Overlay ${faction}.png`));
+    setBackLayer('lMainFrame',        sf('Stratagem - Small - Art Border.png'));
+  }
+  const bStratLabel = g('b_tStratLabel');
+  if (bStratLabel) {
+    if (hasBackAbility) {
+      bStratLabel.textContent  = 'Stratagem';
+      bStratLabel.style.color  = faction ? '#fff' : '#000';
+      bStratLabel.style.display = '';
+    } else { bStratLabel.style.display = 'none'; }
   }
   // Conditional stat layers
   const atkVal = parseInt(g('statAtk').value) || 0;
@@ -660,6 +670,7 @@ function getHTML() {
           <div class="card" id="b_card" style="height:513px;">
             <img id="b_lArt"            class="card-layer" style="display:none;object-fit:cover;object-position:center top;">
             <img id="b_lArtBorder"      class="card-layer" alt="">
+            <img id="b_lBlackBg"        class="card-layer" alt="">
             <img id="b_lTextboxOverlayBg" class="card-layer" alt="">
             <img id="b_lBorderBottom"   class="card-layer" alt="">
             <img id="b_lTextbox"        class="card-layer" alt="">
@@ -669,9 +680,11 @@ function getHTML() {
             <img id="b_lStatAtk"        class="card-layer" alt="" style="display:none;">
             <img id="b_lStatDef"        class="card-layer" alt="" style="display:none;">
             <img id="b_lStatHp"         class="card-layer" alt="" style="display:none;">
+            <img id="b_lMainFrame"      class="card-layer" alt="">
             <span id="b_tAtk" class="card-text" style="display:none;font-family:'ArmadaCondensed',sans-serif;font-size:24px;font-weight:700;color:#fff;line-height:1;letter-spacing:4px;top:402px;left:48px;"></span>
             <span id="b_tDef" class="card-text" style="display:none;font-family:'ArmadaCondensed',sans-serif;font-size:24px;font-weight:700;color:#fff;line-height:1;letter-spacing:4px;top:402px;left:270px;"></span>
             <span id="b_tHp"  class="card-text" style="display:none;font-family:'ArmadaCondensed',sans-serif;font-size:24px;font-weight:700;color:#fff;line-height:1;letter-spacing:4px;top:402px;left:160px;"></span>
+            <div id="b_tStratLabel" class="card-text" style="display:none;left:0;right:0;top:305px;font-family:'BattleCardType',sans-serif;font-size:13px;text-transform:uppercase;letter-spacing:0px;text-align:center;pointer-events:none;"></div>
             <div id="b_abilityBox" class="card-text" style="bottom:18%;left:13%;right:13%;font-size:8px;line-height:1.3;color:#1a1a1a;text-align:center;">
               <div id="b_tAbilityBody" style="font-family:'GothamNarrow','Arial',sans-serif;"></div>
             </div>
